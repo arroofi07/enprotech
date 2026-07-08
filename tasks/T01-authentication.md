@@ -91,7 +91,7 @@ SEED_ADMIN_PASSWORD=
 - Admin seed — `admin@enprotech.local` (via `bun run db:seed`)
 
 ### Catatan sisa
-- **Approve user** di QA manual masih via DB/`db:studio` — UI approve masuk T02
+- **Approve user** UI tersedia di T02 (`/admin/users`)
 - **Merge ke main** dan **manual QA end-to-end** belum dilakukan
 
 ## Catatan Teknis

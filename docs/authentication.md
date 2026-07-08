@@ -5,7 +5,7 @@ Dokumentasi alur autentikasi E-Training Enprotech (T01).
 ## Ringkasan
 
 - **Register:** User mendaftar dengan nama, email, password → status default `pending`, role `student`
-- **Approval:** Admin menyetujui user via T02 (User Management)
+- **Approval:** Admin menyetujui user via `/admin/users` (lihat `docs/user-management.md`)
 - **Login:** Hanya user `active` yang dapat login
 - **Session:** JWT di HTTP-only cookie (`session`)
 - **RBAC:** Route protection via `proxy.ts`
@@ -41,7 +41,7 @@ Membuat admin pertama dengan status `active`. Idempotent — skip jika email sud
 
 1. Register user baru → status pending, redirect ke login
 2. Login dengan user pending → pesan "menunggu persetujuan Admin"
-3. Approve user via DB/T02 → login berhasil
+3. Approve user via `/admin/users` → login berhasil
 4. Login sebagai admin → redirect `/admin/dashboard`
 5. Akses `/admin/*` sebagai student → redirect `/unauthorized`
 6. Refresh browser → session tetap ada
