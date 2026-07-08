@@ -17,3 +17,4 @@ export function UserStatusBadge({ status }: { status: UserStatus }) {
 
   return <Badge variant={variant}>{STATUS_LABEL[status]}</Badge>;
 }
+

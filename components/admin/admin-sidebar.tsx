@@ -74,7 +74,7 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
               </div>
               <div className="grid flex-1 text-left leading-tight group-data-[collapsible=icon]:hidden">
                 <span className="text-sm font-semibold">Enprotech</span>
-                <span className="text-xs text-muted-foreground">
+                <span className="text-xs text-sidebar-muted-foreground">
                   E-Training Admin
                 </span>
               </div>
@@ -85,7 +85,7 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
 
       <SidebarContent className="px-2">
         <SidebarGroup>
-          <SidebarGroupLabel className="px-3 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+          <SidebarGroupLabel className="px-3 text-xs font-medium uppercase tracking-wider text-sidebar-muted-foreground">
             Menu
           </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -126,7 +126,7 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
             <span className="truncate text-sm font-medium">
               {formatUserDisplayName(user)}
             </span>
-            <span className="truncate text-xs text-muted-foreground">
+            <span className="truncate text-xs text-sidebar-muted-foreground">
               {user.email}
             </span>
           </div>
@@ -136,7 +136,7 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
             <form action={logoutAction} className="w-full">
               <SidebarMenuButton
                 tooltip="Keluar"
-                className="h-10 text-sm text-destructive hover:bg-destructive/10 hover:text-destructive [&_svg]:size-5"
+                className="h-10 text-sm text-sidebar-destructive hover:bg-sidebar-destructive/15 hover:text-sidebar-destructive [&_svg]:size-5"
                 render={<button type="submit" />}
               >
                 <IconLogout />
