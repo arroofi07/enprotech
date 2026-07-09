@@ -13,13 +13,18 @@
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
-    "db:seed": "bun run scripts/seed-admin.ts"
+    "db:seed": "bun run scripts/seed-admin.ts",
+    "qa:t03": "bun run scripts/qa-t03-training.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
     "@hookform/resolvers": "^5.4.0",
     "@shadcn/react": "^0.2.0",
     "@tabler/icons-react": "^3.44.0",
+    "@vercel/blob": "^2.6.1",
     "bcryptjs": "^3.0.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -35,6 +40,7 @@
     "react": "19.2.4",
     "react-day-picker": "^10.0.1",
     "react-dom": "19.2.4",
+    "react-dropzone": "^15.0.0",
     "react-hook-form": "^7.81.0",
     "react-resizable-panels": "^4.12.1",
     "recharts": "3.8.0",

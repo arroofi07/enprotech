@@ -8,6 +8,13 @@
       "when": 1783489030540,
       "tag": "0000_elite_winter_soldier",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1783532729464,
+      "tag": "0001_jittery_cerise",
+      "breakpoints": true
     }
   ]
 }

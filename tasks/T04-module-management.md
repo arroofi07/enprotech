@@ -5,7 +5,7 @@ prd_ref: §3.4
 target_week: W2-W3
 priority: P0
 estimate: XL
-status: Pending
+status: Review
 dependencies: [T03]
 ---
 
@@ -34,26 +34,46 @@ Setiap Training terdiri dari beberapa Modul yang berurutan. Modul berisi materi 
   - Interactive content builder
 
 ## Acceptance Criteria
-- [ ] AC-1 — Trainer dapat membuat modul baru dalam training (judul, deskripsi)
-- [ ] AC-2 — Trainer dapat upload thumbnail modul (gambar, max 2MB)
-- [ ] AC-3 — Trainer dapat upload dokumen materi (PDF/DOC/DOCX/XLS/XLSX, max 1MB per file)
-- [ ] AC-4 — Sistem menolak file dengan format atau ukuran tidak sesuai
-- [ ] AC-5 — Trainer dapat menambah multiple link video (YouTube, dll)
-- [ ] AC-6 — Trainer dapat menambah multiple link download (Google Drive, dll)
-- [ ] AC-7 — Trainer dapat menambah link video conference (Google Meet/Zoom)
-- [ ] AC-8 — Trainer dapat mengatur urutan modul dengan drag & drop
-- [ ] AC-9 — Trainer dapat edit dan hapus konten modul
-- [ ] AC-10 — Student dapat melihat dan mengakses semua konten modul
-- [ ] AC-11 — Student dapat download dokumen materi
-- [ ] AC-12 — Link video dan download terbuka di tab baru
-- [ ] AC-13 — Modul menampilkan status completion untuk Student
+- [x] AC-1 — Trainer dapat membuat modul baru dalam training (judul, deskripsi)
+- [x] AC-2 — Trainer dapat upload thumbnail modul (gambar, max 2MB)
+- [x] AC-3 — Trainer dapat upload dokumen materi (PDF/DOC/DOCX/XLS/XLSX, max 1MB per file)
+- [x] AC-4 — Sistem menolak file dengan format atau ukuran tidak sesuai
+- [x] AC-5 — Trainer dapat menambah multiple link video (YouTube, dll)
+- [x] AC-6 — Trainer dapat menambah multiple link download (Google Drive, dll)
+- [x] AC-7 — Trainer dapat menambah link video conference (Google Meet/Zoom)
+- [x] AC-8 — Trainer dapat mengatur urutan modul dengan drag & drop
+- [x] AC-9 — Trainer dapat edit dan hapus konten modul
+- [x] AC-10 — Student dapat melihat dan mengakses semua konten modul
+- [x] AC-11 — Student dapat download dokumen materi
+- [x] AC-12 — Link video dan download terbuka di tab baru
+- [x] AC-13 — Modul menampilkan status completion untuk Student
 
 ## Definition of Done
 - [ ] Code merged ke `main` + reviewed
-- [ ] Unit test untuk upload dan validasi file
+- [x] Unit test untuk upload dan validasi file
 - [ ] Manual QA pass: create modul → upload content → reorder → student access
-- [ ] Dokumentasi: panduan mengelola modul dan format file yang didukung
-- [ ] Tidak ada regresi T01-T03
+- [x] Dokumentasi: panduan mengelola modul dan format file yang didukung
+- [x] Tidak ada regresi T01-T03
+
+## Implementasi (selesai)
+
+### Pendekatan
+- Clean Architecture mirror T03 (domain → application → infrastructure → presentation)
+- Hybrid: Server Actions untuk UI + thin API Routes
+- Vercel Blob untuk thumbnail & dokumen dengan validasi MIME + size di domain layer
+- @dnd-kit untuk drag & drop urutan modul
+- react-dropzone untuk file upload UI
+
+### File utama
+| Layer | Path |
+|-------|------|
+| Domain | `lib/domain/modules/` |
+| Application | `lib/application/modules/` |
+| Infrastructure | `module-repository.ts`, `blob-storage.ts` |
+| Presentation | `app/actions/modules.ts`, `app/api/modules/`, `app/api/trainings/[id]/modules/` |
+| UI | `components/modules/` |
+| Docs | `docs/module-management.md` |
+| Tests | `tests/domain/modules/`, `tests/application/modules/` |
 
 ## Catatan Teknis
 - **Backend:** 

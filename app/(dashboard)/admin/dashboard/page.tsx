@@ -12,7 +12,7 @@ import {
 import { AdminHeader } from "@/components/admin/admin-header";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { ButtonLink } from "@/components/ui/button-link";
 import {
   Card,
   CardContent,
@@ -89,10 +89,10 @@ export default async function AdminDashboardPage() {
             title={`Selamat datang, ${user.name.split(" ")[0]}!`}
             description="Ringkasan sistem dan akses cepat ke manajemen pengguna."
             actions={
-              <Button size="lg" render={<Link href="/admin/users" />}>
+              <ButtonLink size="lg" href="/admin/users">
                 Kelola Pengguna
                 <IconArrowRight data-icon="inline-end" />
-              </Button>
+              </ButtonLink>
             }
           />
 
@@ -131,13 +131,10 @@ export default async function AdminDashboardPage() {
                     Pengguna baru yang belum dapat login
                   </CardDescription>
                 </div>
-                <Button
-                  variant="outline"
-                  render={<Link href="/admin/users?status=pending" />}
-                >
+                <ButtonLink variant="outline" href="/admin/users?status=pending">
                   Lihat Semua
                   <IconChevronRight data-icon="inline-end" className="size-4" />
-                </Button>
+                </ButtonLink>
               </CardHeader>
               <CardContent>
                 {pendingItems.length === 0 ? (

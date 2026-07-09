@@ -7,6 +7,7 @@ import { logoutUser } from "@/lib/application/auth/logout-user";
 import { registerUser } from "@/lib/application/auth/register-user";
 import type { AuthErrorCode } from "@/lib/domain/auth/errors";
 import { createSession } from "@/lib/infrastructure/auth/session-manager";
+import type { LoginInput, RegisterInput } from "@/lib/validations/auth-schemas";
 
 export type AuthActionState = {
   error?: AuthErrorCode;
@@ -16,12 +17,9 @@ export type AuthActionState = {
 
 export async function loginAction(
   _prevState: AuthActionState,
-  formData: FormData,
+  input: LoginInput,
 ): Promise<AuthActionState> {
-  const result = await loginUser({
-    email: String(formData.get("email") ?? ""),
-    password: String(formData.get("password") ?? ""),
-  });
+  const result = await loginUser(input);
 
   if (!result.success) {
     return { error: result.error, message: result.message };
@@ -33,14 +31,9 @@ export async function loginAction(
 
 export async function registerAction(
   _prevState: AuthActionState,
-  formData: FormData,
+  input: RegisterInput,
 ): Promise<AuthActionState> {
-  const result = await registerUser({
-    name: String(formData.get("name") ?? ""),
-    email: String(formData.get("email") ?? ""),
-    password: String(formData.get("password") ?? ""),
-    confirmPassword: String(formData.get("confirmPassword") ?? ""),
-  });
+  const result = await registerUser(input);
 
   if (!result.success) {
     return { error: result.error, message: result.message };

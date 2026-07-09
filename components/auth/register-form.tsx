@@ -45,6 +45,7 @@ export function RegisterForm() {
 
   const {
     register,
+    handleSubmit,
     formState: { errors },
   } = useForm<RegisterInput>({
     resolver: zodResolver(registerSchema),
@@ -54,6 +55,10 @@ export function RegisterForm() {
       password: "",
       confirmPassword: "",
     },
+  });
+
+  const onSubmit = handleSubmit((data) => {
+    formAction(data);
   });
 
   useEffect(() => {
@@ -72,7 +77,7 @@ export function RegisterForm() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form action={formAction} className="space-y-4">
+        <form onSubmit={onSubmit} className="space-y-4">
           <FieldGroup>
             {state.error ? (
               <Alert variant="destructive">

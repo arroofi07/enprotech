@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import {
   IconLayoutDashboard,
   IconLogout,
+  IconSchool,
   IconUsers,
 } from "@tabler/icons-react";
 
@@ -37,6 +38,11 @@ const NAV_ITEMS = [
     title: "Pengguna",
     href: "/admin/users",
     icon: IconUsers,
+  },
+  {
+    title: "Training",
+    href: "/trainer/trainings",
+    icon: IconSchool,
   },
 ] as const;
 

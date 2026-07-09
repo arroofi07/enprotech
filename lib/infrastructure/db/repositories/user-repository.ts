@@ -170,6 +170,14 @@ export async function listUsers(
   };
 }
 
+export async function listActiveStudents(): Promise<PublicUserRecord[]> {
+  return db
+    .select(publicUserColumns)
+    .from(users)
+    .where(and(eq(users.role, "student"), eq(users.status, "active")))
+    .orderBy(desc(users.createdAt));
+}
+
 export async function updateUserRole(
   id: string,
   role: UserRole,

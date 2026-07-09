@@ -16,6 +16,7 @@ export const trainingStatusEnum = pgEnum("training_status", [
   "draft",
   "active",
   "completed",
+  "archived",
 ]);
 
 export const moduleContentTypeEnum = pgEnum("module_content_type", [

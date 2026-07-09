@@ -39,6 +39,7 @@ export function LoginForm() {
 
   const {
     register,
+    handleSubmit,
     formState: { errors },
   } = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
@@ -46,6 +47,10 @@ export function LoginForm() {
       email: "",
       password: "",
     },
+  });
+
+  const onSubmit = handleSubmit((data) => {
+    formAction(data);
   });
 
   return (
@@ -57,7 +62,7 @@ export function LoginForm() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form action={formAction} className="space-y-4">
+        <form onSubmit={onSubmit} className="space-y-4">
           <FieldGroup>
             {state.error ? (
               <Alert variant="destructive">
