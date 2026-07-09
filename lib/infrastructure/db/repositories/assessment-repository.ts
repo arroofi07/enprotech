@@ -201,6 +201,17 @@ export async function findAssessmentById(
   return row ? mapAssessment(row) : null;
 }
 
+export async function listAssessmentsByTraining(
+  trainingId: string,
+): Promise<AssessmentRecord[]> {
+  const rows = await db
+    .select(assessmentColumns)
+    .from(assessments)
+    .where(eq(assessments.trainingId, trainingId));
+
+  return rows.map(mapAssessment);
+}
+
 export async function createAssessment(input: {
   trainingId: string;
   moduleId: string;
@@ -375,6 +386,25 @@ export async function createAttempt(input: {
       assessmentId: input.assessmentId,
       score: 0,
       answers: [],
+    })
+    .returning(attemptColumns);
+
+  return mapAttempt(row);
+}
+
+export async function createSubmittedAttempt(input: {
+  studentId: string;
+  assessmentId: string;
+  score: number;
+}): Promise<AssessmentAttemptRecord> {
+  const [row] = await db
+    .insert(assessmentAttempts)
+    .values({
+      studentId: input.studentId,
+      assessmentId: input.assessmentId,
+      score: input.score,
+      answers: [],
+      submittedAt: new Date(),
     })
     .returning(attemptColumns);
 

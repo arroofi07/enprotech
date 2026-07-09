@@ -14,7 +14,7 @@ import {
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  if (pathname.startsWith("/api/health")) {
+  if (pathname.startsWith("/api/health") || pathname.startsWith("/api/verify/")) {
     return NextResponse.next();
   }
 

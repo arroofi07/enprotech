@@ -1,3 +1,4 @@
+import { NotificationBell } from "@/components/notifications/notification-bell";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -46,6 +47,9 @@ export function AdminHeader({ title, breadcrumbs = [] }: AdminHeaderProps) {
           ) : null}
         </BreadcrumbList>
       </Breadcrumb>
+      <div className="ml-auto">
+        <NotificationBell />
+      </div>
     </header>
   );
 }

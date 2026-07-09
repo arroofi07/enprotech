@@ -52,6 +52,7 @@ describe("getDashboardNav", () => {
       "Dashboard",
       "Pengguna",
       "Training",
+      "Import Excel",
       ...LEARNING_FLOW_TITLES,
     ]);
   });
@@ -65,6 +66,7 @@ describe("getDashboardNav", () => {
     expect(titles).toEqual([
       "Dashboard",
       "Training",
+      "Import Excel",
       ...LEARNING_FLOW_TITLES,
     ]);
   });

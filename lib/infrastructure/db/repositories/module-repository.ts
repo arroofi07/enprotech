@@ -236,6 +236,19 @@ export async function findModuleById(
   return module ? mapModule(module) : null;
 }
 
+export async function findModuleByTrainingAndTitle(
+  trainingId: string,
+  title: string,
+): Promise<ModuleRecord | null> {
+  const [module] = await db
+    .select(moduleColumns)
+    .from(modules)
+    .where(and(eq(modules.trainingId, trainingId), eq(modules.title, title)))
+    .limit(1);
+
+  return module ? mapModule(module) : null;
+}
+
 export async function listModulesByTraining(
   trainingId: string,
 ): Promise<ModuleWithContents[]> {

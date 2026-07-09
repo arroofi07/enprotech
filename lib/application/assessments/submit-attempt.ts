@@ -23,6 +23,7 @@ import {
 } from "@/lib/infrastructure/db/repositories/assessment-repository";
 
 import { assertAssessmentStudent } from "./assert-access";
+import { issueCertificateIfEligible } from "../certificates/issue-certificate-if-eligible";
 
 export type SubmitAttemptResult = {
   attemptId: string;
@@ -123,6 +124,16 @@ export async function submitAttemptUseCase(
   ]);
 
   const wrongAnswers = getWrongAnswerReviews(questions, submitted.answers);
+
+  if (
+    assessment.type === "post_test" &&
+    hasPassed(bestScore, passingGrade)
+  ) {
+    await issueCertificateIfEligible({
+      studentId: actor!.id,
+      trainingId: assessment.trainingId,
+    });
+  }
 
   return assessmentSuccess({
     attemptId: submitted.id,

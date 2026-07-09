@@ -1,3 +1,4 @@
+import { NotificationBell } from "@/components/notifications/notification-bell";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -59,6 +60,9 @@ export function TrainerHeader({ title, breadcrumbs = [], user }: TrainerHeaderPr
           ) : null}
         </BreadcrumbList>
       </Breadcrumb>
+      <div className="ml-auto">
+        <NotificationBell />
+      </div>
     </header>
   );
 }

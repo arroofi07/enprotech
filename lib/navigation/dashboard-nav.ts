@@ -4,6 +4,7 @@ import {
   IconCertificate,
   IconChartBar,
   IconClipboardCheck,
+  IconFileImport,
   IconLayoutDashboard,
   IconListCheck,
   IconPencil,
@@ -89,13 +90,13 @@ function buildLearningFlowNav(prefix: LearningFlowPrefix): DashboardNavItem[] {
       title: "Nilai",
       href: `${prefix}/nilai`,
       icon: IconChartBar,
-      implemented: false,
+      implemented: prefix === "/trainer",
     },
     {
       title: "Sertifikat",
       href: `${prefix}/certificates`,
       icon: IconCertificate,
-      implemented: false,
+      implemented: prefix === "/student",
     },
   ];
 }
@@ -123,6 +124,12 @@ const ADMIN_NAV: DashboardNavGroup[] = [
         implemented: true,
         activePrefixes: ["/trainer/trainings"],
       },
+      {
+        title: "Import Excel",
+        href: "/trainer/import",
+        icon: IconFileImport,
+        implemented: true,
+      },
     ],
   },
   {
@@ -147,6 +154,12 @@ const TRAINER_NAV: DashboardNavGroup[] = [
         icon: IconSchool,
         implemented: true,
         activePrefixes: ["/trainer/trainings"],
+      },
+      {
+        title: "Import Excel",
+        href: "/trainer/import",
+        icon: IconFileImport,
+        implemented: true,
       },
     ],
   },

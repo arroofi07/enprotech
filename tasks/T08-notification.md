@@ -5,7 +5,7 @@ prd_ref: §3.8
 target_week: W4
 priority: P1
 estimate: M
-status: Pending
+status: Review
 dependencies: [T04, T05]
 ---
 
@@ -34,39 +34,47 @@ Admin dan Trainer perlu mendapat notifikasi real-time saat student menyelesaikan
   - Notification preferences/settings
 
 ## Acceptance Criteria
-- [ ] AC-1 — Header menampilkan bell icon untuk notifikasi
-- [ ] AC-2 — Badge counter menampilkan jumlah notifikasi belum dibaca
-- [ ] AC-3 — Klik bell icon membuka dropdown list notifikasi
-- [ ] AC-4 — Admin/Trainer menerima notifikasi saat student menyelesaikan modul
-- [ ] AC-5 — Notifikasi menampilkan: nama student, nama modul, nama training, waktu
-- [ ] AC-6 — Student menerima notifikasi reminder H-3 dan H-1 deadline
-- [ ] AC-7 — User dapat mark single notification as read
-- [ ] AC-8 — User dapat mark all notifications as read
-- [ ] AC-9 — Notifikasi baru muncul tanpa refresh halaman (real-time)
-- [ ] AC-10 — Klik notifikasi redirect ke halaman terkait
+- [x] AC-1 — Header menampilkan bell icon untuk notifikasi
+- [x] AC-2 — Badge counter menampilkan jumlah notifikasi belum dibaca
+- [x] AC-3 — Klik bell icon membuka dropdown list notifikasi
+- [x] AC-4 — Admin/Trainer menerima notifikasi saat student menyelesaikan modul
+- [x] AC-5 — Notifikasi menampilkan: nama student, nama modul, nama training, waktu
+- [x] AC-6 — Student menerima notifikasi reminder H-3 dan H-1 deadline
+- [x] AC-7 — User dapat mark single notification as read
+- [x] AC-8 — User dapat mark all notifications as read
+- [x] AC-9 — Notifikasi baru muncul tanpa refresh halaman (real-time)
+- [x] AC-10 — Klik notifikasi redirect ke halaman terkait
 
 ## Definition of Done
 - [ ] Code merged ke `main` + reviewed
-- [ ] Unit test untuk notification creation logic
-- [ ] Manual QA pass: complete module → verify notification → mark read
-- [ ] Dokumentasi: jenis-jenis notifikasi
-- [ ] Tidak ada regresi T01-T07
+- [x] Unit test untuk notification creation logic
+- [x] Manual QA pass: complete module → verify notification → mark read
+- [x] Dokumentasi: jenis-jenis notifikasi
+- [x] Tidak ada regresi T01-T07
 
 ## Catatan Teknis
 - **Backend:** 
-  - API Routes `/api/notifications` (GET, PATCH)
-  - Trigger notification saat module completion
-  - Cron job untuk deadline reminder (atau on-demand check)
+  - API Routes `GET/PATCH /api/notifications`
+  - Trigger notification saat `updateStudentModuleProgress` → `completed`
+  - On-demand deadline reminder saat list notifikasi student
 - **Database:** 
   - Tabel `notifications` (id, user_id, type, title, message, data: JSON, is_read, created_at)
+  - Dedup via `data.dedupKey`
 - **Frontend:** 
-  - Notification bell component di header
-  - Dropdown dengan virtual scroll untuk banyak notifikasi
-- **Real-time Options:**
-  - Polling setiap 30 detik (simple)
-  - Server-Sent Events (SSE)
-  - WebSocket (jika perlu bidirectional)
-- **UI Components:** 
-  - Bell icon dengan Badge
-  - Dropdown/Popover
-  - NotificationItem component
+  - `NotificationBell` di header Student/Trainer/Admin
+  - Dropdown dengan `ScrollArea`
+  - Polling 30 detik + refresh saat dropdown dibuka
+- **Real-time:** Polling setiap 30 detik (simple, sesuai task spec)
+
+## Implementasi (selesai)
+
+| Area | File / path |
+|------|-------------|
+| Domain | `lib/domain/notifications/build-notifications.ts`, `types.ts`, `errors.ts` |
+| Repository | `lib/infrastructure/db/repositories/notification-repository.ts` |
+| Application | `lib/application/notifications/*`, trigger di `update-student-module-progress.ts` |
+| API | `app/api/notifications/route.ts` |
+| UI | `components/notifications/notification-bell.tsx`, update `*-header.tsx` |
+| Tests | `tests/domain/notifications/build-notifications.test.ts` |
+| Docs | `docs/notifications.md` |
+| QA | `scripts/qa-t08-notification.ts` (`bun run qa:t08`) |

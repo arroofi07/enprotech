@@ -5,7 +5,7 @@ prd_ref: §3.11
 target_week: W5
 priority: P2
 estimate: M
-status: Pending
+status: Review
 dependencies: [T03, T05]
 ---
 
@@ -33,25 +33,25 @@ Trainer membutuhkan cara cepat untuk input data dalam jumlah banyak. Fitur impor
   - Scheduled/automated import
 
 ## Acceptance Criteria
-- [ ] AC-1 — Trainer dapat download template Excel untuk setiap jenis import
-- [ ] AC-2 — Trainer dapat upload file Excel untuk import soal
-- [ ] AC-3 — Template soal: no, question, option_a, option_b, option_c, option_d, correct_answer
-- [ ] AC-4 — Trainer dapat upload file Excel untuk import enrollment
-- [ ] AC-5 — Template enrollment: student_email, training_id
-- [ ] AC-6 — Trainer dapat upload file Excel untuk import nilai
-- [ ] AC-7 — Template nilai: student_email, training_id, module_name, assessment_type, score
-- [ ] AC-8 — Sistem memvalidasi format dan data sebelum import
-- [ ] AC-9 — Tampilkan preview data sebelum confirm import
-- [ ] AC-10 — Tampilkan error untuk baris yang gagal validasi
-- [ ] AC-11 — User dapat proceed import hanya untuk data yang valid
-- [ ] AC-12 — Tampilkan summary hasil import (success count, failed count)
+- [x] AC-1 — Trainer dapat download template Excel untuk setiap jenis import
+- [x] AC-2 — Trainer dapat upload file Excel untuk import soal
+- [x] AC-3 — Template soal: no, question, option_a, option_b, option_c, option_d, correct_answer
+- [x] AC-4 — Trainer dapat upload file Excel untuk import enrollment
+- [x] AC-5 — Template enrollment: student_email, training_id
+- [x] AC-6 — Trainer dapat upload file Excel untuk import nilai
+- [x] AC-7 — Template nilai: student_email, training_id, module_name, assessment_type, score
+- [x] AC-8 — Sistem memvalidasi format dan data sebelum import
+- [x] AC-9 — Tampilkan preview data sebelum confirm import
+- [x] AC-10 — Tampilkan error untuk baris yang gagal validasi
+- [x] AC-11 — User dapat proceed import hanya untuk data yang valid
+- [x] AC-12 — Tampilkan summary hasil import (success count, failed count)
 
 ## Definition of Done
 - [ ] Code merged ke `main` + reviewed
-- [ ] Unit test untuk parsing dan validasi Excel
-- [ ] Manual QA pass: download template → fill data → upload → preview → import
-- [ ] Dokumentasi: panduan import Excel dengan contoh data
-- [ ] Tidak ada regresi T01-T10
+- [x] Unit test untuk parsing dan validasi Excel
+- [x] Manual QA pass: download template → fill data → upload → preview → import
+- [x] Dokumentasi: panduan import Excel dengan contoh data
+- [x] Tidak ada regresi T01-T10
 
 ## Catatan Teknis
 - **Backend:** 
@@ -73,3 +73,15 @@ Trainer membutuhkan cara cepat untuk input data dalam jumlah banyak. Fitur impor
   - Row-level error messages
   - Collect all errors before returning
   - Option to download error report
+
+## Implementasi (selesai)
+
+| Area | File / path |
+|------|-------------|
+| Domain | `lib/domain/imports/*` |
+| Application | `lib/application/imports/excel-import.ts` |
+| API | `app/api/import/*` |
+| UI | `components/imports/excel-import-wizard.tsx`, `app/(dashboard)/trainer/import/page.tsx` |
+| Tests | `tests/domain/imports/validate-import-rows.test.ts` |
+| Docs | `docs/excel-import.md` |
+| QA | `scripts/qa-t11-excel-import.ts` (`bun run qa:t11`) |

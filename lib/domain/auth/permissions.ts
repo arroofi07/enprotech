@@ -4,12 +4,25 @@ const ADMIN_PREFIX = "/admin";
 const TRAINER_PREFIX = "/trainer";
 const STUDENT_PREFIX = "/student";
 
-export const PUBLIC_PATHS = ["/login", "/register", "/unauthorized"] as const;
+export const PUBLIC_PATHS = [
+  "/login",
+  "/register",
+  "/unauthorized",
+  "/verify",
+] as const;
 
 export function isPublicPath(pathname: string): boolean {
-  return PUBLIC_PATHS.some(
+  if (PUBLIC_PATHS.some(
     (path) => pathname === path || pathname.startsWith(`${path}/`),
-  );
+  )) {
+    return true;
+  }
+
+  if (pathname.startsWith("/api/verify/")) {
+    return true;
+  }
+
+  return false;
 }
 
 export function getDashboardPath(role: UserRole): string {

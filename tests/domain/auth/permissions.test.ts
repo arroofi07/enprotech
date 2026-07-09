@@ -10,6 +10,9 @@ describe("permissions", () => {
   it("identifies public paths", () => {
     expect(isPublicPath("/login")).toBe(true);
     expect(isPublicPath("/register")).toBe(true);
+    expect(isPublicPath("/verify")).toBe(true);
+    expect(isPublicPath("/verify/CERT-ABC-2026-0001")).toBe(true);
+    expect(isPublicPath("/api/verify/CERT-ABC-2026-0001")).toBe(true);
     expect(isPublicPath("/admin/dashboard")).toBe(false);
   });
 
