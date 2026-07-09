@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { IconExternalLink } from "@tabler/icons-react";
+import { IconExternalLink, IconListCheck, IconPencil } from "@tabler/icons-react";
 
 import {
   deleteModuleAction,
@@ -58,7 +58,7 @@ export function ModuleEditCard({ module, trainingId }: ModuleEditCardProps) {
         <div>
           <h3 className="font-semibold">{module.title}</h3>
           <p className="text-sm text-muted-foreground">
-            {module.contents.length} konten
+            Urutan {module.order + 1} · {module.contents.length} konten
           </p>
         </div>
         {module.videoConferenceLink ? (
@@ -79,6 +79,33 @@ export function ModuleEditCard({ module, trainingId }: ModuleEditCardProps) {
         ) : null}
       </div>
 
+      <div className="flex flex-wrap gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          render={
+            <a
+              href={`/trainer/trainings/${trainingId}/modules/${module.id}/quiz`}
+            />
+          }
+        >
+          <IconListCheck className="size-4" />
+          Kelola Quiz
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          render={
+            <a
+              href={`/trainer/trainings/${trainingId}/modules/${module.id}/latihan`}
+            />
+          }
+        >
+          <IconPencil className="size-4" />
+          Kelola Latihan
+        </Button>
+      </div>
+
       {updateState.message ? (
         <Alert variant={updateState.error ? "destructive" : "default"}>
           <AlertDescription>{updateState.message}</AlertDescription>
@@ -92,7 +119,7 @@ export function ModuleEditCard({ module, trainingId }: ModuleEditCardProps) {
 
         <FieldGroup>
           <Field>
-            <FieldLabel htmlFor={`title-${module.id}`}>Judul</FieldLabel>
+            <FieldLabel htmlFor={`title-${module.id}`}>Nama Modul</FieldLabel>
             <Input
               id={`title-${module.id}`}
               name="title"
@@ -100,12 +127,25 @@ export function ModuleEditCard({ module, trainingId }: ModuleEditCardProps) {
             />
           </Field>
           <Field>
-            <FieldLabel htmlFor={`description-${module.id}`}>Deskripsi</FieldLabel>
+            <FieldLabel htmlFor={`order-${module.id}`}>Urutan</FieldLabel>
+            <Input
+              id={`order-${module.id}`}
+              name="order"
+              type="number"
+              min={1}
+              defaultValue={module.order + 1}
+            />
+          </Field>
+          <Field>
+            <FieldLabel htmlFor={`description-${module.id}`}>
+              Target Pelatihan
+            </FieldLabel>
             <Textarea
               id={`description-${module.id}`}
               name="description"
-              rows={2}
+              rows={3}
               defaultValue={module.description ?? ""}
+              placeholder="Jelaskan target pembelajaran modul ini"
             />
           </Field>
           <Field>
@@ -117,12 +157,64 @@ export function ModuleEditCard({ module, trainingId }: ModuleEditCardProps) {
               name="videoConferenceLink"
               type="url"
               defaultValue={module.videoConferenceLink ?? ""}
+              placeholder="https://meet.google.com/..."
             />
           </Field>
         </FieldGroup>
 
+        <div className="space-y-3 rounded-lg border p-4">
+          <div>
+            <p className="text-sm font-medium">Syarat Lanjut Modul</p>
+            <p className="text-xs text-muted-foreground">
+              Tentukan nilai minimal agar peserta dapat lanjut ke modul
+              berikutnya.
+            </p>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-3">
+            <Field>
+              <FieldLabel htmlFor={`minQuiz-${module.id}`}>
+                Quiz Minimal (%)
+              </FieldLabel>
+              <Input
+                id={`minQuiz-${module.id}`}
+                name="minQuizScore"
+                type="number"
+                min={0}
+                max={100}
+                defaultValue={module.minQuizScore}
+              />
+            </Field>
+            <Field>
+              <FieldLabel htmlFor={`minLatihan-${module.id}`}>
+                Latihan Minimal (%)
+              </FieldLabel>
+              <Input
+                id={`minLatihan-${module.id}`}
+                name="minLatihanScore"
+                type="number"
+                min={0}
+                max={100}
+                defaultValue={module.minLatihanScore}
+              />
+            </Field>
+            <Field>
+              <FieldLabel htmlFor={`minAttendance-${module.id}`}>
+                Kehadiran (%)
+              </FieldLabel>
+              <Input
+                id={`minAttendance-${module.id}`}
+                name="minAttendance"
+                type="number"
+                min={0}
+                max={100}
+                defaultValue={module.minAttendance}
+              />
+            </Field>
+          </div>
+        </div>
+
         <div className="space-y-2">
-          <FieldLabel>Thumbnail</FieldLabel>
+          <FieldLabel>Upload Gambar Thumbnail</FieldLabel>
           {thumbnailUrl ? (
             <div className="flex items-center gap-3">
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -146,6 +238,9 @@ export function ModuleEditCard({ module, trainingId }: ModuleEditCardProps) {
               onUploaded={({ url }) => setThumbnailUrl(url)}
             />
           )}
+          <p className="text-xs text-muted-foreground">
+            Format: JPG, JPEG, PNG, WEBP. Maksimal 1 MB per file.
+          </p>
         </div>
 
         <Button type="submit" disabled={updatePending}>
@@ -155,7 +250,7 @@ export function ModuleEditCard({ module, trainingId }: ModuleEditCardProps) {
 
       <Collapsible defaultOpen>
         <CollapsibleTrigger className="text-sm font-medium">
-          Konten Modul
+          Materi & Konten Tambahan
         </CollapsibleTrigger>
         <CollapsibleContent className="space-y-4 pt-4">
           <ModuleContentList

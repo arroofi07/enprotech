@@ -30,6 +30,9 @@ const moduleRecord = {
   description: null,
   thumbnail: null,
   videoConferenceLink: null,
+  minQuizScore: 0,
+  minLatihanScore: 0,
+  minAttendance: 0,
   order: 0,
   createdAt: new Date("2026-01-01"),
   updatedAt: new Date("2026-01-01"),
@@ -100,7 +103,7 @@ describe("uploadModuleFile", () => {
   });
 
   it("rejects oversized thumbnail", async () => {
-    const bytes = new Uint8Array(2 * 1024 * 1024 + 1);
+    const bytes = new Uint8Array(1 * 1024 * 1024 + 1);
     const file = new File([bytes], "thumb.png", { type: "image/png" });
 
     const result = await uploadModuleFile(trainer, { purpose: "thumbnail" }, file);

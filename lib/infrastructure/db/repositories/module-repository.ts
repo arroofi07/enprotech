@@ -19,6 +19,9 @@ export type ModuleRecord = {
   description: string | null;
   thumbnail: string | null;
   videoConferenceLink: string | null;
+  minQuizScore: number;
+  minLatihanScore: number;
+  minAttendance: number;
   order: number;
   createdAt: Date;
   updatedAt: Date;
@@ -58,6 +61,9 @@ const moduleColumns = {
   description: modules.description,
   thumbnail: modules.thumbnail,
   videoConferenceLink: modules.videoConferenceLink,
+  minQuizScore: modules.minQuizScore,
+  minLatihanScore: modules.minLatihanScore,
+  minAttendance: modules.minAttendance,
   order: modules.order,
   createdAt: modules.createdAt,
   updatedAt: modules.updatedAt,
@@ -82,6 +88,9 @@ function mapModule(row: typeof modules.$inferSelect): ModuleRecord {
     description: row.description,
     thumbnail: row.thumbnail,
     videoConferenceLink: row.videoConferenceLink,
+    minQuizScore: row.minQuizScore,
+    minLatihanScore: row.minLatihanScore,
+    minAttendance: row.minAttendance,
     order: row.order,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
@@ -151,22 +160,69 @@ export async function createModule(input: {
   trainingId: string;
   title: string;
   description?: string;
+  thumbnail?: string;
   videoConferenceLink?: string;
+  minQuizScore?: number;
+  minLatihanScore?: number;
+  minAttendance?: number;
+  order?: number;
+  contents?: Array<{
+    type: ModuleContentType;
+    title: string;
+    url: string;
+    fileSize?: number;
+  }>;
 }): Promise<ModuleRecord> {
-  const order = await getNextModuleOrder(input.trainingId);
+  const targetOrder =
+    input.order ?? (await getNextModuleOrder(input.trainingId));
 
-  const [module] = await db
-    .insert(modules)
-    .values({
-      trainingId: input.trainingId,
-      title: input.title,
-      description: input.description ?? null,
-      videoConferenceLink: input.videoConferenceLink ?? null,
-      order,
-    })
-    .returning(moduleColumns);
+  return db.transaction(async (tx) => {
+    const existingModules = await tx
+      .select({ id: modules.id, order: modules.order })
+      .from(modules)
+      .where(eq(modules.trainingId, input.trainingId))
+      .orderBy(asc(modules.order));
 
-  return mapModule(module);
+    for (const row of [...existingModules].reverse()) {
+      if (row.order >= targetOrder) {
+        await tx
+          .update(modules)
+          .set({ order: row.order + 1 })
+          .where(eq(modules.id, row.id));
+      }
+    }
+
+    const [module] = await tx
+      .insert(modules)
+      .values({
+        trainingId: input.trainingId,
+        title: input.title,
+        description: input.description ?? null,
+        thumbnail: input.thumbnail ?? null,
+        videoConferenceLink: input.videoConferenceLink ?? null,
+        minQuizScore: input.minQuizScore ?? 0,
+        minLatihanScore: input.minLatihanScore ?? 0,
+        minAttendance: input.minAttendance ?? 0,
+        order: targetOrder,
+      })
+      .returning(moduleColumns);
+
+    if (input.contents?.length) {
+      for (let index = 0; index < input.contents.length; index += 1) {
+        const content = input.contents[index]!;
+        await tx.insert(moduleContents).values({
+          moduleId: module.id,
+          type: content.type,
+          title: content.title,
+          url: content.url,
+          fileSize: content.fileSize ?? null,
+          order: index,
+        });
+      }
+    }
+
+    return mapModule(module);
+  });
 }
 
 export async function findModuleById(
@@ -220,6 +276,10 @@ export async function updateModule(
     description?: string | null;
     thumbnail?: string | null;
     videoConferenceLink?: string | null;
+    minQuizScore?: number;
+    minLatihanScore?: number;
+    minAttendance?: number;
+    order?: number;
   },
 ): Promise<ModuleRecord | null> {
   const [module] = await db

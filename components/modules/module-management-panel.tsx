@@ -7,6 +7,7 @@ import { ModuleCreateForm } from "@/components/modules/module-create-form";
 import { ModuleEditCard } from "@/components/modules/module-edit-card";
 import { ModulesFilters } from "@/components/modules/modules-filters";
 import { ModulesPagination } from "@/components/modules/modules-pagination";
+import { ModulesProgressRequirements } from "@/components/modules/modules-progress-requirements";
 import { ModuleSortableList } from "@/components/modules/module-sortable-list";
 import { ModulesTable } from "@/components/modules/modules-table";
 import { Button } from "@/components/ui/button";
@@ -106,14 +107,17 @@ export function ModuleManagementPanel({
               <IconPlus className="size-4" />
               Buat Modul
             </DialogTrigger>
-            <DialogContent className="max-w-lg">
-              <DialogHeader>
-                <DialogTitle>Buat Modul Baru</DialogTitle>
+            <DialogContent className="flex max-h-[90vh] max-w-4xl flex-col gap-0 overflow-hidden p-0 sm:max-w-4xl">
+              <DialogHeader className="shrink-0 border-b px-6 py-4">
+                <DialogTitle className="text-base">Buat Modul Baru</DialogTitle>
                 <DialogDescription>
-                  Tambahkan modul pembelajaran dengan judul dan deskripsi.
+                  Lengkapi informasi modul, materi, dan target pelatihan.
                 </DialogDescription>
               </DialogHeader>
-              <ModuleCreateForm trainingId={trainingId} />
+              <ModuleCreateForm
+                trainingId={trainingId}
+                defaultOrder={allModules.length + 1}
+              />
             </DialogContent>
           </Dialog>
         </div>
@@ -121,12 +125,17 @@ export function ModuleManagementPanel({
 
       <ModulesFilters search={search} />
 
+      <ModulesProgressRequirements
+        modules={modules}
+        onManage={setSelectedModule}
+      />
+
       <div className="flex items-center justify-between">
+        <p className="text-sm font-medium">Daftar Modul</p>
         <p className="text-sm text-muted-foreground">
           Menampilkan{" "}
           <span className="font-medium text-foreground">{modules.length}</span>{" "}
-          dari <span className="font-medium text-foreground">{total}</span>{" "}
-          modul
+          dari <span className="font-medium text-foreground">{total}</span> modul
         </p>
       </div>
 

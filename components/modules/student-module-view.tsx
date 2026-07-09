@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useEffect } from "react";
-import { IconExternalLink } from "@tabler/icons-react";
+import { IconExternalLink, IconListCheck, IconPencil } from "@tabler/icons-react";
 
 import {
   markModuleCompleteAction,
@@ -79,6 +79,34 @@ export function StudentModuleView({ module, trainingId }: StudentModuleViewProps
           />
         </div>
       ) : null}
+
+      <div className="space-y-3">
+        <h3 className="text-lg font-medium">Aktivitas Pembelajaran</h3>
+        <div className="flex flex-wrap gap-2">
+          <Button
+            variant="outline"
+            render={
+              <a
+                href={`/student/trainings/${trainingId}/modules/${module.id}/quiz`}
+              />
+            }
+          >
+            <IconListCheck className="size-4" />
+            Kerjakan Quiz
+          </Button>
+          <Button
+            variant="outline"
+            render={
+              <a
+                href={`/student/trainings/${trainingId}/modules/${module.id}/latihan`}
+              />
+            }
+          >
+            <IconPencil className="size-4" />
+            Kerjakan Latihan
+          </Button>
+        </div>
+      </div>
 
       <div className="space-y-3">
         <h3 className="text-lg font-medium">Materi Pembelajaran</h3>

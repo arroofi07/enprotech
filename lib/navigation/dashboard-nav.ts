@@ -41,7 +41,11 @@ function buildLearningFlowNav(prefix: LearningFlowPrefix): DashboardNavItem[] {
       title: "Pre Test",
       href: `${prefix}/pre-test`,
       icon: IconClipboardCheck,
-      implemented: false,
+      implemented: true,
+      activePrefixes: [
+        `${prefix}/pre-test`,
+        `${prefix}/trainings`,
+      ],
     },
     {
       title: "Modul",
@@ -61,19 +65,25 @@ function buildLearningFlowNav(prefix: LearningFlowPrefix): DashboardNavItem[] {
       title: "Quiz",
       href: `${prefix}/quiz`,
       icon: IconListCheck,
-      implemented: false,
+      implemented: true,
+      activePrefixes: [`${prefix}/quiz`, `${prefix}/trainings`],
     },
     {
       title: "Latihan",
       href: `${prefix}/latihan`,
       icon: IconPencil,
-      implemented: false,
+      implemented: true,
+      activePrefixes: [`${prefix}/latihan`, `${prefix}/trainings`],
     },
     {
       title: "Post Test",
       href: `${prefix}/post-test`,
       icon: IconClipboardCheck,
-      implemented: false,
+      implemented: true,
+      activePrefixes: [
+        `${prefix}/post-test`,
+        `${prefix}/trainings`,
+      ],
     },
     {
       title: "Nilai",

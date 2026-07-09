@@ -25,6 +25,9 @@ export default async function StudentModuleDetailPage({
   const result = await getStudentModule(user, { moduleId });
 
   if (!result.success) {
+    if (result.error === "PRETEST_REQUIRED") {
+      redirect(`/student/trainings/${id}/pre-test`);
+    }
     redirect("/unauthorized");
   }
 

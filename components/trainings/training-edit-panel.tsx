@@ -119,6 +119,18 @@ export function TrainingEditPanel({
         <ButtonLink href={`/trainer/trainings/${training.id}/modules`}>
           Kelola Modul
         </ButtonLink>
+        <ButtonLink
+          variant="outline"
+          href={`/trainer/trainings/${training.id}/pre-test`}
+        >
+          Kelola Pre-Test
+        </ButtonLink>
+        <ButtonLink
+          variant="outline"
+          href={`/trainer/trainings/${training.id}/post-test`}
+        >
+          Kelola Post-Test
+        </ButtonLink>
       </div>
 
       <Tabs defaultValue="detail">

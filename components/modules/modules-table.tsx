@@ -4,19 +4,14 @@ import { IconExternalLink, IconPhoto } from "@tabler/icons-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { DataTable } from "@/components/ui/data-table";
+import { formatModuleRequirement } from "@/lib/domain/modules/format-requirement";
 import type { ModuleWithContents } from "@/lib/infrastructure/db/repositories/module-repository";
 
 type ModulesTableProps = {
   modules: ModuleWithContents[];
   onManage: (module: ModuleWithContents) => void;
+  showProgressRequirements?: boolean;
 };
 
 function summarizeContents(module: ModuleWithContents) {
@@ -39,125 +34,193 @@ function formatUpdatedAt(date: Date): string {
   }).format(date);
 }
 
-export function ModulesTable({ modules, onManage }: ModulesTableProps) {
-  if (modules.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed py-16">
-        <div className="rounded-full bg-muted p-4">
-          <IconPhoto className="size-8 text-muted-foreground" />
-        </div>
-        <p className="mt-4 text-sm font-medium text-muted-foreground">
-          Tidak ada modul yang cocok dengan filter.
-        </p>
-      </div>
-    );
-  }
+export function ModulesTable({
+  modules,
+  onManage,
+  showProgressRequirements = false,
+}: ModulesTableProps) {
+  const progressColumns = showProgressRequirements
+    ? [
+        {
+          id: "moduleName",
+          header: "Syarat Lanjut",
+          className: "max-w-xs whitespace-normal",
+          cell: (module: ModuleWithContents) => (
+            <div>
+              <p className="font-medium">{module.title}</p>
+              {module.description ? (
+                <p className="mt-0.5 line-clamp-1 text-xs text-muted-foreground">
+                  {module.description}
+                </p>
+              ) : null}
+            </div>
+          ),
+        },
+        {
+          id: "minQuizScore",
+          header: "Quiz Minimal",
+          cell: (module: ModuleWithContents) => (
+            <span className="text-sm">
+              {formatModuleRequirement(module.minQuizScore)}
+            </span>
+          ),
+        },
+        {
+          id: "minLatihanScore",
+          header: "Latihan Minimal",
+          cell: (module: ModuleWithContents) => (
+            <span className="text-sm">
+              {formatModuleRequirement(module.minLatihanScore)}
+            </span>
+          ),
+        },
+        {
+          id: "minAttendance",
+          header: "Kehadiran",
+          cell: (module: ModuleWithContents) => (
+            <span className="text-sm">
+              {formatModuleRequirement(module.minAttendance)}
+            </span>
+          ),
+        },
+      ]
+    : [];
 
-  return (
-    <div className="overflow-hidden rounded-lg border">
-      <Table>
-        <TableHeader>
-          <TableRow className="bg-muted/40 hover:bg-muted/40">
-            <TableHead className="w-14">Urutan</TableHead>
-            <TableHead className="w-20">Thumb</TableHead>
-            <TableHead>Judul Modul</TableHead>
-            <TableHead>Konten</TableHead>
-            <TableHead>Video Conf.</TableHead>
-            <TableHead>Diperbarui</TableHead>
-            <TableHead className="text-right">Aksi</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {modules.map((module) => {
+  const defaultColumns = showProgressRequirements
+    ? []
+    : [
+        {
+          id: "order",
+          header: "Urutan",
+          headerClassName: "w-14",
+          className: "w-14",
+          cell: (module: ModuleWithContents) => (
+            <span className="inline-flex size-8 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
+              {module.order + 1}
+            </span>
+          ),
+        },
+        {
+          id: "thumbnail",
+          header: "Thumb",
+          headerClassName: "w-20",
+          className: "w-20",
+          cell: (module: ModuleWithContents) =>
+            module.thumbnail ? (
+              <div className="size-12 overflow-hidden rounded-md border bg-muted">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={module.thumbnail}
+                  alt={module.title}
+                  className="size-full object-cover"
+                />
+              </div>
+            ) : (
+              <div className="flex size-12 items-center justify-center rounded-md border border-dashed bg-muted/50">
+                <IconPhoto className="size-4 text-muted-foreground" />
+              </div>
+            ),
+        },
+        {
+          id: "title",
+          header: "Nama Modul",
+          className: "max-w-xs whitespace-normal",
+          cell: (module: ModuleWithContents) => (
+            <div>
+              <p className="font-medium">{module.title}</p>
+              {module.description ? (
+                <p className="mt-0.5 line-clamp-1 text-xs text-muted-foreground">
+                  {module.description}
+                </p>
+              ) : (
+                <p className="mt-0.5 text-xs text-muted-foreground">
+                  Tanpa target pelatihan
+                </p>
+              )}
+            </div>
+          ),
+        },
+        {
+          id: "contents",
+          header: "Konten",
+          className: "whitespace-normal",
+          cell: (module: ModuleWithContents) => {
             const summary = summarizeContents(module);
 
             return (
-              <TableRow key={module.id} className="align-middle">
-                <TableCell>
-                  <span className="inline-flex size-8 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
-                    {module.order + 1}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  {module.thumbnail ? (
-                    <div className="size-12 overflow-hidden rounded-md border bg-muted">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={module.thumbnail}
-                        alt={module.title}
-                        className="size-full object-cover"
-                      />
-                    </div>
-                  ) : (
-                    <div className="flex size-12 items-center justify-center rounded-md border border-dashed bg-muted/50">
-                      <IconPhoto className="size-4 text-muted-foreground" />
-                    </div>
-                  )}
-                </TableCell>
-                <TableCell className="max-w-xs">
-                  <p className="font-medium">{module.title}</p>
-                  {module.description ? (
-                    <p className="mt-0.5 line-clamp-1 text-xs text-muted-foreground">
-                      {module.description}
-                    </p>
-                  ) : (
-                    <p className="mt-0.5 text-xs text-muted-foreground">
-                      Tanpa deskripsi
-                    </p>
-                  )}
-                </TableCell>
-                <TableCell>
-                  <div className="space-y-1">
-                    <Badge variant="secondary">{summary.total} item</Badge>
-                    {summary.total > 0 ? (
-                      <p className="text-xs text-muted-foreground">
-                        {summary.documents} dok · {summary.videos} video ·{" "}
-                        {summary.downloads} link
-                      </p>
-                    ) : (
-                      <p className="text-xs text-amber-600 dark:text-amber-400">
-                        Belum ada materi
-                      </p>
-                    )}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  {module.videoConferenceLink ? (
-                    <Button
-                      variant="outline"
-                      size="xs"
-                      render={
-                        <a
-                          href={module.videoConferenceLink}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        />
-                      }
-                    >
-                      <IconExternalLink className="size-3.5" />
-                      Meet/Zoom
-                    </Button>
-                  ) : (
-                    <span className="text-xs text-muted-foreground">—</span>
-                  )}
-                </TableCell>
-                <TableCell className="text-sm text-muted-foreground">
-                  {formatUpdatedAt(module.updatedAt)}
-                </TableCell>
-                <TableCell className="text-right">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => onManage(module)}
-                  >
-                    Kelola
-                  </Button>
-                </TableCell>
-              </TableRow>
+              <div className="space-y-1">
+                <Badge variant="secondary">{summary.total} item</Badge>
+                {summary.total > 0 ? (
+                  <p className="text-xs text-muted-foreground">
+                    {summary.documents} dok · {summary.videos} video ·{" "}
+                    {summary.downloads} link
+                  </p>
+                ) : (
+                  <p className="text-xs text-amber-600 dark:text-amber-400">
+                    Belum ada materi
+                  </p>
+                )}
+              </div>
             );
-          })}
-        </TableBody>
-      </Table>
-    </div>
+          },
+        },
+        {
+          id: "videoConference",
+          header: "Video Conf.",
+          cell: (module: ModuleWithContents) =>
+            module.videoConferenceLink ? (
+              <Button
+                variant="outline"
+                size="xs"
+                render={
+                  <a
+                    href={module.videoConferenceLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  />
+                }
+              >
+                <IconExternalLink className="size-3.5" />
+                Meet/Zoom
+              </Button>
+            ) : (
+              <span className="text-xs text-muted-foreground">—</span>
+            ),
+        },
+        {
+          id: "updatedAt",
+          header: "Diperbarui",
+          cell: (module: ModuleWithContents) => (
+            <span className="text-sm text-muted-foreground">
+              {formatUpdatedAt(module.updatedAt)}
+            </span>
+          ),
+        },
+      ];
+
+  return (
+    <DataTable
+      data={modules}
+      getRowKey={(module) => module.id}
+      emptyState={{
+        message: "Tidak ada modul yang cocok dengan filter.",
+        icon: IconPhoto,
+      }}
+      columns={[
+        ...progressColumns,
+        ...defaultColumns,
+        {
+          id: "actions",
+          header: "Aksi",
+          headerClassName: "text-right",
+          className: "text-right",
+          cell: (module) => (
+            <Button variant="outline" size="sm" onClick={() => onManage(module)}>
+              Kelola
+            </Button>
+          ),
+        },
+      ]}
+    />
   );
 }

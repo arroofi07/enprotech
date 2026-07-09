@@ -22,21 +22,52 @@ function emptyToNull(value: unknown): unknown {
   return value;
 }
 
+const scoreRequirementSchema = z.coerce
+  .number()
+  .int("Nilai harus bilangan bulat.")
+  .min(0, "Nilai minimal 0%.")
+  .max(100, "Nilai maksimal 100%.");
+
 export const createModuleSchema = z.object({
   trainingId: z.uuid("ID training tidak valid."),
   title: z
     .string()
     .trim()
-    .min(3, "Judul minimal 3 karakter.")
-    .max(200, "Judul maksimal 200 karakter."),
+    .min(3, "Nama modul minimal 3 karakter.")
+    .max(200, "Nama modul maksimal 200 karakter."),
   description: z.preprocess(
     emptyToUndefined,
-    z.string().trim().max(5000, "Deskripsi terlalu panjang.").optional(),
+    z.string().trim().max(5000, "Target pelatihan terlalu panjang.").optional(),
+  ),
+  thumbnail: z.preprocess(
+    emptyToUndefined,
+    z.string().url("URL thumbnail tidak valid.").optional(),
   ),
   videoConferenceLink: z.preprocess(
     emptyToUndefined,
     z.string().url("URL video conference tidak valid.").optional(),
   ),
+  order: z.coerce
+    .number()
+    .int("Urutan harus bilangan bulat.")
+    .min(1, "Urutan minimal 1.")
+    .optional(),
+  minQuizScore: scoreRequirementSchema.optional(),
+  minLatihanScore: scoreRequirementSchema.optional(),
+  minAttendance: scoreRequirementSchema.optional(),
+  videoUrl: z.preprocess(
+    emptyToUndefined,
+    z.string().url("URL video tidak valid.").optional(),
+  ),
+  pptUrl: z.preprocess(
+    emptyToUndefined,
+    z.string().url("URL PPT tidak valid.").optional(),
+  ),
+  materialUrl: z.preprocess(
+    emptyToUndefined,
+    z.string().url("URL materi tidak valid.").optional(),
+  ),
+  materialSize: z.coerce.number().int().min(0).optional(),
 });
 
 export const updateModuleSchema = z
@@ -60,6 +91,14 @@ export const updateModuleSchema = z
       emptyToNull,
       z.string().url("URL video conference tidak valid.").nullable().optional(),
     ),
+    minQuizScore: scoreRequirementSchema.optional(),
+    minLatihanScore: scoreRequirementSchema.optional(),
+    minAttendance: scoreRequirementSchema.optional(),
+    order: z.coerce
+      .number()
+      .int("Urutan harus bilangan bulat.")
+      .min(1, "Urutan minimal 1.")
+      .optional(),
   })
   .refine((value) => Object.keys(value).length > 1, {
     message: "Minimal satu field harus diisi.",

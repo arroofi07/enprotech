@@ -10,7 +10,7 @@ type ModulesFiltersProps = {
 
 export function ModulesFilters({ search }: ModulesFiltersProps) {
   return (
-    <form className="flex flex-col gap-4 sm:flex-row sm:items-end">
+    <form method="get" className="flex flex-col gap-4 sm:flex-row sm:items-end">
       <div className="flex-1 space-y-2">
         <Label htmlFor="search" className="text-sm font-medium">
           Cari Modul

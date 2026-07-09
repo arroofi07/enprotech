@@ -9,6 +9,7 @@ export const TrainingErrorCode = {
   MODULES_NOT_READY: "MODULES_NOT_READY",
   PRETEST_ALREADY_ACTIVE: "PRETEST_ALREADY_ACTIVE",
   VALIDATION_ERROR: "VALIDATION_ERROR",
+  PRETEST_NO_QUESTIONS: "PRETEST_NO_QUESTIONS",
 } as const;
 
 export type TrainingErrorCode =
@@ -29,6 +30,8 @@ const TRAINING_ERROR_MESSAGES: Record<TrainingErrorCode, string> = {
     "Semua modul harus memiliki materi sebelum pre-test diaktifkan.",
   [TrainingErrorCode.PRETEST_ALREADY_ACTIVE]: "Pre-test sudah aktif.",
   [TrainingErrorCode.VALIDATION_ERROR]: "Data yang dimasukkan tidak valid.",
+  [TrainingErrorCode.PRETEST_NO_QUESTIONS]:
+    "Tambahkan minimal satu soal pre-test sebelum aktivasi.",
 };
 
 export function getTrainingErrorMessage(code: TrainingErrorCode): string {

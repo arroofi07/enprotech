@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { activatePretest } from "@/lib/application/trainings/activate-pretest";
 import type { SessionUser } from "@/lib/domain/auth/types";
 import { TrainingErrorCode } from "@/lib/domain/trainings/errors";
+import * as assessmentRepository from "@/lib/infrastructure/db/repositories/assessment-repository";
 import * as trainingRepository from "@/lib/infrastructure/db/repositories/training-repository";
 
 const trainer: SessionUser = {
@@ -35,6 +36,23 @@ describe("activatePretest", () => {
       updatedAt: new Date("2026-01-01"),
     });
     vi.spyOn(trainingRepository, "areAllModulesReady").mockResolvedValue(true);
+    vi.spyOn(
+      assessmentRepository,
+      "findAssessmentByTrainingAndType",
+    ).mockResolvedValue({
+      id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      trainingId,
+      moduleId: null,
+      type: "pre_test",
+      title: "Pre-Test — Safety Training",
+      passingGrade: null,
+      timeLimit: null,
+      maxRetry: 1,
+      createdAt: new Date("2026-01-01"),
+    });
+    vi.spyOn(assessmentRepository, "countQuestionsByAssessment").mockResolvedValue(
+      5,
+    );
     vi.spyOn(trainingRepository, "setPretestActive").mockResolvedValue({
       id: trainingId,
       title: "Safety Training",

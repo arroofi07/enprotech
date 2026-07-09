@@ -7,7 +7,7 @@ import {
 } from "@/lib/domain/modules/file-validation";
 
 describe("validateUploadFile", () => {
-  it("accepts valid thumbnail images under 2MB", () => {
+  it("accepts valid thumbnail images under 1MB", () => {
     const result = validateUploadFile("thumbnail", {
       type: "image/png",
       size: THUMBNAIL_MAX_BYTES,
@@ -16,7 +16,7 @@ describe("validateUploadFile", () => {
     expect(result).toEqual({ valid: true });
   });
 
-  it("rejects thumbnail over 2MB", () => {
+  it("rejects thumbnail over 1MB", () => {
     const result = validateUploadFile("thumbnail", {
       type: "image/jpeg",
       size: THUMBNAIL_MAX_BYTES + 1,

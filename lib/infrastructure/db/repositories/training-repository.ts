@@ -517,6 +517,42 @@ export async function countTrainingsByStatus(
   return result?.value ?? 0;
 }
 
+export async function areAllModulesCompleted(
+  studentId: string,
+  trainingId: string,
+): Promise<boolean> {
+  const moduleRows = await db
+    .select({ id: modules.id })
+    .from(modules)
+    .where(eq(modules.trainingId, trainingId));
+
+  if (moduleRows.length === 0) {
+    return false;
+  }
+
+  const moduleIds = moduleRows.map((row) => row.id);
+  const progressRows = await db
+    .select({
+      moduleId: moduleProgress.moduleId,
+      status: moduleProgress.status,
+    })
+    .from(moduleProgress)
+    .where(
+      and(
+        eq(moduleProgress.studentId, studentId),
+        inArray(moduleProgress.moduleId, moduleIds),
+      ),
+    );
+
+  const completedModuleIds = new Set(
+    progressRows
+      .filter((row) => row.status === "completed")
+      .map((row) => row.moduleId),
+  );
+
+  return moduleIds.every((moduleId) => completedModuleIds.has(moduleId));
+}
+
 export async function trainingHasEnrollments(trainingId: string): Promise<boolean> {
   const [result] = await db
     .select({ value: count() })

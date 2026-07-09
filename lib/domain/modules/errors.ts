@@ -9,6 +9,7 @@ export const ModuleErrorCode = {
   INVALID_FILE_TYPE: "INVALID_FILE_TYPE",
   FILE_TOO_LARGE: "FILE_TOO_LARGE",
   UPLOAD_FAILED: "UPLOAD_FAILED",
+  PRETEST_REQUIRED: "PRETEST_REQUIRED",
 } as const;
 
 export type ModuleErrorCode =
@@ -27,6 +28,8 @@ const MODULE_ERROR_MESSAGES: Record<ModuleErrorCode, string> = {
     "Format file tidak didukung.",
   [ModuleErrorCode.FILE_TOO_LARGE]: "Ukuran file melebihi batas yang diizinkan.",
   [ModuleErrorCode.UPLOAD_FAILED]: "Gagal mengunggah file.",
+  [ModuleErrorCode.PRETEST_REQUIRED]:
+    "Selesaikan pre-test terlebih dahulu sebelum mengakses modul.",
 };
 
 export function getModuleErrorMessage(code: ModuleErrorCode): string {

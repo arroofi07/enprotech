@@ -1,12 +1,14 @@
 import { redirect } from "next/navigation";
 
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
+import { StudentTrainingFlowBanner } from "@/components/assessments/student-training-flow-banner";
 import { StudentModuleCard } from "@/components/modules/student-module-card";
 import { StudentHeader } from "@/components/student/student-header";
 import { ButtonLink } from "@/components/ui/button-link";
 import { Card, CardContent } from "@/components/ui/card";
 import { getCurrentUser } from "@/lib/application/auth/get-session";
 import { listStudentModules } from "@/lib/application/modules/list-student-modules";
+import { getStudentTrainingFlowState } from "@/lib/application/training-flow/get-student-training-flow-state";
 import { listEnrolledTrainings } from "@/lib/application/trainings/list-enrolled-trainings";
 
 type StudentTrainingModulesPageProps = {
@@ -23,9 +25,10 @@ export default async function StudentTrainingModulesPage({
   }
 
   const { id } = await params;
-  const [modulesResult, trainingsResult] = await Promise.all([
+  const [modulesResult, trainingsResult, flow] = await Promise.all([
     listStudentModules(user, { trainingId: id }),
     listEnrolledTrainings(user),
+    getStudentTrainingFlowState(user.id, id),
   ]);
 
   if (!modulesResult.success) {
@@ -35,6 +38,8 @@ export default async function StudentTrainingModulesPage({
   const training = trainingsResult.success
     ? trainingsResult.data.find((item) => item.id === id)
     : undefined;
+
+  const modulesLocked = flow ? !flow.canAccessModules : true;
 
   return (
     <>
@@ -57,6 +62,10 @@ export default async function StudentTrainingModulesPage({
             }
           />
 
+          {flow ? (
+            <StudentTrainingFlowBanner trainingId={id} flow={flow} />
+          ) : null}
+
           {modulesResult.data.length === 0 ? (
             <Card>
               <CardContent className="p-6 text-center text-sm text-muted-foreground">
@@ -70,6 +79,7 @@ export default async function StudentTrainingModulesPage({
                   key={module.id}
                   module={module}
                   trainingId={id}
+                  locked={modulesLocked}
                 />
               ))}
             </div>

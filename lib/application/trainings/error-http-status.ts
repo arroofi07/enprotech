@@ -16,6 +16,7 @@ export function trainingErrorHttpStatus(error: TrainingErrorCode): number {
     case "ALREADY_ENROLLED":
     case "MODULES_NOT_READY":
     case "PRETEST_ALREADY_ACTIVE":
+    case "PRETEST_NO_QUESTIONS":
       return 409;
     default: {
       const _exhaustive: never = error;

@@ -39,6 +39,18 @@ function parseOptionalString(value: FormDataEntryValue | null): string | undefin
   return text.length > 0 ? text : undefined;
 }
 
+function parseOptionalNumber(
+  value: FormDataEntryValue | null,
+): number | undefined {
+  const text = String(value ?? "").trim();
+  if (!text) {
+    return undefined;
+  }
+
+  const parsed = Number(text);
+  return Number.isFinite(parsed) ? parsed : undefined;
+}
+
 export async function createModuleAction(
   _prevState: ModuleActionState,
   formData: FormData,
@@ -50,9 +62,18 @@ export async function createModuleAction(
     trainingId,
     title: String(formData.get("title") ?? ""),
     description: parseOptionalString(formData.get("description")),
+    thumbnail: parseOptionalString(formData.get("thumbnail")),
     videoConferenceLink: parseOptionalString(
       formData.get("videoConferenceLink"),
     ),
+    order: parseOptionalNumber(formData.get("order")),
+    minQuizScore: parseOptionalNumber(formData.get("minQuizScore")),
+    minLatihanScore: parseOptionalNumber(formData.get("minLatihanScore")),
+    minAttendance: parseOptionalNumber(formData.get("minAttendance")),
+    videoUrl: parseOptionalString(formData.get("videoUrl")),
+    pptUrl: parseOptionalString(formData.get("pptUrl")),
+    materialUrl: parseOptionalString(formData.get("materialUrl")),
+    materialSize: parseOptionalNumber(formData.get("materialSize")),
   });
 
   if (!result.success) {
@@ -91,6 +112,10 @@ export async function updateModuleAction(
       formData.get("videoConferenceLink") === ""
         ? null
         : parseOptionalString(formData.get("videoConferenceLink")),
+    minQuizScore: parseOptionalNumber(formData.get("minQuizScore")),
+    minLatihanScore: parseOptionalNumber(formData.get("minLatihanScore")),
+    minAttendance: parseOptionalNumber(formData.get("minAttendance")),
+    order: parseOptionalNumber(formData.get("order")),
   });
 
   if (!result.success) {

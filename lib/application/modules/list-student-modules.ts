@@ -18,6 +18,7 @@ import {
 import { getModuleSchema, listModulesSchema } from "@/lib/validations/module-schemas";
 
 import { assertModuleStudent } from "./assert-access";
+import { assertStudentCanAccessModules } from "@/lib/application/training-flow/get-student-training-flow-state";
 
 export type StudentModuleListItem = ModuleWithContents & {
   progress: ModuleProgressRecord | null;
@@ -83,6 +84,14 @@ export async function getStudentModule(
   );
   if (!enrolled) {
     return moduleFailure(ModuleErrorCode.NOT_ENROLLED);
+  }
+
+  const canAccess = await assertStudentCanAccessModules(
+    actor!,
+    module.trainingId,
+  );
+  if (!canAccess) {
+    return moduleFailure(ModuleErrorCode.PRETEST_REQUIRED);
   }
 
   const detail = await getStudentModuleDetail(actor!.id, parsed.data.moduleId);

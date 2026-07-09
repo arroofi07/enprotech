@@ -5,7 +5,7 @@ prd_ref: §3.5
 target_week: W3
 priority: P0
 estimate: XL
-status: Pending
+status: Review
 dependencies: [T04]
 ---
 
@@ -37,26 +37,26 @@ Setiap Modul memiliki Quiz (dikerjakan dalam sesi) dan Latihan (dikerjakan akhir
   - Randomize urutan soal/opsi
 
 ## Acceptance Criteria
-- [ ] AC-1 — Trainer dapat membuat quiz untuk setiap modul
-- [ ] AC-2 — Trainer dapat membuat latihan untuk setiap modul
-- [ ] AC-3 — Trainer dapat menambah soal pilihan ganda (pertanyaan + 4 opsi + jawaban benar)
-- [ ] AC-4 — Trainer dapat edit dan hapus soal
-- [ ] AC-5 — Trainer dapat import soal dari Excel (template tersedia)
-- [ ] AC-6 — Student dapat mengerjakan quiz/latihan
-- [ ] AC-7 — Jawaban auto-save saat student memilih opsi
-- [ ] AC-8 — Student dapat submit dan melihat hasil (score, passing/not passing)
-- [ ] AC-9 — Student dapat retry jika belum mencapai passing grade
-- [ ] AC-10 — Sistem menyimpan nilai tertinggi dari semua attempt
-- [ ] AC-11 — Student dapat melihat review jawaban yang salah setelah submit
-- [ ] AC-12 — Tampilkan riwayat attempt dengan score masing-masing
-- [ ] AC-13 — Quiz/latihan yang sudah passing tidak bisa di-retry lagi (opsional)
+- [x] AC-1 — Trainer dapat membuat quiz untuk setiap modul
+- [x] AC-2 — Trainer dapat membuat latihan untuk setiap modul
+- [x] AC-3 — Trainer dapat menambah soal pilihan ganda (pertanyaan + 4 opsi + jawaban benar)
+- [x] AC-4 — Trainer dapat edit dan hapus soal
+- [x] AC-5 — Trainer dapat import soal dari Excel (template tersedia)
+- [x] AC-6 — Student dapat mengerjakan quiz/latihan
+- [x] AC-7 — Jawaban auto-save saat student memilih opsi
+- [x] AC-8 — Student dapat submit dan melihat hasil (score, passing/not passing)
+- [x] AC-9 — Student dapat retry jika belum mencapai passing grade
+- [x] AC-10 — Sistem menyimpan nilai tertinggi dari semua attempt
+- [x] AC-11 — Student dapat melihat review jawaban yang salah setelah submit
+- [x] AC-12 — Tampilkan riwayat attempt dengan score masing-masing
+- [x] AC-13 — Quiz/latihan yang sudah passing tidak bisa di-retry lagi (opsional)
 
 ## Definition of Done
 - [ ] Code merged ke `main` + reviewed
-- [ ] Unit test untuk scoring logic dan best score calculation
+- [x] Unit test untuk scoring logic dan best score calculation
 - [ ] Manual QA pass: create soal → import → attempt → retry → review
-- [ ] Dokumentasi: panduan membuat quiz/latihan dan template Excel
-- [ ] Tidak ada regresi T01-T04
+- [x] Dokumentasi: panduan membuat quiz/latihan dan template Excel
+- [x] Tidak ada regresi T01-T04
 
 ## Catatan Teknis
 - **Backend:** 

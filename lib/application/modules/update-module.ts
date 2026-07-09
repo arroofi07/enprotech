@@ -33,8 +33,14 @@ export async function updateModule(
     return moduleFailure(ModuleErrorCode.MODULE_NOT_FOUND);
   }
 
-  const { moduleId, ...updates } = parsed.data;
-  const updated = await updateModuleInRepo(moduleId, updates);
+  const { moduleId, order, ...updates } = parsed.data;
+
+  const repoUpdates = {
+    ...updates,
+    ...(order !== undefined ? { order: order - 1 } : {}),
+  };
+
+  const updated = await updateModuleInRepo(moduleId, repoUpdates);
   if (!updated) {
     return moduleFailure(ModuleErrorCode.MODULE_NOT_FOUND);
   }

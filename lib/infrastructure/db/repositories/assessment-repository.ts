@@ -1,0 +1,505 @@
+import { and, asc, count, desc, eq, isNull, sql } from "drizzle-orm";
+
+import { db } from "@/lib/db";
+import {
+  assessmentAttempts,
+  assessments,
+  questions,
+  type AssessmentAnswer,
+  type QuestionOption,
+} from "@/lib/db/schema/assessments";
+import { modules } from "@/lib/db/schema/modules";
+import { trainings } from "@/lib/db/schema/trainings";
+import type {
+  AssessmentType,
+  ModuleAssessmentType,
+  TrainingAssessmentType,
+} from "@/lib/domain/assessments/types";
+
+export type AssessmentRecord = {
+  id: string;
+  trainingId: string;
+  moduleId: string | null;
+  type: AssessmentType;
+  title: string;
+  passingGrade: number | null;
+  timeLimit: number | null;
+  maxRetry: number | null;
+  createdAt: Date;
+};
+
+export type QuestionRecord = {
+  id: string;
+  assessmentId: string;
+  questionText: string;
+  options: QuestionOption[];
+  order: number;
+  createdAt: Date;
+};
+
+export type AssessmentAttemptRecord = {
+  id: string;
+  studentId: string;
+  assessmentId: string;
+  score: number;
+  answers: AssessmentAnswer[];
+  startedAt: Date;
+  submittedAt: Date | null;
+};
+
+export type ModuleContext = {
+  id: string;
+  trainingId: string;
+  title: string;
+  minQuizScore: number;
+  minLatihanScore: number;
+};
+
+const assessmentColumns = {
+  id: assessments.id,
+  trainingId: assessments.trainingId,
+  moduleId: assessments.moduleId,
+  type: assessments.type,
+  title: assessments.title,
+  passingGrade: assessments.passingGrade,
+  timeLimit: assessments.timeLimit,
+  maxRetry: assessments.maxRetry,
+  createdAt: assessments.createdAt,
+};
+
+const questionColumns = {
+  id: questions.id,
+  assessmentId: questions.assessmentId,
+  questionText: questions.questionText,
+  options: questions.options,
+  order: questions.order,
+  createdAt: questions.createdAt,
+};
+
+const attemptColumns = {
+  id: assessmentAttempts.id,
+  studentId: assessmentAttempts.studentId,
+  assessmentId: assessmentAttempts.assessmentId,
+  score: assessmentAttempts.score,
+  answers: assessmentAttempts.answers,
+  startedAt: assessmentAttempts.startedAt,
+  submittedAt: assessmentAttempts.submittedAt,
+};
+
+function mapAssessment(
+  row: typeof assessments.$inferSelect,
+): AssessmentRecord {
+  return {
+    id: row.id,
+    trainingId: row.trainingId,
+    moduleId: row.moduleId,
+    type: row.type,
+    title: row.title,
+    passingGrade: row.passingGrade,
+    timeLimit: row.timeLimit,
+    maxRetry: row.maxRetry,
+    createdAt: row.createdAt,
+  };
+}
+
+function mapQuestion(row: typeof questions.$inferSelect): QuestionRecord {
+  return {
+    id: row.id,
+    assessmentId: row.assessmentId,
+    questionText: row.questionText,
+    options: row.options,
+    order: row.order,
+    createdAt: row.createdAt,
+  };
+}
+
+function mapAttempt(
+  row: typeof assessmentAttempts.$inferSelect,
+): AssessmentAttemptRecord {
+  return {
+    id: row.id,
+    studentId: row.studentId,
+    assessmentId: row.assessmentId,
+    score: row.score,
+    answers: row.answers,
+    startedAt: row.startedAt,
+    submittedAt: row.submittedAt,
+  };
+}
+
+export async function findModuleContextById(
+  moduleId: string,
+): Promise<ModuleContext | null> {
+  const [row] = await db
+    .select({
+      id: modules.id,
+      trainingId: modules.trainingId,
+      title: modules.title,
+      minQuizScore: modules.minQuizScore,
+      minLatihanScore: modules.minLatihanScore,
+    })
+    .from(modules)
+    .where(eq(modules.id, moduleId))
+    .limit(1);
+
+  return row ?? null;
+}
+
+export async function getTrainingPassingGrade(
+  trainingId: string,
+): Promise<number> {
+  const [row] = await db
+    .select({ passingGrade: trainings.passingGrade })
+    .from(trainings)
+    .where(eq(trainings.id, trainingId))
+    .limit(1);
+
+  return row?.passingGrade ?? 70;
+}
+
+export async function findAssessmentByModuleAndType(
+  moduleId: string,
+  type: ModuleAssessmentType,
+): Promise<AssessmentRecord | null> {
+  const [row] = await db
+    .select(assessmentColumns)
+    .from(assessments)
+    .where(and(eq(assessments.moduleId, moduleId), eq(assessments.type, type)))
+    .limit(1);
+
+  return row ? mapAssessment(row) : null;
+}
+
+export async function findAssessmentByTrainingAndType(
+  trainingId: string,
+  type: TrainingAssessmentType,
+): Promise<AssessmentRecord | null> {
+  const [row] = await db
+    .select(assessmentColumns)
+    .from(assessments)
+    .where(
+      and(
+        eq(assessments.trainingId, trainingId),
+        isNull(assessments.moduleId),
+        eq(assessments.type, type),
+      ),
+    )
+    .limit(1);
+
+  return row ? mapAssessment(row) : null;
+}
+
+export async function findAssessmentById(
+  assessmentId: string,
+): Promise<AssessmentRecord | null> {
+  const [row] = await db
+    .select(assessmentColumns)
+    .from(assessments)
+    .where(eq(assessments.id, assessmentId))
+    .limit(1);
+
+  return row ? mapAssessment(row) : null;
+}
+
+export async function createAssessment(input: {
+  trainingId: string;
+  moduleId: string;
+  type: ModuleAssessmentType;
+  title: string;
+}): Promise<AssessmentRecord> {
+  const [row] = await db
+    .insert(assessments)
+    .values({
+      trainingId: input.trainingId,
+      moduleId: input.moduleId,
+      type: input.type,
+      title: input.title,
+      maxRetry: null,
+    })
+    .returning(assessmentColumns);
+
+  return mapAssessment(row);
+}
+
+export async function createTrainingAssessment(input: {
+  trainingId: string;
+  type: TrainingAssessmentType;
+  title: string;
+}): Promise<AssessmentRecord> {
+  const [row] = await db
+    .insert(assessments)
+    .values({
+      trainingId: input.trainingId,
+      moduleId: null,
+      type: input.type,
+      title: input.title,
+      maxRetry: input.type === "pre_test" ? 1 : null,
+    })
+    .returning(assessmentColumns);
+
+  return mapAssessment(row);
+}
+
+export async function listQuestionsByAssessment(
+  assessmentId: string,
+): Promise<QuestionRecord[]> {
+  const rows = await db
+    .select(questionColumns)
+    .from(questions)
+    .where(eq(questions.assessmentId, assessmentId))
+    .orderBy(asc(questions.order), asc(questions.createdAt));
+
+  return rows.map(mapQuestion);
+}
+
+export async function findQuestionById(
+  questionId: string,
+): Promise<QuestionRecord | null> {
+  const [row] = await db
+    .select(questionColumns)
+    .from(questions)
+    .where(eq(questions.id, questionId))
+    .limit(1);
+
+  return row ? mapQuestion(row) : null;
+}
+
+export async function getNextQuestionOrder(
+  assessmentId: string,
+): Promise<number> {
+  const [row] = await db
+    .select({
+      maxOrder: sql<number>`coalesce(max(${questions.order}), -1)`,
+    })
+    .from(questions)
+    .where(eq(questions.assessmentId, assessmentId));
+
+  return (row?.maxOrder ?? -1) + 1;
+}
+
+export async function createQuestion(input: {
+  assessmentId: string;
+  questionText: string;
+  options: QuestionOption[];
+  order: number;
+}): Promise<QuestionRecord> {
+  const [row] = await db
+    .insert(questions)
+    .values({
+      assessmentId: input.assessmentId,
+      questionText: input.questionText,
+      options: input.options,
+      order: input.order,
+    })
+    .returning(questionColumns);
+
+  return mapQuestion(row);
+}
+
+export async function bulkCreateQuestions(
+  items: Array<{
+    assessmentId: string;
+    questionText: string;
+    options: QuestionOption[];
+    order: number;
+  }>,
+): Promise<QuestionRecord[]> {
+  if (items.length === 0) {
+    return [];
+  }
+
+  const rows = await db
+    .insert(questions)
+    .values(items)
+    .returning(questionColumns);
+
+  return rows.map(mapQuestion);
+}
+
+export async function updateQuestion(
+  questionId: string,
+  input: {
+    questionText: string;
+    options: QuestionOption[];
+  },
+): Promise<QuestionRecord | null> {
+  const [row] = await db
+    .update(questions)
+    .set({
+      questionText: input.questionText,
+      options: input.options,
+    })
+    .where(eq(questions.id, questionId))
+    .returning(questionColumns);
+
+  return row ? mapQuestion(row) : null;
+}
+
+export async function deleteQuestion(questionId: string): Promise<boolean> {
+  const deleted = await db
+    .delete(questions)
+    .where(eq(questions.id, questionId))
+    .returning({ id: questions.id });
+
+  return deleted.length > 0;
+}
+
+export async function findInProgressAttempt(
+  studentId: string,
+  assessmentId: string,
+): Promise<AssessmentAttemptRecord | null> {
+  const [row] = await db
+    .select(attemptColumns)
+    .from(assessmentAttempts)
+    .where(
+      and(
+        eq(assessmentAttempts.studentId, studentId),
+        eq(assessmentAttempts.assessmentId, assessmentId),
+        isNull(assessmentAttempts.submittedAt),
+      ),
+    )
+    .orderBy(desc(assessmentAttempts.startedAt))
+    .limit(1);
+
+  return row ? mapAttempt(row) : null;
+}
+
+export async function createAttempt(input: {
+  studentId: string;
+  assessmentId: string;
+}): Promise<AssessmentAttemptRecord> {
+  const [row] = await db
+    .insert(assessmentAttempts)
+    .values({
+      studentId: input.studentId,
+      assessmentId: input.assessmentId,
+      score: 0,
+      answers: [],
+    })
+    .returning(attemptColumns);
+
+  return mapAttempt(row);
+}
+
+export async function findAttemptById(
+  attemptId: string,
+): Promise<AssessmentAttemptRecord | null> {
+  const [row] = await db
+    .select(attemptColumns)
+    .from(assessmentAttempts)
+    .where(eq(assessmentAttempts.id, attemptId))
+    .limit(1);
+
+  return row ? mapAttempt(row) : null;
+}
+
+export async function updateAttemptAnswers(
+  attemptId: string,
+  answers: AssessmentAnswer[],
+): Promise<AssessmentAttemptRecord | null> {
+  const [row] = await db
+    .update(assessmentAttempts)
+    .set({ answers })
+    .where(
+      and(
+        eq(assessmentAttempts.id, attemptId),
+        isNull(assessmentAttempts.submittedAt),
+      ),
+    )
+    .returning(attemptColumns);
+
+  return row ? mapAttempt(row) : null;
+}
+
+export async function submitAttempt(
+  attemptId: string,
+  input: {
+    score: number;
+    answers: AssessmentAnswer[];
+  },
+): Promise<AssessmentAttemptRecord | null> {
+  const [row] = await db
+    .update(assessmentAttempts)
+    .set({
+      score: input.score,
+      answers: input.answers,
+      submittedAt: new Date(),
+    })
+    .where(
+      and(
+        eq(assessmentAttempts.id, attemptId),
+        isNull(assessmentAttempts.submittedAt),
+      ),
+    )
+    .returning(attemptColumns);
+
+  return row ? mapAttempt(row) : null;
+}
+
+export async function listSubmittedAttempts(
+  studentId: string,
+  assessmentId: string,
+): Promise<AssessmentAttemptRecord[]> {
+  const rows = await db
+    .select(attemptColumns)
+    .from(assessmentAttempts)
+    .where(
+      and(
+        eq(assessmentAttempts.studentId, studentId),
+        eq(assessmentAttempts.assessmentId, assessmentId),
+        sql`${assessmentAttempts.submittedAt} is not null`,
+      ),
+    )
+    .orderBy(desc(assessmentAttempts.submittedAt));
+
+  return rows.map(mapAttempt);
+}
+
+export async function getBestSubmittedScore(
+  studentId: string,
+  assessmentId: string,
+): Promise<number> {
+  const [row] = await db
+    .select({
+      bestScore: sql<number>`coalesce(max(${assessmentAttempts.score}), 0)`,
+    })
+    .from(assessmentAttempts)
+    .where(
+      and(
+        eq(assessmentAttempts.studentId, studentId),
+        eq(assessmentAttempts.assessmentId, assessmentId),
+        sql`${assessmentAttempts.submittedAt} is not null`,
+      ),
+    );
+
+  return row?.bestScore ?? 0;
+}
+
+export async function countSubmittedAttempts(
+  studentId: string,
+  assessmentId: string,
+): Promise<number> {
+  const [row] = await db
+    .select({ value: count() })
+    .from(assessmentAttempts)
+    .where(
+      and(
+        eq(assessmentAttempts.studentId, studentId),
+        eq(assessmentAttempts.assessmentId, assessmentId),
+        sql`${assessmentAttempts.submittedAt} is not null`,
+      ),
+    );
+
+  return row?.value ?? 0;
+}
+
+export async function countQuestionsByAssessment(
+  assessmentId: string,
+): Promise<number> {
+  const [row] = await db
+    .select({ value: count() })
+    .from(questions)
+    .where(eq(questions.assessmentId, assessmentId));
+
+  return row?.value ?? 0;
+}

@@ -18,6 +18,9 @@ export const modules = pgTable("modules", {
   description: text("description"),
   thumbnail: text("thumbnail"),
   videoConferenceLink: text("video_conference_link"),
+  minQuizScore: integer("min_quiz_score").notNull().default(0),
+  minLatihanScore: integer("min_latihan_score").notNull().default(0),
+  minAttendance: integer("min_attendance").notNull().default(0),
   order: integer("order").notNull().default(0),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()

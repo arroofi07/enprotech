@@ -15,6 +15,13 @@
       "when": 1783532729464,
       "tag": "0001_jittery_cerise",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1783569130255,
+      "tag": "0003_module_progression_requirements",
+      "breakpoints": true
     }
   ]
 }

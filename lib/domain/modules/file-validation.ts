@@ -1,13 +1,12 @@
 import type { UploadPurpose } from "./types";
 
-export const THUMBNAIL_MAX_BYTES = 2 * 1024 * 1024;
+export const THUMBNAIL_MAX_BYTES = 1 * 1024 * 1024;
 export const DOCUMENT_MAX_BYTES = 1 * 1024 * 1024;
 
 const THUMBNAIL_MIME_TYPES = new Set([
   "image/jpeg",
   "image/png",
   "image/webp",
-  "image/gif",
 ]);
 
 const DOCUMENT_MIME_TYPES = new Set([

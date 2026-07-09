@@ -1,41 +1,7 @@
-import { redirect } from "next/navigation";
+import { TrainingAssessmentHubPage } from "@/components/assessments/training-assessment-hub-page";
 
-import { LearningFlowPlaceholder } from "@/components/dashboard/learning-flow-placeholder";
-import { TrainerHeader } from "@/components/trainer/trainer-header";
-import { getCurrentUser } from "@/lib/application/auth/get-session";
-
-async function TrainerLearningPage({
-  title,
-  description,
-  taskId,
-}: {
-  title: string;
-  description: string;
-  taskId: string;
-}) {
-  const user = await getCurrentUser();
-  if (!user) redirect("/login");
-
+export default function TrainerPostTestHubPage() {
   return (
-    <>
-      <TrainerHeader title={title} breadcrumbs={[{ label: title }]} user={user} />
-      <main className="flex-1 overflow-auto">
-        <LearningFlowPlaceholder
-          title={title}
-          description={description}
-          taskId={taskId}
-        />
-      </main>
-    </>
-  );
-}
-
-export default function TrainerPostTestPage() {
-  return (
-    <TrainerLearningPage
-      title="Post Test"
-      description="Kelola soal post-test dan syarat kelulusan training."
-      taskId="T06"
-    />
+    <TrainingAssessmentHubPage assessmentType="post_test" role="trainer" />
   );
 }
