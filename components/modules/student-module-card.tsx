@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { ModuleProgressBadge } from "@/components/modules/module-progress-badge";
+import { AssessmentProgressBadge } from "@/components/progress/assessment-progress-badge";
 import {
   Card,
   CardContent,
@@ -9,17 +10,20 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import type { StudentModuleListItem } from "@/lib/application/modules/list-student-modules";
+import type { ModuleProgressItem } from "@/lib/domain/trainings/progress-types";
 
 type StudentModuleCardProps = {
   module: StudentModuleListItem;
   trainingId: string;
   locked?: boolean;
+  progressItem?: ModuleProgressItem;
 };
 
 export function StudentModuleCard({
   module,
   trainingId,
   locked = false,
+  progressItem,
 }: StudentModuleCardProps) {
   const status = module.progress?.status ?? "not_started";
 
@@ -54,12 +58,19 @@ export function StudentModuleCard({
           <ModuleProgressBadge status={status} />
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-3">
         <p className="text-sm text-muted-foreground">
           {locked
             ? "Selesaikan pre-test untuk membuka modul."
             : `${module.contents.length} materi`}
         </p>
+
+        {progressItem && !locked ? (
+          <div className="flex flex-wrap gap-2">
+            <AssessmentProgressBadge status={progressItem.quiz.status} />
+            <AssessmentProgressBadge status={progressItem.latihan.status} />
+          </div>
+        ) : null}
       </CardContent>
     </Card>
   );

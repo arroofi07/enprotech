@@ -14,10 +14,6 @@ import { moduleContents, moduleProgress, modules } from "@/lib/db/schema/modules
 import { enrollments, trainings } from "@/lib/db/schema/trainings";
 import { users } from "@/lib/db/schema/users";
 import type { EnrollmentStatus, TrainingStatus } from "@/lib/domain/trainings/types";
-import {
-  calculateTrainingProgress,
-  countCompletedModules,
-} from "@/lib/domain/trainings/compute-progress";
 
 export type TrainingRecord = {
   id: string;
@@ -44,13 +40,22 @@ export type EnrollmentRecord = {
   studentEmail: string;
 };
 
-export type EnrolledTrainingRecord = TrainingRecord & {
+export type EnrolledTrainingBase = TrainingRecord & {
   enrollmentId: string;
   enrollmentStatus: EnrollmentStatus;
   enrolledAt: Date;
+};
+
+export type EnrolledTrainingRecord = EnrolledTrainingBase & {
   progressPercent: number;
   completedModules: number;
   totalModules: number;
+  completedQuizzes: number;
+  totalQuizzes: number;
+  completedLatihans: number;
+  totalLatihans: number;
+  completedItems: number;
+  totalItems: number;
 };
 
 export type ListTrainingsQuery = {
@@ -405,7 +410,7 @@ export async function setPretestActive(
 
 export async function listEnrolledTrainingsByStudent(
   studentId: string,
-): Promise<EnrolledTrainingRecord[]> {
+): Promise<EnrolledTrainingBase[]> {
   const rows = await db
     .select({
       ...trainingColumns,
@@ -423,87 +428,12 @@ export async function listEnrolledTrainingsByStudent(
     )
     .orderBy(desc(enrollments.enrolledAt));
 
-  const trainingIds = rows.map((row) => row.id);
-  const moduleCounts = await getModuleCountsByTrainingIds(trainingIds);
-  const completedCounts = await getCompletedModuleCountsByStudent(
-    studentId,
-    trainingIds,
-  );
-
-  return rows.map((row) => {
-    const totalModules = moduleCounts.get(row.id) ?? 0;
-    const completedModules = completedCounts.get(row.id) ?? 0;
-
-    return {
-      ...mapTraining(row),
-      enrollmentId: row.enrollmentId,
-      enrollmentStatus: row.enrollmentStatus,
-      enrolledAt: row.enrolledAt,
-      totalModules,
-      completedModules,
-      progressPercent: calculateTrainingProgress(
-        totalModules,
-        completedModules,
-      ),
-    };
-  });
-}
-
-async function getModuleCountsByTrainingIds(
-  trainingIds: string[],
-): Promise<Map<string, number>> {
-  if (trainingIds.length === 0) {
-    return new Map();
-  }
-
-  const rows = await db
-    .select({
-      trainingId: modules.trainingId,
-      value: count(),
-    })
-    .from(modules)
-    .where(inArray(modules.trainingId, trainingIds))
-    .groupBy(modules.trainingId);
-
-  return new Map(rows.map((row) => [row.trainingId, row.value]));
-}
-
-async function getCompletedModuleCountsByStudent(
-  studentId: string,
-  trainingIds: string[],
-): Promise<Map<string, number>> {
-  if (trainingIds.length === 0) {
-    return new Map();
-  }
-
-  const rows = await db
-    .select({
-      trainingId: modules.trainingId,
-      status: moduleProgress.status,
-    })
-    .from(moduleProgress)
-    .innerJoin(modules, eq(moduleProgress.moduleId, modules.id))
-    .where(
-      and(
-        eq(moduleProgress.studentId, studentId),
-        inArray(modules.trainingId, trainingIds),
-      ),
-    );
-
-  const grouped = new Map<string, { status: "not_started" | "in_progress" | "completed" }[]>();
-
-  for (const row of rows) {
-    const current = grouped.get(row.trainingId) ?? [];
-    current.push({ status: row.status });
-    grouped.set(row.trainingId, current);
-  }
-
-  return new Map(
-    [...grouped.entries()].map(([trainingId, progress]) => [
-      trainingId,
-      countCompletedModules(progress),
-    ]),
-  );
+  return rows.map((row) => ({
+    ...mapTraining(row),
+    enrollmentId: row.enrollmentId,
+    enrollmentStatus: row.enrollmentStatus,
+    enrolledAt: row.enrolledAt,
+  }));
 }
 
 export async function countTrainingsByStatus(

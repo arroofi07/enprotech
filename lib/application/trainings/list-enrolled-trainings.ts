@@ -11,6 +11,7 @@ import {
 } from "@/lib/infrastructure/db/repositories/training-repository";
 
 import { assertStudent } from "./assert-student";
+import { enrichEnrolledTrainingsWithProgress } from "../progress/enrich-enrolled-trainings";
 
 export async function listEnrolledTrainings(
   actor: SessionUser | null,
@@ -21,5 +22,6 @@ export async function listEnrolledTrainings(
   }
 
   const items = await listEnrolledTrainingsByStudent(actor!.id);
-  return trainingSuccess(items);
+  const enriched = await enrichEnrolledTrainingsWithProgress(actor!.id, items);
+  return trainingSuccess(enriched);
 }
