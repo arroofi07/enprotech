@@ -27,11 +27,17 @@ Training `draft` dan `archived` tidak muncul di halaman student.
 | Admin / Trainer | `/trainer/trainings/[id]/edit` | Edit, enrollment, pengaturan |
 | Student | `/student/trainings` | Training enrolled + progress |
 
-Nav:
+Nav (sidebar) mengikuti alur E-Training PRD:
 
-- **Trainer sidebar:** Dashboard, Training
-- **Admin sidebar:** Dashboard, Pengguna, Training (→ `/trainer/trainings`)
-- **Student sidebar:** Dashboard, Training Saya
+| Role | Grup Administrasi | Grup Alur E-Training |
+|------|-------------------|----------------------|
+| Admin | Dashboard, Pengguna, Training | Pre Test, Modul, Video Conference, Quiz, Latihan, Post Test, Nilai, Sertifikat |
+| Trainer | Dashboard, Training | (sama) |
+| Student | — | (sama, tanpa administrasi) |
+
+Konfigurasi: `lib/navigation/dashboard-nav.ts`. Item belum diimplementasi ditandai badge **Segera**.
+
+Student: `/student/trainings` redirect ke `/student/modules`.
 
 ## Status Training
 

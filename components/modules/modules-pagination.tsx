@@ -7,17 +7,17 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 
-type TrainingsPaginationProps = {
+type ModulesPaginationProps = {
+  trainingId: string;
   page: number;
   totalPages: number;
   searchParams: Record<string, string | undefined>;
-  basePath?: string;
 };
 
 function buildHref(
+  trainingId: string,
   page: number,
   searchParams: Record<string, string | undefined>,
-  basePath: string,
 ): string {
   const params = new URLSearchParams();
 
@@ -28,15 +28,16 @@ function buildHref(
   }
 
   params.set("page", String(page));
-  return `${basePath}?${params.toString()}`;
+  const query = params.toString();
+  return `/trainer/trainings/${trainingId}/modules${query ? `?${query}` : ""}`;
 }
 
-export function TrainingsPagination({
+export function ModulesPagination({
+  trainingId,
   page,
   totalPages,
   searchParams,
-  basePath = "/trainer/trainings",
-}: TrainingsPaginationProps) {
+}: ModulesPaginationProps) {
   if (totalPages <= 1) {
     return null;
   }
@@ -46,14 +47,19 @@ export function TrainingsPagination({
       <PaginationContent>
         <PaginationItem>
           <PaginationPrevious
-            href={page > 1 ? buildHref(page - 1, searchParams, basePath) : "#"}
+            href={
+              page > 1 ? buildHref(trainingId, page - 1, searchParams) : "#"
+            }
             text="Sebelumnya"
             aria-disabled={page <= 1}
             className={page <= 1 ? "pointer-events-none opacity-50" : undefined}
           />
         </PaginationItem>
         <PaginationItem>
-          <PaginationLink href={buildHref(page, searchParams, basePath)} isActive>
+          <PaginationLink
+            href={buildHref(trainingId, page, searchParams)}
+            isActive
+          >
             {page}
           </PaginationLink>
         </PaginationItem>
@@ -66,7 +72,7 @@ export function TrainingsPagination({
           <PaginationNext
             href={
               page < totalPages
-                ? buildHref(page + 1, searchParams, basePath)
+                ? buildHref(trainingId, page + 1, searchParams)
                 : "#"
             }
             text="Berikutnya"

@@ -53,7 +53,7 @@ export function ModuleEditCard({ module, trainingId }: ModuleEditCardProps) {
   );
 
   return (
-    <div className="space-y-4 p-4">
+    <div className="space-y-6">
       <div className="flex items-start justify-between gap-3">
         <div>
           <h3 className="font-semibold">{module.title}</h3>

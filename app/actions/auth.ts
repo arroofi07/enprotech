@@ -13,6 +13,7 @@ export type AuthActionState = {
   error?: AuthErrorCode;
   message?: string;
   success?: boolean;
+  redirectTo?: string;
 };
 
 export async function loginAction(
@@ -26,7 +27,7 @@ export async function loginAction(
   }
 
   await createSession(result.data.user);
-  redirect(result.data.redirectTo);
+  return { success: true, redirectTo: result.data.redirectTo };
 }
 
 export async function registerAction(

@@ -30,9 +30,7 @@ export default async function StudentDashboardPage() {
                   {formatUserDisplayName(user)}
                 </span>
                 . Buka menu{" "}
-                <span className="font-medium text-foreground">
-                  Training Saya
-                </span>{" "}
+                <span className="font-medium text-foreground">Modul</span>{" "}
                 untuk melihat program yang sudah Anda ikuti.
               </p>
             </CardContent>

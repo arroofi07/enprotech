@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState } from "react";
+import { useRouter } from "next/navigation";
+import { startTransition, useActionState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -32,6 +33,7 @@ import { loginSchema, type LoginInput } from "@/lib/validations/auth-schemas";
 const initialState: AuthActionState = {};
 
 export function LoginForm() {
+  const router = useRouter();
   const [state, formAction, isPending] = useActionState(
     loginAction,
     initialState,
@@ -49,8 +51,17 @@ export function LoginForm() {
     },
   });
 
+  useEffect(() => {
+    if (state.success && state.redirectTo) {
+      router.replace(state.redirectTo);
+      router.refresh();
+    }
+  }, [state.success, state.redirectTo, router]);
+
   const onSubmit = handleSubmit((data) => {
-    formAction(data);
+    startTransition(() => {
+      formAction(data);
+    });
   });
 
   return (
