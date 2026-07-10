@@ -2,6 +2,7 @@ import type { CertificateRow } from "@/lib/infrastructure/db/repositories/certif
 import type {
   CertificateRecord,
   CertificateSummary,
+  TrainerCertificateSummary,
   VerifiedCertificate,
 } from "@/lib/domain/certificates/types";
 
@@ -15,6 +16,17 @@ export function toCertificateSummary(row: CertificateRow): CertificateSummary {
     preTestScore: row.preTestScore,
     postTestScore: row.postTestScore,
     finalGrade: row.finalGrade,
+  };
+}
+
+export function toTrainerCertificateSummary(
+  row: CertificateRow,
+): TrainerCertificateSummary {
+  return {
+    ...toCertificateSummary(row),
+    studentId: row.studentId,
+    studentName: row.studentName,
+    studentEmail: row.studentEmail,
   };
 }
 

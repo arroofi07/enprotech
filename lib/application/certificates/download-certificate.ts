@@ -9,7 +9,7 @@ import {
 import { findCertificateById } from "@/lib/infrastructure/db/repositories/certificate-repository";
 import { certificateIdSchema } from "@/lib/validations/certificate-schemas";
 
-import { assertCertificateStudent } from "./assert-student";
+import { assertCertificateAccess } from "./assert-certificate-access";
 
 export type DownloadCertificateResult = {
   buffer: ArrayBuffer;
@@ -21,11 +21,6 @@ export async function downloadCertificate(
   actor: SessionUser | null,
   input: unknown,
 ): Promise<CertificateResult<DownloadCertificateResult>> {
-  const forbidden = assertCertificateStudent(actor);
-  if (forbidden) {
-    return forbidden;
-  }
-
   const parsed = certificateIdSchema.safeParse(input);
   if (!parsed.success) {
     return certificateFailure(CertificateErrorCode.VALIDATION_ERROR);
@@ -36,8 +31,9 @@ export async function downloadCertificate(
     return certificateFailure(CertificateErrorCode.CERTIFICATE_NOT_FOUND);
   }
 
-  if (row.studentId !== actor!.id) {
-    return certificateFailure(CertificateErrorCode.FORBIDDEN);
+  const forbidden = assertCertificateAccess(actor, row);
+  if (forbidden) {
+    return forbidden;
   }
 
   const buffer = buildCertificatePdfBuffer({

@@ -35,3 +35,20 @@ export const listCertificatesQuerySchema = z.object({
   page: listPaginationQuerySchema.shape.page,
   pageSize: listPaginationQuerySchema.shape.pageSize,
 });
+
+export const listTrainerCertificatesQuerySchema = z.object({
+  search: z.preprocess(
+    emptyToUndefined,
+    z.string().trim().max(120, "Kata kunci terlalu panjang.").optional(),
+  ),
+  studentId: z.preprocess(
+    emptyToUndefined,
+    z.string().uuid("Student tidak valid.").optional(),
+  ),
+  trainingId: z.preprocess(
+    emptyToUndefined,
+    z.string().uuid("Training tidak valid.").optional(),
+  ),
+  page: listPaginationQuerySchema.shape.page,
+  pageSize: listPaginationQuerySchema.shape.pageSize,
+});

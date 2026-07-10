@@ -23,6 +23,12 @@ export type CertificateSummary = {
   finalGrade: number;
 };
 
+export type TrainerCertificateSummary = CertificateSummary & {
+  studentId: string;
+  studentName: string;
+  studentEmail: string;
+};
+
 export type VerifiedCertificate = {
   certificateNumber: string;
   studentName: string;

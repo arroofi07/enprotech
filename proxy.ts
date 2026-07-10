@@ -3,6 +3,7 @@ import type { NextRequest } from "next/server";
 
 import {
   canAccessRoute,
+  allowsLoggedInPublicAccess,
   getDashboardPath,
   isPublicPath,
 } from "@/lib/domain/auth/permissions";
@@ -22,7 +23,7 @@ export async function proxy(request: NextRequest) {
   const session = token ? await verifySessionToken(token) : null;
 
   if (isPublicPath(pathname)) {
-    if (session) {
+    if (session && !allowsLoggedInPublicAccess(pathname)) {
       return NextResponse.redirect(
         new URL(getDashboardPath(session.role), request.url),
       );

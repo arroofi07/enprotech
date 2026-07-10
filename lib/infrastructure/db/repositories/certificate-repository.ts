@@ -1,4 +1,4 @@
-import { and, count, desc, eq, ilike } from "drizzle-orm";
+import { and, count, desc, eq, ilike, or, type SQL } from "drizzle-orm";
 
 import { db } from "@/lib/db";
 import { certificates } from "@/lib/db/schema/certificates";
@@ -169,6 +169,66 @@ export async function listCertificatesByStudent(
       .limit(query.pageSize)
       .offset(offset),
     db.select({ value: count() }).from(certificates).where(where),
+  ]);
+
+  return {
+    items: rows.map(mapCertificateRow),
+    total: totalResult[0]?.value ?? 0,
+  };
+}
+
+export type ListCertificatesQuery = {
+  studentId?: string;
+  trainingId?: string;
+  search?: string;
+  page: number;
+  pageSize: number;
+};
+
+function buildListCertificatesWhere(
+  query: Pick<ListCertificatesQuery, "studentId" | "trainingId" | "search">,
+): SQL | undefined {
+  const conditions: SQL[] = [];
+
+  if (query.studentId) {
+    conditions.push(eq(certificates.studentId, query.studentId));
+  }
+
+  if (query.trainingId) {
+    conditions.push(eq(certificates.trainingId, query.trainingId));
+  }
+
+  if (query.search) {
+    conditions.push(
+      or(
+        ilike(users.name, `%${query.search}%`),
+        ilike(users.email, `%${query.search}%`),
+        ilike(certificates.certificateNumber, `%${query.search}%`),
+      )!,
+    );
+  }
+
+  return conditions.length > 0 ? and(...conditions) : undefined;
+}
+
+export async function listCertificates(
+  query: ListCertificatesQuery,
+): Promise<{ items: CertificateRow[]; total: number }> {
+  const where = buildListCertificatesWhere(query);
+  const offset = (query.page - 1) * query.pageSize;
+
+  const [rows, totalResult] = await Promise.all([
+    buildCertificateQuery()
+      .where(where)
+      .orderBy(desc(certificates.issuedAt))
+      .limit(query.pageSize)
+      .offset(offset),
+    db
+      .select({ value: count() })
+      .from(certificates)
+      .innerJoin(users, eq(certificates.studentId, users.id))
+      .innerJoin(trainings, eq(certificates.trainingId, trainings.id))
+      .where(where),
   ]);
 
   return {

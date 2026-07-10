@@ -95,7 +95,7 @@ function buildLearningFlowNav(prefix: LearningFlowPrefix): DashboardNavItem[] {
       title: "Sertifikat",
       href: `${prefix}/certificates`,
       icon: IconCertificate,
-      implemented: prefix === "/student",
+      implemented: true,
     },
   ];
 }

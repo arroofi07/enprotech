@@ -25,6 +25,10 @@ export function isPublicPath(pathname: string): boolean {
   return false;
 }
 
+export function allowsLoggedInPublicAccess(pathname: string): boolean {
+  return pathname === "/verify" || pathname.startsWith("/verify/");
+}
+
 export function getDashboardPath(role: UserRole): string {
   switch (role) {
     case "admin":

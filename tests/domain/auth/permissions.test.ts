@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  allowsLoggedInPublicAccess,
   canAccessRoute,
   getDashboardPath,
   isPublicPath,
@@ -14,6 +15,13 @@ describe("permissions", () => {
     expect(isPublicPath("/verify/CERT-ABC-2026-0001")).toBe(true);
     expect(isPublicPath("/api/verify/CERT-ABC-2026-0001")).toBe(true);
     expect(isPublicPath("/admin/dashboard")).toBe(false);
+  });
+
+  it("allows logged-in users to access verify pages", () => {
+    expect(allowsLoggedInPublicAccess("/verify")).toBe(true);
+    expect(allowsLoggedInPublicAccess("/verify/CERT-ABC-2026-0001")).toBe(true);
+    expect(allowsLoggedInPublicAccess("/login")).toBe(false);
+    expect(allowsLoggedInPublicAccess("/register")).toBe(false);
   });
 
   it("returns dashboard path by role", () => {
