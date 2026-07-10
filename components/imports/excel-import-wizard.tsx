@@ -1,7 +1,9 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { IconDownload, IconUpload } from "@tabler/icons-react";
+import { IconUpload } from "@tabler/icons-react";
+
+import { ImportTemplateDownload } from "@/components/imports/import-template-download";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -94,7 +96,6 @@ export function ExcelImportWizard({ kind, trainings }: ExcelImportWizardProps) {
   const [modules, setModules] = useState<ModuleOption[]>([]);
   const [assessmentId, setAssessmentId] = useState("");
 
-  const templateHref = `/api/import/templates/${kind}`;
   const endpoint = KIND_ENDPOINTS[kind];
 
   const columns = useMemo(
@@ -279,13 +280,7 @@ export function ExcelImportWizard({ kind, trainings }: ExcelImportWizardProps) {
 
         {step === "upload" ? (
           <div className="space-y-4">
-            <a
-              href={templateHref}
-              className="inline-flex h-8 items-center gap-2 rounded-lg border px-3 text-sm hover:bg-muted"
-            >
-              <IconDownload className="size-4" />
-              Unduh Template Excel
-            </a>
+            <ImportTemplateDownload kind={kind} />
 
             {kind === "questions" ? (
               <div className="grid gap-4 md:grid-cols-3">
@@ -344,7 +339,9 @@ export function ExcelImportWizard({ kind, trainings }: ExcelImportWizardProps) {
             ) : null}
 
             <div className="space-y-2">
-              <Label htmlFor={`file-${kind}`}>File Excel (.xlsx)</Label>
+              <Label htmlFor={`file-${kind}`}>
+                Langkah 2 — Upload File Excel (.xlsx)
+              </Label>
               <Input
                 id={`file-${kind}`}
                 type="file"

@@ -48,6 +48,8 @@ describe("activatePretest", () => {
       passingGrade: null,
       timeLimit: null,
       maxRetry: 1,
+      questionDisplayCount: null,
+      shuffleQuestions: false,
       createdAt: new Date("2026-01-01"),
     });
     vi.spyOn(assessmentRepository, "countQuestionsByAssessment").mockResolvedValue(

@@ -33,6 +33,7 @@ import {
 import { trainingAssessmentSchema } from "@/lib/validations/assessment-schemas";
 
 import { assertAssessmentStudent } from "./assert-access";
+import { buildAttemptQuestionSet } from "./attempt-questions";
 
 export type StudentTrainingAssessmentState = {
   training: {
@@ -137,6 +138,15 @@ export async function getStudentTrainingAssessmentState(
     passingGrade,
   });
 
+  const displayQuestions = inProgressAttempt
+    ? buildAttemptQuestionSet(
+        questions,
+        assessment,
+        inProgressAttempt,
+        inProgressAttempt.id,
+      )
+    : questions;
+
   return assessmentSuccess({
     training: {
       id: training.id,
@@ -144,7 +154,7 @@ export async function getStudentTrainingAssessmentState(
       isPretestActive: training.isPretestActive,
     },
     assessment,
-    questions,
+    questions: displayQuestions,
     passingGrade,
     bestScore,
     hasPassed: passed,

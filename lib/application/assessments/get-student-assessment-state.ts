@@ -24,6 +24,7 @@ import { isStudentEnrolledInTraining } from "@/lib/infrastructure/db/repositorie
 import { moduleAssessmentSchema } from "@/lib/validations/assessment-schemas";
 
 import { assertAssessmentStudent } from "./assert-access";
+import { buildAttemptQuestionSet } from "./attempt-questions";
 
 export type StudentAssessmentState = {
   module: {
@@ -105,6 +106,15 @@ export async function getStudentAssessmentState(
     passingGrade,
   });
 
+  const displayQuestions = inProgressAttempt
+    ? buildAttemptQuestionSet(
+        questions,
+        assessment,
+        inProgressAttempt,
+        inProgressAttempt.id,
+      )
+    : questions;
+
   return assessmentSuccess({
     module: {
       id: module.id,
@@ -112,7 +122,7 @@ export async function getStudentAssessmentState(
       title: module.title,
     },
     assessment,
-    questions,
+    questions: displayQuestions,
     passingGrade,
     bestScore,
     hasPassed: passed,

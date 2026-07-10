@@ -25,6 +25,8 @@ export type AssessmentRecord = {
   passingGrade: number | null;
   timeLimit: number | null;
   maxRetry: number | null;
+  questionDisplayCount: number | null;
+  shuffleQuestions: boolean;
   createdAt: Date;
 };
 
@@ -43,6 +45,7 @@ export type AssessmentAttemptRecord = {
   assessmentId: string;
   score: number;
   answers: AssessmentAnswer[];
+  questionIds: string[] | null;
   startedAt: Date;
   submittedAt: Date | null;
 };
@@ -64,6 +67,8 @@ const assessmentColumns = {
   passingGrade: assessments.passingGrade,
   timeLimit: assessments.timeLimit,
   maxRetry: assessments.maxRetry,
+  questionDisplayCount: assessments.questionDisplayCount,
+  shuffleQuestions: assessments.shuffleQuestions,
   createdAt: assessments.createdAt,
 };
 
@@ -82,6 +87,7 @@ const attemptColumns = {
   assessmentId: assessmentAttempts.assessmentId,
   score: assessmentAttempts.score,
   answers: assessmentAttempts.answers,
+  questionIds: assessmentAttempts.questionIds,
   startedAt: assessmentAttempts.startedAt,
   submittedAt: assessmentAttempts.submittedAt,
 };
@@ -98,6 +104,8 @@ function mapAssessment(
     passingGrade: row.passingGrade,
     timeLimit: row.timeLimit,
     maxRetry: row.maxRetry,
+    questionDisplayCount: row.questionDisplayCount,
+    shuffleQuestions: row.shuffleQuestions,
     createdAt: row.createdAt,
   };
 }
@@ -122,6 +130,7 @@ function mapAttempt(
     assessmentId: row.assessmentId,
     score: row.score,
     answers: row.answers,
+    questionIds: row.questionIds ?? null,
     startedAt: row.startedAt,
     submittedAt: row.submittedAt,
   };
@@ -375,9 +384,33 @@ export async function findInProgressAttempt(
   return row ? mapAttempt(row) : null;
 }
 
+export async function updateAssessmentSettings(
+  assessmentId: string,
+  input: {
+    questionDisplayCount?: number | null;
+    shuffleQuestions?: boolean;
+  },
+): Promise<AssessmentRecord | null> {
+  const [row] = await db
+    .update(assessments)
+    .set({
+      ...(input.questionDisplayCount !== undefined
+        ? { questionDisplayCount: input.questionDisplayCount }
+        : {}),
+      ...(input.shuffleQuestions !== undefined
+        ? { shuffleQuestions: input.shuffleQuestions }
+        : {}),
+    })
+    .where(eq(assessments.id, assessmentId))
+    .returning(assessmentColumns);
+
+  return row ? mapAssessment(row) : null;
+}
+
 export async function createAttempt(input: {
   studentId: string;
   assessmentId: string;
+  questionIds?: string[];
 }): Promise<AssessmentAttemptRecord> {
   const [row] = await db
     .insert(assessmentAttempts)
@@ -386,6 +419,7 @@ export async function createAttempt(input: {
       assessmentId: input.assessmentId,
       score: 0,
       answers: [],
+      questionIds: input.questionIds ?? null,
     })
     .returning(attemptColumns);
 

@@ -4,7 +4,6 @@ import {
   IconCertificate,
   IconChartBar,
   IconClipboardCheck,
-  IconFileImport,
   IconLayoutDashboard,
   IconListCheck,
   IconPencil,
@@ -124,12 +123,6 @@ const ADMIN_NAV: DashboardNavGroup[] = [
         implemented: true,
         activePrefixes: ["/trainer/trainings"],
       },
-      {
-        title: "Import Excel",
-        href: "/trainer/import",
-        icon: IconFileImport,
-        implemented: true,
-      },
     ],
   },
   {
@@ -154,12 +147,6 @@ const TRAINER_NAV: DashboardNavGroup[] = [
         icon: IconSchool,
         implemented: true,
         activePrefixes: ["/trainer/trainings"],
-      },
-      {
-        title: "Import Excel",
-        href: "/trainer/import",
-        icon: IconFileImport,
-        implemented: true,
       },
     ],
   },

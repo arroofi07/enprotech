@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useEffect } from "react";
-import { IconDownload, IconUpload } from "@tabler/icons-react";
+import { IconUpload } from "@tabler/icons-react";
 
 import {
   importQuestionsAction,
@@ -64,26 +64,8 @@ export function AssessmentImportDialog({
         </Alert>
       ) : null}
 
-      <Alert>
-        <AlertDescription>
-          Gunakan template Excel dengan kolom: no, question, option_a, option_b,
-          option_c, option_d, correct_answer (A/B/C/D).
-        </AlertDescription>
-      </Alert>
-
-      <Button
-        type="button"
-        variant="outline"
-        render={
-          <a href="/templates/assessment-questions-template.xlsx" download />
-        }
-      >
-        <IconDownload className="size-4" />
-        Unduh Template Excel
-      </Button>
-
       <Field>
-        <FieldLabel htmlFor="file">File Excel (.xlsx)</FieldLabel>
+        <FieldLabel htmlFor="file">Upload File Excel (.xlsx)</FieldLabel>
         <Input
           id="file"
           name="file"

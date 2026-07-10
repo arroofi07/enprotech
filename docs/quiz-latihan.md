@@ -29,12 +29,12 @@ Urutan prioritas:
 ### Fitur
 
 - Tambah, edit, hapus soal pilihan ganda
-- Impor soal dari Excel (template tersedia)
+- Impor soal dari Excel (tombol **Export Excel** untuk template, **Impor Excel** untuk upload)
 - Lihat jumlah soal dan passing grade modul
 
 ### Template Excel
 
-Unduh: `/templates/assessment-questions-template.xlsx`
+Unduh template via tombol **Export Excel** di halaman kelola soal, atau langsung dari `/api/import/templates/questions`
 
 Kolom wajib:
 

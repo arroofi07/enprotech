@@ -22,6 +22,13 @@
       "when": 1783569130255,
       "tag": "0003_module_progression_requirements",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1783572000000,
+      "tag": "0004_assessment_display_settings",
+      "breakpoints": true
     }
   ]
 }

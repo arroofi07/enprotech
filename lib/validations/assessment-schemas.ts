@@ -107,6 +107,28 @@ export const saveAnswersSchema = z.object({
   ),
 });
 
+export const updateAssessmentSettingsSchema = z.object({
+  assessmentId: z.uuid("ID assessment tidak valid."),
+  questionDisplayCount: z.preprocess(
+    (value) => {
+      if (value === "" || value === null || value === undefined) {
+        return null;
+      }
+
+      const parsed = Number(value);
+      return Number.isFinite(parsed) ? parsed : value;
+    },
+    z.number().int().min(1).nullable(),
+  ),
+  shuffleQuestions: z.preprocess((value) => {
+    if (value === "true" || value === true || value === "on") {
+      return true;
+    }
+
+    return false;
+  }, z.boolean()),
+});
+
 export type ModuleAssessmentInput = z.infer<typeof moduleAssessmentSchema>;
 export type TrainingAssessmentInput = z.infer<typeof trainingAssessmentSchema>;
 export type CreateQuestionInput = z.infer<typeof createQuestionSchema>;

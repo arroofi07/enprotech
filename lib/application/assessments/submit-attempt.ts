@@ -24,6 +24,7 @@ import {
 
 import { assertAssessmentStudent } from "./assert-access";
 import { issueCertificateIfEligible } from "../certificates/issue-certificate-if-eligible";
+import { buildAttemptQuestionSet } from "./attempt-questions";
 
 export type SubmitAttemptResult = {
   attemptId: string;
@@ -96,7 +97,18 @@ export async function submitAttemptUseCase(
     return assessmentFailure(AssessmentErrorCode.ASSESSMENT_NOT_FOUND);
   }
 
-  const questions = await listQuestionsByAssessment(assessment.id);
+  const allQuestions = await listQuestionsByAssessment(assessment.id);
+  if (allQuestions.length === 0) {
+    return assessmentFailure(AssessmentErrorCode.NO_QUESTIONS);
+  }
+
+  const questions = buildAttemptQuestionSet(
+    allQuestions,
+    assessment,
+    attempt,
+    attempt.id,
+  );
+
   if (questions.length === 0) {
     return assessmentFailure(AssessmentErrorCode.NO_QUESTIONS);
   }

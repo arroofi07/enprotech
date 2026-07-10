@@ -45,7 +45,7 @@ Urutan prioritas untuk pre/post-test:
 ### Fitur
 
 - CRUD soal pilihan ganda (reuse komponen quiz/latihan)
-- Import Excel (template sama dengan quiz/latihan)
+- **Export Excel** untuk unduh template, **Impor Excel** untuk upload soal (format sama dengan quiz/latihan)
 
 ## Student
 

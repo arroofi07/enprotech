@@ -195,6 +195,7 @@ export function AssessmentTakeView({
           assessmentId: assessment.id,
           score: data.score,
           answers: [],
+          questionIds: null,
           startedAt: new Date(),
           submittedAt: new Date(),
         },

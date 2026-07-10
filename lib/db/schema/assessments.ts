@@ -1,4 +1,5 @@
 import {
+  boolean,
   integer,
   jsonb,
   pgTable,
@@ -35,6 +36,8 @@ export const assessments = pgTable("assessments", {
   passingGrade: integer("passing_grade"),
   timeLimit: integer("time_limit"),
   maxRetry: integer("max_retry"),
+  questionDisplayCount: integer("question_display_count"),
+  shuffleQuestions: boolean("shuffle_questions").notNull().default(false),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),
@@ -63,6 +66,7 @@ export const assessmentAttempts = pgTable("assessment_attempts", {
     .references(() => assessments.id, { onDelete: "cascade" }),
   score: integer("score").notNull(),
   answers: jsonb("answers").$type<AssessmentAnswer[]>().notNull(),
+  questionIds: jsonb("question_ids").$type<string[]>(),
   startedAt: timestamp("started_at", { withTimezone: true })
     .notNull()
     .defaultNow(),

@@ -29,6 +29,10 @@ import {
 import { assessmentIdSchema } from "@/lib/validations/assessment-schemas";
 
 import { assertAssessmentStudent } from "./assert-access";
+import {
+  buildAttemptQuestionSet,
+  getAttemptQuestionIds,
+} from "./attempt-questions";
 
 export type StartAttemptResult = {
   attempt: AssessmentAttemptRecord;
@@ -163,16 +167,31 @@ export async function startAttempt(
     assessment.id,
   );
   if (existingAttempt) {
+    const attemptQuestions = buildAttemptQuestionSet(
+      questions,
+      assessment,
+      existingAttempt,
+      existingAttempt.id,
+    );
+
     return assessmentSuccess({
       attempt: existingAttempt,
-      questions,
+      questions: attemptQuestions,
     });
   }
+
+  const preparedQuestions = buildAttemptQuestionSet(
+    questions,
+    assessment,
+    null,
+    crypto.randomUUID(),
+  );
 
   const attempt = await createAttempt({
     studentId: actor!.id,
     assessmentId: assessment.id,
+    questionIds: getAttemptQuestionIds(preparedQuestions),
   });
 
-  return assessmentSuccess({ attempt, questions });
+  return assessmentSuccess({ attempt, questions: preparedQuestions });
 }

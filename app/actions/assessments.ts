@@ -6,6 +6,7 @@ import { getCurrentUser } from "@/lib/application/auth/get-session";
 import { createQuestionUseCase } from "@/lib/application/assessments/create-question";
 import { deleteQuestionUseCase } from "@/lib/application/assessments/delete-question";
 import { importQuestionsUseCase } from "@/lib/application/assessments/import-questions";
+import { updateAssessmentSettingsUseCase } from "@/lib/application/assessments/update-assessment-settings";
 import { updateQuestionUseCase } from "@/lib/application/assessments/update-question";
 import type { AssessmentErrorCode } from "@/lib/domain/assessments/errors";
 import type { AssessmentType } from "@/lib/domain/assessments/types";
@@ -152,4 +153,27 @@ export async function importQuestionsAction(
     success: true,
     message: `${result.data.length} soal berhasil diimpor.`,
   };
+}
+
+export async function updateAssessmentSettingsAction(
+  _prevState: AssessmentActionState,
+  formData: FormData,
+): Promise<AssessmentActionState> {
+  const actor = await getCurrentUser();
+  const result = await updateAssessmentSettingsUseCase(actor, {
+    assessmentId: String(formData.get("assessmentId") ?? ""),
+    questionDisplayCount: formData.get("questionDisplayCount"),
+    shuffleQuestions: formData.get("shuffleQuestions"),
+  });
+
+  if (!result.success) {
+    return { error: result.error, message: result.message, success: false };
+  }
+
+  const trainingId = String(formData.get("trainingId") ?? "");
+  const moduleId = String(formData.get("moduleId") ?? "") || undefined;
+  const type = String(formData.get("type") ?? "quiz") as AssessmentType;
+
+  revalidateAssessmentPaths(trainingId, type, moduleId);
+  return { success: true, message: "Pengaturan assessment berhasil disimpan." };
 }

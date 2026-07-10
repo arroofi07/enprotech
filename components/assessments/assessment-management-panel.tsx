@@ -6,6 +6,8 @@ import { IconFileImport, IconPlus } from "@tabler/icons-react";
 import { AssessmentImportDialog } from "@/components/assessments/assessment-import-dialog";
 import { AssessmentQuestionForm } from "@/components/assessments/assessment-question-form";
 import { AssessmentQuestionTable } from "@/components/assessments/assessment-question-table";
+import { AssessmentSettingsForm } from "@/components/assessments/assessment-settings-form";
+import { ImportTemplateDownload } from "@/components/imports/import-template-download";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,6 +29,7 @@ import type {
 } from "@/lib/infrastructure/db/repositories/assessment-repository";
 
 import { ListPagination } from "@/components/ui/list-pagination";
+import { getEffectiveDisplayCount } from "@/lib/domain/assessments/prepare-attempt-questions";
 
 type AssessmentManagementPanelProps = {
   trainingId: string;
@@ -62,6 +65,10 @@ export function AssessmentManagementPanel({
   );
 
   const typeLabel = getAssessmentTypeLabel(type);
+  const effectiveDisplayCount = getEffectiveDisplayCount(
+    questionTotal,
+    assessment.questionDisplayCount,
+  );
 
   return (
     <div className="space-y-6">
@@ -79,9 +86,19 @@ export function AssessmentManagementPanel({
           <p className="text-sm text-muted-foreground">
             Passing grade: <span className="font-medium">{passingGrade}%</span>
           </p>
+          <p className="text-sm text-muted-foreground">
+            Tampilan student:{" "}
+            <span className="font-medium text-foreground">
+              {effectiveDisplayCount}
+            </span>{" "}
+            soal
+            {assessment.shuffleQuestions ? " · diacak" : " · urutan tetap"}
+          </p>
         </div>
 
         <div className="flex flex-wrap gap-2">
+          <ImportTemplateDownload kind="questions" variant="button" />
+
           <Dialog open={importOpen} onOpenChange={setImportOpen}>
             <DialogTrigger render={<Button variant="outline" />}>
               <IconFileImport className="size-4" />
@@ -91,8 +108,8 @@ export function AssessmentManagementPanel({
               <DialogHeader>
                 <DialogTitle>Impor Soal dari Excel</DialogTitle>
                 <DialogDescription>
-                  Unggah file Excel sesuai template untuk menambahkan banyak
-                  soal sekaligus.
+                  Export template terlebih dahulu, isi data soal, lalu unggah
+                  file Excel di sini.
                 </DialogDescription>
               </DialogHeader>
               <AssessmentImportDialog
@@ -128,6 +145,14 @@ export function AssessmentManagementPanel({
           </Dialog>
         </div>
       </div>
+
+      <AssessmentSettingsForm
+        assessment={assessment}
+        trainingId={trainingId}
+        moduleId={moduleId}
+        type={type}
+        totalQuestions={questionTotal}
+      />
 
       <div className="space-y-4">
         <div className="flex items-center justify-between">
