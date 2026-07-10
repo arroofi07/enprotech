@@ -38,7 +38,7 @@ export default async function TrainerTrainingEditPage({
       <TrainerHeader
         title={trainingResult.data.title}
         breadcrumbs={[
-          { label: "Training", href: "/trainer/trainings" },
+          { label: "Buat Training", href: "/trainer/trainings/new" },
           { label: trainingResult.data.title },
         ]}
         user={user}

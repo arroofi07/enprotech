@@ -201,7 +201,7 @@ async function main() {
   await expectRedirect(
     "RBAC-1",
     "Student blocked from trainer routes",
-    "/trainer/trainings",
+    "/trainer/modules",
     student,
     "/unauthorized",
   );
@@ -222,7 +222,7 @@ async function main() {
   await expectPage(
     "RBAC-4",
     "Admin can access trainer routes",
-    "/trainer/trainings",
+    "/trainer/modules",
     admin,
     200,
   );
@@ -281,6 +281,13 @@ async function main() {
       user: student,
       location: "/student/nilai",
     },
+    {
+      id: "TRAINER-REDIRECT-trainings",
+      label: "Trainer /trainings redirects to modules",
+      path: "/trainer/trainings",
+      user: trainer,
+      location: "/trainer/modules",
+    },
   ];
 
   for (const item of redirectPages) {
@@ -289,7 +296,6 @@ async function main() {
 
   const staticTrainerPages = [
     "/trainer/dashboard",
-    "/trainer/trainings",
     "/trainer/trainings/new",
     "/trainer/import",
     "/trainer/pre-test",

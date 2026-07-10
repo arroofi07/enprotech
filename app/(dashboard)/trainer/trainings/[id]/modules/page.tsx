@@ -3,7 +3,6 @@ import { redirect } from "next/navigation";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { ModuleManagementPanel } from "@/components/modules/module-management-panel";
 import { TrainerHeader } from "@/components/trainer/trainer-header";
-import { ButtonLink } from "@/components/ui/button-link";
 import { Card, CardContent } from "@/components/ui/card";
 import { getCurrentUser } from "@/lib/application/auth/get-session";
 import { listModules } from "@/lib/application/modules/list-modules";
@@ -90,7 +89,7 @@ export default async function TrainerModulesPage({
       <TrainerHeader
         title={`Modul — ${trainingResult.data.title}`}
         breadcrumbs={[
-          { label: "Training", href: "/trainer/trainings" },
+          { label: "Buat Training", href: "/trainer/trainings/new" },
           {
             label: trainingResult.data.title,
             href: `/trainer/trainings/${id}/edit`,
@@ -104,11 +103,6 @@ export default async function TrainerModulesPage({
           <AdminPageHeader
             title="Kelola Modul"
             description={`Kelola modul, materi, dan konten untuk training "${trainingResult.data.title}".`}
-            actions={
-              <ButtonLink variant="outline" href={`/trainer/trainings/${id}/edit`}>
-                Kembali ke Training
-              </ButtonLink>
-            }
           />
 
           <Card>

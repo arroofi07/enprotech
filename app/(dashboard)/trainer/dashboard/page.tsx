@@ -136,7 +136,7 @@ export default async function TrainerDashboardPage() {
                     Program yang baru dibuat atau diperbarui
                   </CardDescription>
                 </div>
-                <ButtonLink variant="outline" href="/trainer/trainings">
+                <ButtonLink variant="outline" href="/trainer/modules">
                   Lihat Semua
                   <IconChevronRight data-icon="inline-end" className="size-4" />
                 </ButtonLink>
@@ -209,7 +209,7 @@ export default async function TrainerDashboardPage() {
                 </Link>
 
                 <Link
-                  href="/trainer/trainings"
+                  href="/trainer/modules"
                   className="flex items-center justify-between rounded-lg border bg-card p-4 transition-all hover:border-primary/50 hover:bg-muted/50 hover:shadow-sm"
                 >
                   <div className="flex items-center gap-3">
@@ -217,7 +217,7 @@ export default async function TrainerDashboardPage() {
                       <IconWriting className="size-5 text-emerald-600" />
                     </div>
                     <div>
-                      <p className="font-medium">Kelola Training</p>
+                      <p className="font-medium">Kelola Modul</p>
                       <p className="text-sm text-muted-foreground">
                         {allTrainings} training terdaftar
                       </p>
@@ -227,7 +227,7 @@ export default async function TrainerDashboardPage() {
                 </Link>
 
                 <Link
-                  href="/trainer/trainings?status=draft"
+                  href="/trainer/modules?status=draft"
                   className="flex items-center justify-between rounded-lg border bg-card p-4 transition-all hover:border-primary/50 hover:bg-muted/50 hover:shadow-sm"
                 >
                   <div className="flex items-center gap-3">
@@ -245,7 +245,7 @@ export default async function TrainerDashboardPage() {
                 </Link>
 
                 <Link
-                  href="/trainer/trainings?status=active"
+                  href="/trainer/modules?status=active"
                   className="flex items-center justify-between rounded-lg border bg-card p-4 transition-all hover:border-primary/50 hover:bg-muted/50 hover:shadow-sm"
                 >
                   <div className="flex items-center gap-3">

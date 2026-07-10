@@ -51,7 +51,7 @@ describe("getDashboardNav", () => {
     expect(titles).toEqual([
       "Dashboard",
       "Pengguna",
-      "Training",
+      "Buat Training",
       ...LEARNING_FLOW_TITLES,
     ]);
   });
@@ -64,7 +64,7 @@ describe("getDashboardNav", () => {
 
     expect(titles).toEqual([
       "Dashboard",
-      "Training",
+      "Buat Training",
       ...LEARNING_FLOW_TITLES,
     ]);
   });

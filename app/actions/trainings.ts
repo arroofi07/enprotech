@@ -19,7 +19,11 @@ export type TrainingActionState = {
   trainingId?: string;
 };
 
-const TRAINING_PATHS = ["/trainer/trainings"];
+const TRAINING_PATHS = [
+  "/trainer/modules",
+  "/trainer/dashboard",
+  "/trainer/trainings/new",
+];
 
 function revalidateTrainingPaths(trainingId?: string) {
   for (const path of TRAINING_PATHS) {

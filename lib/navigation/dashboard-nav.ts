@@ -100,6 +100,14 @@ function buildLearningFlowNav(prefix: LearningFlowPrefix): DashboardNavItem[] {
   ];
 }
 
+const CREATE_TRAINING_NAV_ITEM: DashboardNavItem = {
+  title: "Buat Training",
+  href: "/trainer/trainings/new",
+  icon: IconSchool,
+  implemented: true,
+  activePrefixes: ["/trainer/trainings/new"],
+};
+
 const ADMIN_NAV: DashboardNavGroup[] = [
   {
     label: "Administrasi",
@@ -116,13 +124,7 @@ const ADMIN_NAV: DashboardNavGroup[] = [
         icon: IconUsers,
         implemented: true,
       },
-      {
-        title: "Training",
-        href: "/trainer/trainings",
-        icon: IconSchool,
-        implemented: true,
-        activePrefixes: ["/trainer/trainings"],
-      },
+      CREATE_TRAINING_NAV_ITEM,
     ],
   },
   {
@@ -141,13 +143,7 @@ const TRAINER_NAV: DashboardNavGroup[] = [
         icon: IconLayoutDashboard,
         implemented: true,
       },
-      {
-        title: "Training",
-        href: "/trainer/trainings",
-        icon: IconSchool,
-        implemented: true,
-        activePrefixes: ["/trainer/trainings"],
-      },
+      CREATE_TRAINING_NAV_ITEM,
     ],
   },
   {

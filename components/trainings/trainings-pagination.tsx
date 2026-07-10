@@ -35,7 +35,7 @@ export function TrainingsPagination({
   page,
   totalPages,
   searchParams,
-  basePath = "/trainer/trainings",
+  basePath = "/trainer/modules",
 }: TrainingsPaginationProps) {
   if (totalPages <= 1) {
     return null;

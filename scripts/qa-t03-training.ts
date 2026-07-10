@@ -295,9 +295,9 @@ async function main() {
       : "unexpected success",
   );
 
-  // HTTP: student /trainer/trainings -> unauthorized redirect
+  // HTTP: student /trainer/modules -> unauthorized redirect
   const httpStudentTrainer = await fetchWithSession(
-    "/trainer/trainings",
+    "/trainer/modules",
     { ...student1, status: "active" },
   );
   const httpUnauthorized = Boolean(
@@ -307,7 +307,7 @@ async function main() {
   );
   record(
     11,
-    "Student HTTP /trainer/trainings unauthorized",
+    "Student HTTP /trainer/modules unauthorized",
     httpUnauthorized,
     `status=${httpStudentTrainer.status}, location=${httpStudentTrainer.headers.get("location") ?? "none"}`,
   );
@@ -373,14 +373,14 @@ async function main() {
     record(12, "Regresi T02 admin list users", false, "admin login failed");
   }
 
-  // HTTP smoke: trainer trainings page
-  const httpTrainerList = await fetchWithSession("/trainer/trainings", {
+  // HTTP smoke: trainer modules hub page
+  const httpTrainerList = await fetchWithSession("/trainer/modules", {
     ...trainer,
     status: "active",
   });
   record(
     13,
-    "Trainer GET /trainer/trainings",
+    "Trainer GET /trainer/modules",
     httpTrainerList.status === 200,
     `status=${httpTrainerList.status}`,
   );

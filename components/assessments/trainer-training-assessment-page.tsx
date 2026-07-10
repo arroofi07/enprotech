@@ -71,7 +71,7 @@ export async function TrainerTrainingAssessmentPage({
       <TrainerHeader
         title={`${typeLabel} — ${trainingResult.data.title}`}
         breadcrumbs={[
-          { label: "Training", href: "/trainer/trainings" },
+          { label: "Buat Training", href: "/trainer/trainings/new" },
           {
             label: trainingResult.data.title,
             href: `/trainer/trainings/${id}/edit`,
@@ -90,7 +90,7 @@ export async function TrainerTrainingAssessmentPage({
                 variant="outline"
                 href={`/trainer/trainings/${id}/edit`}
               >
-                Kembali ke Training
+                Pengaturan Training
               </ButtonLink>
             }
           />

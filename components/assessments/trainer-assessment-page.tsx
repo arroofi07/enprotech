@@ -74,7 +74,7 @@ export async function TrainerAssessmentPage({
       <TrainerHeader
         title={`${typeLabel} — ${module.title}`}
         breadcrumbs={[
-          { label: "Training", href: "/trainer/trainings" },
+          { label: "Buat Training", href: "/trainer/trainings/new" },
           {
             label: trainingResult.data.title,
             href: `/trainer/trainings/${id}/edit`,
