@@ -5,6 +5,7 @@ const TRAINER_PREFIX = "/trainer";
 const STUDENT_PREFIX = "/student";
 
 export const PUBLIC_PATHS = [
+  "/",
   "/login",
   "/register",
   "/unauthorized",
@@ -26,7 +27,11 @@ export function isPublicPath(pathname: string): boolean {
 }
 
 export function allowsLoggedInPublicAccess(pathname: string): boolean {
-  return pathname === "/verify" || pathname.startsWith("/verify/");
+  return (
+    pathname === "/" ||
+    pathname === "/verify" ||
+    pathname.startsWith("/verify/")
+  );
 }
 
 export function getDashboardPath(role: UserRole): string {
