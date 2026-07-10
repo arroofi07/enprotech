@@ -3,7 +3,6 @@
 import { useActionState } from "react";
 
 import {
-  activatePretestAction,
   archiveTrainingAction,
   publishTrainingAction,
   type TrainingActionState,
@@ -28,13 +27,11 @@ const initialState: TrainingActionState = {};
 type TrainingManagementActionsProps = {
   trainingId: string;
   status: TrainingStatus;
-  isPretestActive: boolean;
 };
 
 export function TrainingManagementActions({
   trainingId,
   status,
-  isPretestActive,
 }: TrainingManagementActionsProps) {
   const [publishState, publishAction, publishPending] = useActionState(
     publishTrainingAction,
@@ -44,12 +41,7 @@ export function TrainingManagementActions({
     archiveTrainingAction,
     initialState,
   );
-  const [pretestState, pretestAction, pretestPending] = useActionState(
-    activatePretestAction,
-    initialState,
-  );
-
-  const feedback = [publishState, archiveState, pretestState]
+  const feedback = [publishState, archiveState]
     .reverse()
     .find((state) => state.message);
 
@@ -68,16 +60,6 @@ export function TrainingManagementActions({
             <Button type="submit" disabled={publishPending}>
               {publishPending ? <Spinner data-icon="inline-start" /> : null}
               Publikasikan
-            </Button>
-          </form>
-        ) : null}
-
-        {status === "active" && !isPretestActive ? (
-          <form action={pretestAction}>
-            <input type="hidden" name="trainingId" value={trainingId} />
-            <Button type="submit" variant="secondary" disabled={pretestPending}>
-              {pretestPending ? <Spinner data-icon="inline-start" /> : null}
-              Aktifkan Pre-test
             </Button>
           </form>
         ) : null}

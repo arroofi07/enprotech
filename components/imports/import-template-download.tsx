@@ -29,6 +29,7 @@ export function ImportTemplateDownload({
       <Button
         type="button"
         variant="outline"
+        nativeButton={false}
         render={<a href={templateHref} />}
       >
         <IconDownload className="size-4" />
@@ -49,6 +50,7 @@ export function ImportTemplateDownload({
       <Button
         type="button"
         variant="outline"
+        nativeButton={false}
         render={<a href={templateHref} />}
       >
         <IconDownload className="size-4" />
