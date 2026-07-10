@@ -10,6 +10,8 @@ export async function GET(request: Request) {
 
   const result = await listStudentCertificates(actor, {
     trainingId: searchParams.get("trainingId") ?? undefined,
+    page: searchParams.get("page") ?? undefined,
+    pageSize: searchParams.get("pageSize") ?? undefined,
   });
 
   if (!result.success) {
@@ -19,5 +21,5 @@ export async function GET(request: Request) {
     );
   }
 
-  return NextResponse.json({ items: result.data });
+  return NextResponse.json(result.data);
 }

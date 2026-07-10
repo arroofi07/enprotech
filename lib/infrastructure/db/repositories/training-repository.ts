@@ -413,30 +413,43 @@ export async function setPretestActive(
 
 export async function listEnrolledTrainingsByStudent(
   studentId: string,
-): Promise<EnrolledTrainingBase[]> {
-  const rows = await db
-    .select({
-      ...trainingColumns,
-      enrollmentId: enrollments.id,
-      enrollmentStatus: enrollments.status,
-      enrolledAt: enrollments.enrolledAt,
-    })
-    .from(enrollments)
-    .innerJoin(trainings, eq(enrollments.trainingId, trainings.id))
-    .where(
-      and(
-        eq(enrollments.studentId, studentId),
-        notInArray(trainings.status, ["draft", "archived"]),
-      ),
-    )
-    .orderBy(desc(enrollments.enrolledAt));
+  query: { page: number; pageSize: number },
+): Promise<{ items: EnrolledTrainingBase[]; total: number }> {
+  const where = and(
+    eq(enrollments.studentId, studentId),
+    notInArray(trainings.status, ["draft", "archived"]),
+  );
+  const offset = (query.page - 1) * query.pageSize;
 
-  return rows.map((row) => ({
-    ...mapTraining(row),
-    enrollmentId: row.enrollmentId,
-    enrollmentStatus: row.enrollmentStatus,
-    enrolledAt: row.enrolledAt,
-  }));
+  const [rows, totalResult] = await Promise.all([
+    db
+      .select({
+        ...trainingColumns,
+        enrollmentId: enrollments.id,
+        enrollmentStatus: enrollments.status,
+        enrolledAt: enrollments.enrolledAt,
+      })
+      .from(enrollments)
+      .innerJoin(trainings, eq(enrollments.trainingId, trainings.id))
+      .where(where)
+      .orderBy(desc(enrollments.enrolledAt))
+      .limit(query.pageSize)
+      .offset(offset),
+    db.select({ value: count() }).from(enrollments).innerJoin(
+      trainings,
+      eq(enrollments.trainingId, trainings.id),
+    ).where(where),
+  ]);
+
+  return {
+    items: rows.map((row) => ({
+      ...mapTraining(row),
+      enrollmentId: row.enrollmentId,
+      enrollmentStatus: row.enrollmentStatus,
+      enrolledAt: row.enrolledAt,
+    })),
+    total: totalResult[0]?.value ?? 0,
+  };
 }
 
 export async function countTrainingsByStatus(

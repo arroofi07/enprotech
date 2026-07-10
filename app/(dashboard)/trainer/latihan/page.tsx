@@ -1,5 +1,13 @@
 import { TrainerAssessmentHubPage } from "@/components/assessments/trainer-assessment-hub-page";
 
-export default function TrainerLatihanHubPage() {
-  return <TrainerAssessmentHubPage type="latihan" />;
+type PageProps = {
+  searchParams: Promise<{ page?: string; search?: string }>;
+};
+
+export default async function TrainerLatihanHubPage({
+  searchParams,
+}: PageProps) {
+  const params = await searchParams;
+
+  return <TrainerAssessmentHubPage type="latihan" searchParams={params} />;
 }

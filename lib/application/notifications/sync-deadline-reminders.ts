@@ -12,7 +12,10 @@ import { listEnrolledTrainingsByStudent } from "@/lib/infrastructure/db/reposito
 export async function syncDeadlineRemindersForStudent(
   studentId: string,
 ): Promise<number> {
-  const trainings = await listEnrolledTrainingsByStudent(studentId);
+  const { items: trainings } = await listEnrolledTrainingsByStudent(studentId, {
+    page: 1,
+    pageSize: 100,
+  });
   let created = 0;
 
   for (const training of trainings) {

@@ -12,14 +12,19 @@ import { getAssessmentTypeLabel } from "@/lib/domain/assessments/labels";
 import { resolvePassingGrade } from "@/lib/domain/assessments/resolve-passing-grade";
 import type { TrainingAssessmentType } from "@/lib/domain/assessments/types";
 import { getTrainingPassingGrade } from "@/lib/infrastructure/db/repositories/assessment-repository";
+import { paginateArray } from "@/lib/validations/pagination-schemas";
+
+const QUESTION_PAGE_SIZE = 10;
 
 type TrainerTrainingAssessmentPageProps = {
   params: Promise<{ id: string }>;
+  searchParams?: Promise<{ page?: string }>;
   assessmentType: TrainingAssessmentType;
 };
 
 export async function TrainerTrainingAssessmentPage({
   params,
+  searchParams,
   assessmentType,
 }: TrainerTrainingAssessmentPageProps) {
   const user = await getCurrentUser();
@@ -29,7 +34,11 @@ export async function TrainerTrainingAssessmentPage({
   }
 
   const { id } = await params;
+  const query = searchParams ? await searchParams : {};
+  const page = Number(query.page ?? "1");
   const typeLabel = getAssessmentTypeLabel(assessmentType);
+  const segment = assessmentType === "pre_test" ? "pre-test" : "post-test";
+  const paginationBasePath = `/trainer/trainings/${id}/${segment}`;
 
   const [trainingResult, assessmentResult, trainingPassingGrade] =
     await Promise.all([
@@ -51,6 +60,12 @@ export async function TrainerTrainingAssessmentPage({
     trainingPassingGrade,
   });
 
+  const paginatedQuestions = paginateArray(
+    assessmentResult.data.questions,
+    page,
+    QUESTION_PAGE_SIZE,
+  );
+
   return (
     <>
       <TrainerHeader
@@ -66,7 +81,7 @@ export async function TrainerTrainingAssessmentPage({
         user={user}
       />
       <main className="flex-1 overflow-auto">
-        <div className="container max-w-6xl space-y-6 p-6 md:p-8">
+        <div className="container max-w-7xl space-y-6 p-6 md:p-8">
           <AdminPageHeader
             title={`Kelola ${typeLabel}`}
             description={`Buat dan kelola soal ${typeLabel.toLowerCase()} untuk training "${trainingResult.data.title}".`}
@@ -87,8 +102,12 @@ export async function TrainerTrainingAssessmentPage({
                 contextTitle={trainingResult.data.title}
                 type={assessmentType}
                 assessment={assessmentResult.data}
-                questions={assessmentResult.data.questions}
+                questions={paginatedQuestions.items}
                 passingGrade={passingGrade}
+                questionPage={paginatedQuestions.page}
+                questionTotalPages={paginatedQuestions.totalPages}
+                questionTotal={paginatedQuestions.total}
+                paginationBasePath={paginationBasePath}
               />
             </CardContent>
           </Card>

@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { listPaginationQuerySchema } from "@/lib/validations/pagination-schemas";
+
 function emptyToUndefined(value: unknown): unknown {
   if (value === "" || value === null || value === undefined) {
     return undefined;
@@ -30,4 +32,6 @@ export const listCertificatesQuerySchema = z.object({
     emptyToUndefined,
     z.string().uuid("Training tidak valid.").optional(),
   ),
+  page: listPaginationQuerySchema.shape.page,
+  pageSize: listPaginationQuerySchema.shape.pageSize,
 });

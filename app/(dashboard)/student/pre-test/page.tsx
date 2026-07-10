@@ -1,7 +1,19 @@
 import { TrainingAssessmentHubPage } from "@/components/assessments/training-assessment-hub-page";
 
-export default function StudentPreTestHubPage() {
+type PageProps = {
+  searchParams: Promise<{ page?: string }>;
+};
+
+export default async function StudentPreTestHubPage({
+  searchParams,
+}: PageProps) {
+  const params = await searchParams;
+
   return (
-    <TrainingAssessmentHubPage assessmentType="pre_test" role="student" />
+    <TrainingAssessmentHubPage
+      assessmentType="pre_test"
+      role="student"
+      searchParams={params}
+    />
   );
 }

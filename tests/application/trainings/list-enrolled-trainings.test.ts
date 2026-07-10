@@ -56,7 +56,7 @@ describe("listEnrolledTrainings", () => {
     vi.spyOn(
       trainingRepository,
       "listEnrolledTrainingsByStudent",
-    ).mockResolvedValue([baseTraining]);
+    ).mockResolvedValue({ items: [baseTraining], total: 1 });
 
     vi.spyOn(
       progressApplication,
@@ -80,8 +80,8 @@ describe("listEnrolledTrainings", () => {
 
     expect(result.success).toBe(true);
     if (result.success) {
-      expect(result.data).toHaveLength(1);
-      expect(result.data[0].progressPercent).toBe(0);
+      expect(result.data.items).toHaveLength(1);
+      expect(result.data.items[0].progressPercent).toBe(0);
     }
   });
 });

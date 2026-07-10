@@ -247,10 +247,10 @@ async function main() {
     });
   }
 
-  const enrolled = await listEnrolledTrainings(student);
+  const enrolled = await listEnrolledTrainings(student, { page: 1, pageSize: 100 });
   const studentTrainingId =
-    enrolled.success && enrolled.data.length > 0
-      ? enrolled.data[0].id
+    enrolled.success && enrolled.data.items.length > 0
+      ? enrolled.data.items[0].id
       : null;
 
   const redirectPages: Array<{

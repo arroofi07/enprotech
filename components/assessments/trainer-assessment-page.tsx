@@ -15,14 +15,19 @@ import {
   findModuleContextById,
   getTrainingPassingGrade,
 } from "@/lib/infrastructure/db/repositories/assessment-repository";
+import { paginateArray } from "@/lib/validations/pagination-schemas";
+
+const QUESTION_PAGE_SIZE = 10;
 
 type TrainerAssessmentPageProps = {
   params: Promise<{ id: string; moduleId: string }>;
+  searchParams?: Promise<{ page?: string }>;
   assessmentType: AssessmentType;
 };
 
 export async function TrainerAssessmentPage({
   params,
+  searchParams,
   assessmentType,
 }: TrainerAssessmentPageProps) {
   const user = await getCurrentUser();
@@ -32,7 +37,11 @@ export async function TrainerAssessmentPage({
   }
 
   const { id, moduleId } = await params;
+  const query = searchParams ? await searchParams : {};
+  const page = Number(query.page ?? "1");
   const typeLabel = getAssessmentTypeLabel(assessmentType);
+  const segment = assessmentType === "quiz" ? "quiz" : "latihan";
+  const paginationBasePath = `/trainer/trainings/${id}/modules/${moduleId}/${segment}`;
 
   const [trainingResult, module, assessmentResult, trainingPassingGrade] =
     await Promise.all([
@@ -54,6 +63,12 @@ export async function TrainerAssessmentPage({
     trainingPassingGrade,
   });
 
+  const paginatedQuestions = paginateArray(
+    assessmentResult.data.questions,
+    page,
+    QUESTION_PAGE_SIZE,
+  );
+
   return (
     <>
       <TrainerHeader
@@ -74,7 +89,7 @@ export async function TrainerAssessmentPage({
         user={user}
       />
       <main className="flex-1 overflow-auto">
-        <div className="container max-w-6xl space-y-6 p-6 md:p-8">
+        <div className="container max-w-7xl space-y-6 p-6 md:p-8">
           <AdminPageHeader
             title={`Kelola ${typeLabel}`}
             description={`Buat dan kelola soal ${typeLabel.toLowerCase()} untuk modul "${module.title}".`}
@@ -96,8 +111,12 @@ export async function TrainerAssessmentPage({
                 contextTitle={module.title}
                 type={assessmentType}
                 assessment={assessmentResult.data}
-                questions={assessmentResult.data.questions}
+                questions={paginatedQuestions.items}
                 passingGrade={passingGrade}
+                questionPage={paginatedQuestions.page}
+                questionTotalPages={paginatedQuestions.totalPages}
+                questionTotal={paginatedQuestions.total}
+                paginationBasePath={paginationBasePath}
               />
             </CardContent>
           </Card>

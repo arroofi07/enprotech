@@ -2,8 +2,18 @@ import { TrainerAssessmentPage } from "@/components/assessments/trainer-assessme
 
 type PageProps = {
   params: Promise<{ id: string; moduleId: string }>;
+  searchParams: Promise<{ page?: string }>;
 };
 
-export default function TrainerLatihanPage({ params }: PageProps) {
-  return <TrainerAssessmentPage params={params} assessmentType="latihan" />;
+export default function TrainerLatihanPage({
+  params,
+  searchParams,
+}: PageProps) {
+  return (
+    <TrainerAssessmentPage
+      params={params}
+      searchParams={searchParams}
+      assessmentType="latihan"
+    />
+  );
 }

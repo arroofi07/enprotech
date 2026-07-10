@@ -248,13 +248,13 @@ async function main() {
   );
 
   // 8 & 9. Student view before archive
-  const studentView = await listEnrolledTrainings(student1);
+  const studentView = await listEnrolledTrainings(student1, { page: 1, pageSize: 100 });
   const hasTraining =
     studentView.success &&
-    studentView.data.some((item) => item.id === trainingId);
+    studentView.data.items.some((item) => item.id === trainingId);
   const progressOk =
     studentView.success &&
-    studentView.data.find((item) => item.id === trainingId)?.progressPercent ===
+    studentView.data.items.find((item) => item.id === trainingId)?.progressPercent ===
       0;
 
   record(
@@ -323,10 +323,13 @@ async function main() {
       : `error=${!archiveResult.success ? archiveResult.error : "unknown"}`,
   );
 
-  const studentAfterArchive = await listEnrolledTrainings(student1);
+  const studentAfterArchive = await listEnrolledTrainings(student1, {
+    page: 1,
+    pageSize: 100,
+  });
   const hiddenAfterArchive =
     studentAfterArchive.success &&
-    !studentAfterArchive.data.some((item) => item.id === trainingId);
+    !studentAfterArchive.data.items.some((item) => item.id === trainingId);
   record(
     7,
     "Training archived hilang dari student view",

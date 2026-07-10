@@ -5,10 +5,26 @@ import type {
   ModuleAssessmentType,
   TrainingAssessmentType,
 } from "@/lib/domain/assessments/types";
+import { listPaginationQuerySchema } from "@/lib/validations/pagination-schemas";
 
 const moduleAssessmentTypeSchema = z.enum(["quiz", "latihan"]);
 const trainingAssessmentTypeSchema = z.enum(["pre_test", "post_test"]);
 const assessmentTypeSchema = z.enum(["quiz", "latihan", "pre_test", "post_test"]);
+
+function emptyToUndefined(value: unknown): unknown {
+  if (value === "" || value === null || value === undefined) {
+    return undefined;
+  }
+
+  return value;
+}
+
+export const listModuleAssessmentHubSchema = z.object({
+  type: moduleAssessmentTypeSchema,
+  search: z.preprocess(emptyToUndefined, z.string().trim().optional()),
+  page: listPaginationQuerySchema.shape.page,
+  pageSize: listPaginationQuerySchema.shape.pageSize,
+});
 
 const optionInputSchema = z.object({
   text: z.string().trim().min(1, "Opsi jawaban tidak boleh kosong."),

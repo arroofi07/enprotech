@@ -15,13 +15,13 @@ export default async function StudentDashboardPage() {
     redirect("/login");
   }
 
-  const result = await listEnrolledTrainings(user);
+  const result = await listEnrolledTrainings(user, { page: 1, pageSize: 100 });
 
   if (!result.success) {
     redirect("/unauthorized");
   }
 
-  const trainings = result.data;
+  const trainings = result.data.items;
 
   return (
     <>

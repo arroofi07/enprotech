@@ -1,4 +1,4 @@
-import { and, asc, count, desc, eq, isNull, sql } from "drizzle-orm";
+import { and, asc, count, desc, eq, ilike, isNull, or, sql } from "drizzle-orm";
 
 import { db } from "@/lib/db";
 import {
@@ -532,4 +532,82 @@ export async function countQuestionsByAssessment(
     .where(eq(questions.assessmentId, assessmentId));
 
   return row?.value ?? 0;
+}
+
+export type ModuleAssessmentHubRow = {
+  moduleId: string;
+  moduleTitle: string;
+  moduleOrder: number;
+  trainingId: string;
+  trainingTitle: string;
+  questionCount: number;
+};
+
+function buildModuleAssessmentHubSearch(search?: string) {
+  if (!search?.trim()) {
+    return undefined;
+  }
+
+  const term = `%${search.trim()}%`;
+  return or(ilike(trainings.title, term), ilike(modules.title, term));
+}
+
+export async function listModuleAssessmentHub(query: {
+  type: ModuleAssessmentType;
+  search?: string;
+  page: number;
+  pageSize: number;
+}): Promise<{ items: ModuleAssessmentHubRow[]; total: number }> {
+  const where = buildModuleAssessmentHubSearch(query.search);
+  const offset = (query.page - 1) * query.pageSize;
+
+  const [rows, totalResult] = await Promise.all([
+    db
+      .select({
+        moduleId: modules.id,
+        moduleTitle: modules.title,
+        moduleOrder: modules.order,
+        trainingId: trainings.id,
+        trainingTitle: trainings.title,
+        questionCount: sql<number>`cast(count(${questions.id}) as int)`,
+      })
+      .from(modules)
+      .innerJoin(trainings, eq(modules.trainingId, trainings.id))
+      .leftJoin(
+        assessments,
+        and(
+          eq(assessments.moduleId, modules.id),
+          eq(assessments.type, query.type),
+        ),
+      )
+      .leftJoin(questions, eq(questions.assessmentId, assessments.id))
+      .where(where)
+      .groupBy(
+        modules.id,
+        modules.title,
+        modules.order,
+        trainings.id,
+        trainings.title,
+      )
+      .orderBy(asc(trainings.title), asc(modules.order))
+      .limit(query.pageSize)
+      .offset(offset),
+    db
+      .select({ value: count() })
+      .from(modules)
+      .innerJoin(trainings, eq(modules.trainingId, trainings.id))
+      .where(where),
+  ]);
+
+  return {
+    items: rows.map((row) => ({
+      moduleId: row.moduleId,
+      moduleTitle: row.moduleTitle,
+      moduleOrder: row.moduleOrder,
+      trainingId: row.trainingId,
+      trainingTitle: row.trainingTitle,
+      questionCount: Number(row.questionCount ?? 0),
+    })),
+    total: totalResult[0]?.value ?? 0,
+  };
 }

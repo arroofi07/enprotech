@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { listPaginationQuerySchema } from "@/lib/validations/pagination-schemas";
+
 const trainingStatusSchema = z.enum([
   "draft",
   "active",
@@ -62,9 +64,11 @@ export const updateTrainingSchema = createTrainingSchema
 export const listTrainingsQuerySchema = z.object({
   search: z.preprocess(emptyToUndefined, z.string().trim().optional()),
   status: z.preprocess(emptyToUndefined, trainingStatusSchema.optional()),
-  page: z.coerce.number().int().min(1).default(1),
-  pageSize: z.coerce.number().int().min(1).max(100).default(10),
+  page: listPaginationQuerySchema.shape.page,
+  pageSize: listPaginationQuerySchema.shape.pageSize,
 });
+
+export const listEnrolledTrainingsQuerySchema = listPaginationQuerySchema;
 
 export const getTrainingSchema = z.object({
   trainingId: z.uuid("ID training tidak valid."),
@@ -88,6 +92,9 @@ export const activatePretestSchema = z.object({
 export type CreateTrainingInput = z.infer<typeof createTrainingSchema>;
 export type UpdateTrainingInput = z.infer<typeof updateTrainingSchema>;
 export type ListTrainingsQueryInput = z.infer<typeof listTrainingsQuerySchema>;
+export type ListEnrolledTrainingsQueryInput = z.infer<
+  typeof listEnrolledTrainingsQuerySchema
+>;
 export type GetTrainingInput = z.infer<typeof getTrainingSchema>;
 export type EnrollStudentsInput = z.infer<typeof enrollStudentsSchema>;
 export type RemoveEnrollmentInput = z.infer<typeof removeEnrollmentSchema>;

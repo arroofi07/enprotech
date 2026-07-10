@@ -152,12 +152,29 @@ export async function findCertificateByStudentAndTraining(
 
 export async function listCertificatesByStudent(
   studentId: string,
-): Promise<CertificateRow[]> {
-  const rows = await buildCertificateQuery()
-    .where(eq(certificates.studentId, studentId))
-    .orderBy(desc(certificates.issuedAt));
+  query: { page: number; pageSize: number; trainingId?: string },
+): Promise<{ items: CertificateRow[]; total: number }> {
+  const filters = [eq(certificates.studentId, studentId)];
+  if (query.trainingId) {
+    filters.push(eq(certificates.trainingId, query.trainingId));
+  }
 
-  return rows.map(mapCertificateRow);
+  const where = and(...filters);
+  const offset = (query.page - 1) * query.pageSize;
+
+  const [rows, totalResult] = await Promise.all([
+    buildCertificateQuery()
+      .where(where)
+      .orderBy(desc(certificates.issuedAt))
+      .limit(query.pageSize)
+      .offset(offset),
+    db.select({ value: count() }).from(certificates).where(where),
+  ]);
+
+  return {
+    items: rows.map(mapCertificateRow),
+    total: totalResult[0]?.value ?? 0,
+  };
 }
 
 export async function countCertificatesForCodeYear(

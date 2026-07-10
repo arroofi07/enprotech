@@ -2,10 +2,18 @@ import { TrainerTrainingAssessmentPage } from "@/components/assessments/trainer-
 
 type PageProps = {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ page?: string }>;
 };
 
-export default function TrainerPreTestPage({ params }: PageProps) {
+export default function TrainerPreTestPage({
+  params,
+  searchParams,
+}: PageProps) {
   return (
-    <TrainerTrainingAssessmentPage params={params} assessmentType="pre_test" />
+    <TrainerTrainingAssessmentPage
+      params={params}
+      searchParams={searchParams}
+      assessmentType="pre_test"
+    />
   );
 }

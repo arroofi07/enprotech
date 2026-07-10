@@ -244,9 +244,9 @@ async function main() {
     certificate?.certificateNumber ?? "not issued",
   );
 
-  const listResult = await listStudentCertificates(student, {});
+  const listResult = await listStudentCertificates(student, { page: 1, pageSize: 100 });
   const listed = listResult.success
-    ? listResult.data.find((item) => item.id === certificate?.id)
+    ? listResult.data.items.find((item) => item.id === certificate?.id)
     : null;
 
   record(

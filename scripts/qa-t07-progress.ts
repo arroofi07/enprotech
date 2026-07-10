@@ -395,9 +395,9 @@ async function main() {
       : "progress unavailable",
   );
 
-  const enrolled = await listEnrolledTrainings(student);
+  const enrolled = await listEnrolledTrainings(student, { page: 1, pageSize: 100 });
   const enrolledItem = enrolled.success
-    ? enrolled.data.find((item) => item.id === trainingId)
+    ? enrolled.data.items.find((item) => item.id === trainingId)
     : undefined;
   const enrolledOk =
     enrolled.success &&

@@ -26,6 +26,8 @@ import type {
   QuestionRecord,
 } from "@/lib/infrastructure/db/repositories/assessment-repository";
 
+import { ListPagination } from "@/components/ui/list-pagination";
+
 type AssessmentManagementPanelProps = {
   trainingId: string;
   moduleId?: string;
@@ -34,6 +36,10 @@ type AssessmentManagementPanelProps = {
   assessment: AssessmentRecord;
   questions: QuestionRecord[];
   passingGrade: number;
+  questionPage: number;
+  questionTotalPages: number;
+  questionTotal: number;
+  paginationBasePath: string;
 };
 
 export function AssessmentManagementPanel({
@@ -44,6 +50,10 @@ export function AssessmentManagementPanel({
   assessment,
   questions,
   passingGrade,
+  questionPage,
+  questionTotalPages,
+  questionTotal,
+  paginationBasePath,
 }: AssessmentManagementPanelProps) {
   const [createOpen, setCreateOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
@@ -61,7 +71,7 @@ export function AssessmentManagementPanel({
             <h2 className="text-xl font-semibold">
               {typeLabel} — {contextTitle}
             </h2>
-            <Badge variant="secondary">{questions.length} soal</Badge>
+            <Badge variant="secondary">{questionTotal} soal</Badge>
           </div>
           <p className="text-sm text-muted-foreground">
             {getAssessmentTypeDescription(type)}
@@ -100,8 +110,8 @@ export function AssessmentManagementPanel({
               <IconPlus className="size-4" />
               Tambah Soal
             </DialogTrigger>
-            <DialogContent className="max-w-2xl">
-              <DialogHeader>
+            <DialogContent className="flex max-h-[90vh] max-w-4xl flex-col gap-0 overflow-hidden p-0 sm:max-w-4xl">
+              <DialogHeader className="shrink-0 border-b px-6 py-4">
                 <DialogTitle>Tambah Soal {typeLabel}</DialogTitle>
                 <DialogDescription>
                   Buat soal pilihan ganda dengan 4 opsi jawaban.
@@ -119,13 +129,33 @@ export function AssessmentManagementPanel({
         </div>
       </div>
 
-      <AssessmentQuestionTable
-        questions={questions}
-        trainingId={trainingId}
-        moduleId={moduleId}
-        type={type}
-        onEdit={setEditingQuestion}
-      />
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <p className="text-sm text-muted-foreground">
+            Menampilkan{" "}
+            <span className="font-medium text-foreground">
+              {questions.length}
+            </span>{" "}
+            dari{" "}
+            <span className="font-medium text-foreground">{questionTotal}</span>{" "}
+            soal
+          </p>
+        </div>
+
+        <AssessmentQuestionTable
+          questions={questions}
+          trainingId={trainingId}
+          moduleId={moduleId}
+          type={type}
+          onEdit={setEditingQuestion}
+        />
+
+        <ListPagination
+          page={questionPage}
+          totalPages={questionTotalPages}
+          basePath={paginationBasePath}
+        />
+      </div>
 
       <Dialog
         open={editingQuestion !== null}
@@ -135,8 +165,8 @@ export function AssessmentManagementPanel({
           }
         }}
       >
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
+        <DialogContent className="flex max-h-[90vh] max-w-4xl flex-col gap-0 overflow-hidden p-0 sm:max-w-4xl">
+          <DialogHeader className="shrink-0 border-b px-6 py-4">
             <DialogTitle>Edit Soal</DialogTitle>
             <DialogDescription>
               Perbarui pertanyaan dan opsi jawaban.
