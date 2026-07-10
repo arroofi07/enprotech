@@ -24,7 +24,7 @@ describe("buildModuleCompletedNotification", () => {
     expect(notification.message).toContain("Budi");
     expect(notification.message).toContain("Modul A");
     expect(notification.message).toContain("Safety Training");
-    expect(notification.data.href).toBe("/trainer/trainings/training-1");
+    expect(notification.data.href).toBe("/trainer/trainings/training-1/modules");
     expect(buildModuleCompletedDedupKey({
       studentId: "student-1",
       moduleId: "module-1",

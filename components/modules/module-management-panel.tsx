@@ -156,7 +156,7 @@ export function ModuleManagementPanel({
           }
         }}
       >
-        <SheetContent side="right" className="w-full overflow-y-auto sm:max-w-2xl">
+        <SheetContent side="right" size="wide" className="overflow-y-auto">
           {selectedModule ? (
             <>
               <SheetHeader className="border-b pb-4">

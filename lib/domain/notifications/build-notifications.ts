@@ -39,7 +39,7 @@ export function buildDeadlineReminderDedupKey(input: {
 export function buildModuleCompletedNotification(
   input: ModuleCompletedNotificationInput,
 ) {
-  const href = `/trainer/trainings/${input.trainingId}`;
+  const href = `/trainer/trainings/${input.trainingId}/modules`;
   const data: NotificationData = {
     href,
     trainingId: input.trainingId,

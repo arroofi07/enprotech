@@ -18,7 +18,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { IconGripVertical } from "@tabler/icons-react";
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useState } from "react";
 
 import {
   reorderModulesAction,
@@ -43,15 +43,19 @@ export function ModuleSortableList({
   trainingId,
   renderModule,
 }: ModuleSortableListProps) {
+  const moduleIdsKey = modules.map((item) => item.id).join(",");
   const [items, setItems] = useState(modules);
+  const [trackedModuleIdsKey, setTrackedModuleIdsKey] = useState(moduleIdsKey);
+
+  if (moduleIdsKey !== trackedModuleIdsKey) {
+    setTrackedModuleIdsKey(moduleIdsKey);
+    setItems(modules);
+  }
+
   const [state, formAction, pending] = useActionState(
     reorderModulesAction,
     initialState,
   );
-
-  useEffect(() => {
-    setItems(modules);
-  }, [modules]);
 
   const sensors = useSensors(
     useSensor(PointerSensor),

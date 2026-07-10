@@ -17,13 +17,31 @@ export function assertAuthenticated(
   return null;
 }
 
+function resolveNotificationHref(
+  notification: NotificationRecord,
+): string | null {
+  const href = notification.data?.href ?? null;
+  if (!href) {
+    return null;
+  }
+
+  if (notification.type === "module_completed") {
+    const legacyMatch = href.match(/^\/trainer\/trainings\/([^/]+)$/);
+    if (legacyMatch) {
+      return `/trainer/trainings/${legacyMatch[1]}/modules`;
+    }
+  }
+
+  return href;
+}
+
 export function toNotificationView(notification: NotificationRecord) {
   return {
     id: notification.id,
     type: notification.type,
     title: notification.title,
     message: notification.message,
-    href: notification.data?.href ?? null,
+    href: resolveNotificationHref(notification),
     isRead: notification.isRead,
     createdAt: notification.createdAt.toISOString(),
     data: notification.data,

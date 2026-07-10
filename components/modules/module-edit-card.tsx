@@ -22,7 +22,8 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { ButtonLink } from "@/components/ui/button-link";
 import {
   Collapsible,
   CollapsibleContent,
@@ -62,48 +63,35 @@ export function ModuleEditCard({ module, trainingId }: ModuleEditCardProps) {
           </p>
         </div>
         {module.videoConferenceLink ? (
-          <Button
-            variant="outline"
-            size="xs"
-            render={
-              <a
-                href={module.videoConferenceLink}
-                target="_blank"
-                rel="noopener noreferrer"
-              />
-            }
+          <a
+            href={module.videoConferenceLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={buttonVariants({ variant: "outline", size: "xs" })}
           >
             <IconExternalLink className="size-3.5" />
             Meet/Zoom
-          </Button>
+          </a>
         ) : null}
       </div>
 
       <div className="flex flex-wrap gap-2">
-        <Button
+        <ButtonLink
           variant="outline"
           size="sm"
-          render={
-            <a
-              href={`/trainer/trainings/${trainingId}/modules/${module.id}/quiz`}
-            />
-          }
+          href={`/trainer/trainings/${trainingId}/modules/${module.id}/quiz`}
         >
           <IconListCheck className="size-4" />
           Kelola Quiz
-        </Button>
-        <Button
+        </ButtonLink>
+        <ButtonLink
           variant="outline"
           size="sm"
-          render={
-            <a
-              href={`/trainer/trainings/${trainingId}/modules/${module.id}/latihan`}
-            />
-          }
+          href={`/trainer/trainings/${trainingId}/modules/${module.id}/latihan`}
         >
           <IconPencil className="size-4" />
           Kelola Latihan
-        </Button>
+        </ButtonLink>
       </div>
 
       {updateState.message ? (

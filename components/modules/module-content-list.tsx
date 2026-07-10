@@ -7,7 +7,7 @@ import {
   deleteModuleContentAction,
   type ModuleActionState,
 } from "@/app/actions/modules";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import type { ModuleContentRecord } from "@/lib/infrastructure/db/repositories/module-repository";
 
@@ -69,20 +69,23 @@ export function ModuleContentList({
 
             <div className="flex shrink-0 items-center gap-2">
               {content.type === "document" ? (
-                <Button variant="outline" size="xs" render={<a href={content.url} download />}>
+                <a
+                  href={content.url}
+                  download
+                  className={buttonVariants({ variant: "outline", size: "xs" })}
+                >
                   Download
-                </Button>
+                </a>
               ) : (
-                <Button
-                  variant="outline"
-                  size="xs"
-                  render={
-                    <a href={content.url} target="_blank" rel="noopener noreferrer" />
-                  }
+                <a
+                  href={content.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={buttonVariants({ variant: "outline", size: "xs" })}
                 >
                   <IconExternalLink className="size-3.5" />
                   Buka
-                </Button>
+                </a>
               )}
 
               {editable ? (

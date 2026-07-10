@@ -37,20 +37,39 @@ async function ensureUser(input: {
   email: string;
   name: string;
   role: "trainer" | "student";
-}) {
+}): Promise<{
+  id: string;
+  email: string;
+  name: string;
+  role: "trainer" | "student";
+  status: "active";
+}> {
   const existing = await findUserByEmail(input.email);
   if (existing) {
-    return existing;
+    return {
+      id: existing.id,
+      email: existing.email,
+      name: existing.name,
+      role: input.role,
+      status: "active",
+    };
   }
 
   const passwordHash = await hashPassword("QaTest123!");
-  return createUser({
+  const user = await createUser({
     email: input.email,
     name: input.name,
     passwordHash,
     role: input.role,
     status: "active",
   });
+  return {
+    id: user.id,
+    email: user.email,
+    name: user.name,
+    role: input.role,
+    status: "active",
+  };
 }
 
 async function fetchWithSession(

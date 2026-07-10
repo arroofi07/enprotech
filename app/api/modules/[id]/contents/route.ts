@@ -84,15 +84,15 @@ export async function GET(_request: Request, context: RouteContext) {
   const actor = await getCurrentUser();
   const { id } = await context.params;
 
-  const module = await findModuleById(id);
-  if (!module) {
+  const moduleRecord = await findModuleById(id);
+  if (!moduleRecord) {
     return errorResponse(ModuleErrorCode.MODULE_NOT_FOUND);
   }
 
   const { listModulesByTraining } = await import(
     "@/lib/infrastructure/db/repositories/module-repository"
   );
-  const modules = await listModulesByTraining(module.trainingId);
+  const modules = await listModulesByTraining(moduleRecord.trainingId);
   const found = modules.find((item) => item.id === id);
 
   if (!actor || (actor.role !== "admin" && actor.role !== "trainer")) {

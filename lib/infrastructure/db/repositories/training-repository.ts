@@ -122,7 +122,10 @@ function formatDeadline(deadline: Date | string | null | undefined): string | nu
   }
 
   if (deadline instanceof Date) {
-    return deadline.toISOString().slice(0, 10);
+    const year = deadline.getFullYear();
+    const month = String(deadline.getMonth() + 1).padStart(2, "0");
+    const day = String(deadline.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
   }
 
   return deadline;

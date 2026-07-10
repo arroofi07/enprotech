@@ -171,7 +171,8 @@ async function main() {
         (item) =>
           item.type === "module_completed" &&
           item.message.includes("QA T08 Student") &&
-          item.message.includes("Modul Notifikasi QA"),
+          item.message.includes("Modul Notifikasi QA") &&
+          item.href?.includes(`/trainer/trainings/${trainingId}`),
       )
     : undefined;
 
@@ -259,7 +260,8 @@ async function main() {
         (item) =>
           item.type === "deadline_reminder" &&
           item.title.includes("H-3") &&
-          item.message.includes("QA Notification Training"),
+          item.message.includes("QA Notification Training") &&
+          item.href?.includes(`/student/trainings/${trainingId}`),
       )
     : undefined;
 

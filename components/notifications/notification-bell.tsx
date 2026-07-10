@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { IconBell } from "@tabler/icons-react";
 import { formatDistanceToNow } from "date-fns";
@@ -15,7 +15,6 @@ import {
   PopoverTitle,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 
 const POLL_INTERVAL_MS = 30_000;
@@ -36,6 +35,7 @@ type NotificationResponse = {
 };
 
 export function NotificationBell() {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState<NotificationItem[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -102,12 +102,16 @@ export function NotificationBell() {
     setUnreadCount(0);
   }
 
-  async function handleNotificationClick(notification: NotificationItem) {
+  function handleNotificationClick(notification: NotificationItem) {
+    setOpen(false);
+
     if (!notification.isRead) {
-      await markAsRead(notification.id);
+      void markAsRead(notification.id);
     }
 
-    setOpen(false);
+    if (notification.href) {
+      router.push(notification.href);
+    }
   }
 
   return (
@@ -137,8 +141,12 @@ export function NotificationBell() {
           </Badge>
         ) : null}
       </PopoverTrigger>
-      <PopoverContent align="end" className="w-96 p-0">
-        <PopoverHeader className="flex flex-row items-center justify-between border-b px-4 py-3">
+      <PopoverContent
+        align="end"
+        sideOffset={8}
+        className="w-[min(24rem,calc(100vw-2rem))] gap-0 p-0"
+      >
+        <PopoverHeader className="flex shrink-0 flex-row items-center justify-between border-b px-4 py-3">
           <PopoverTitle>Notifikasi</PopoverTitle>
           {unreadCount > 0 ? (
             <Button
@@ -152,7 +160,7 @@ export function NotificationBell() {
           ) : null}
         </PopoverHeader>
 
-        <ScrollArea className="max-h-96">
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
           {loading ? (
             <p className="px-4 py-6 text-sm text-muted-foreground">
               Memuat notifikasi...
@@ -172,11 +180,11 @@ export function NotificationBell() {
                     )}
                   >
                     <div className="flex items-start justify-between gap-3">
-                      <div className="space-y-1">
+                      <div className="min-w-0 space-y-1">
                         <p className="text-sm font-medium">
                           {notification.title}
                         </p>
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-xs wrap-break-word text-muted-foreground">
                           {notification.message}
                         </p>
                       </div>
@@ -193,24 +201,15 @@ export function NotificationBell() {
                   </div>
                 );
 
-                if (notification.href) {
-                  return (
-                    <Link
-                      key={notification.id}
-                      href={notification.href}
-                      onClick={() => void handleNotificationClick(notification)}
-                    >
-                      {content}
-                    </Link>
-                  );
-                }
-
                 return (
                   <button
                     key={notification.id}
                     type="button"
-                    className="block w-full text-left"
-                    onClick={() => void handleNotificationClick(notification)}
+                    className={cn(
+                      "block w-full text-left",
+                      notification.href && "cursor-pointer",
+                    )}
+                    onClick={() => handleNotificationClick(notification)}
                   >
                     {content}
                   </button>
@@ -218,7 +217,7 @@ export function NotificationBell() {
               })}
             </div>
           )}
-        </ScrollArea>
+        </div>
       </PopoverContent>
     </Popover>
   );

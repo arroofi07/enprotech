@@ -90,7 +90,7 @@ function buildLearningFlowNav(prefix: LearningFlowPrefix): DashboardNavItem[] {
       title: "Nilai",
       href: `${prefix}/nilai`,
       icon: IconChartBar,
-      implemented: prefix === "/trainer",
+      implemented: true,
     },
     {
       title: "Sertifikat",

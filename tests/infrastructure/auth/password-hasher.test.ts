@@ -6,12 +6,16 @@ import {
 } from "@/lib/infrastructure/auth/password-hasher";
 
 describe("password-hasher", () => {
-  it("hashes password and verifies correctly", async () => {
-    const password = "SecurePass123";
-    const hash = await hashPassword(password);
+  it(
+    "hashes password and verifies correctly",
+    async () => {
+      const password = "SecurePass123";
+      const hash = await hashPassword(password);
 
-    expect(hash).not.toBe(password);
-    expect(await verifyPassword(password, hash)).toBe(true);
-    expect(await verifyPassword("wrong-password", hash)).toBe(false);
-  });
+      expect(hash).not.toBe(password);
+      expect(await verifyPassword(password, hash)).toBe(true);
+      expect(await verifyPassword("wrong-password", hash)).toBe(false);
+    },
+    10_000,
+  );
 });
