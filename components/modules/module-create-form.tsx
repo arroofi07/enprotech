@@ -19,7 +19,6 @@ const initialState: ModuleActionState = {};
 
 type ModuleCreateFormProps = {
   trainingId: string;
-  defaultOrder: number;
   onSuccess?: () => void;
 };
 
@@ -49,10 +48,8 @@ function ModuleFormSection({
 
 export function ModuleCreateForm({
   trainingId,
-  defaultOrder,
   onSuccess,
 }: ModuleCreateFormProps) {
-  const [order, setOrder] = useState(String(defaultOrder));
   const [minQuizScore, setMinQuizScore] = useState("0");
   const [minLatihanScore, setMinLatihanScore] = useState("0");
   const [minAttendance, setMinAttendance] = useState("0");
@@ -90,29 +87,15 @@ export function ModuleCreateForm({
 
       <div className="flex-1 space-y-4 overflow-y-auto px-6 py-4">
         <ModuleFormSection title="Informasi Modul">
-          <div className="grid gap-4 sm:grid-cols-[1fr_7rem]">
-            <Field>
-              <FieldLabel htmlFor="title">Nama Modul</FieldLabel>
-              <Input
-                id="title"
-                name="title"
-                required
-                placeholder="Masukkan nama modul"
-              />
-            </Field>
-            <Field>
-              <FieldLabel htmlFor="order">Urutan</FieldLabel>
-              <Input
-                id="order"
-                name="order"
-                type="number"
-                min={1}
-                value={order}
-                onChange={(event) => setOrder(event.target.value)}
-                required
-              />
-            </Field>
-          </div>
+          <Field>
+            <FieldLabel htmlFor="title">Nama Modul</FieldLabel>
+            <Input
+              id="title"
+              name="title"
+              required
+              placeholder="Masukkan nama modul"
+            />
+          </Field>
 
           <Field className="mt-4">
             <FieldLabel htmlFor="description">Target Pelatihan</FieldLabel>

@@ -130,7 +130,6 @@ export function ModuleManagementPanel({
                 <ModuleCreateForm
                   key={createFormKey}
                   trainingId={trainingId}
-                  defaultOrder={allModules.length + 1}
                   onSuccess={handleCreateSuccess}
                 />
               ) : null}
