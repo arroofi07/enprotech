@@ -1,4 +1,3 @@
-import Link from "next/link";
 import {
   IconArrowRight,
   IconBriefcase,
@@ -9,6 +8,23 @@ import {
   IconMapPin,
   IconQuote,
 } from "@tabler/icons-react";
+
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { ButtonLink } from "@/components/ui/button-link";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 const STATS = [
   { value: "12+", label: "Modul Praktis" },
@@ -102,19 +118,47 @@ const FAQS = [
   },
 ] as const;
 
+function SectionHeading({
+  label,
+  title,
+  description,
+}: {
+  label: string;
+  title: string;
+  description?: string;
+}) {
+  return (
+    <div className="mx-auto max-w-2xl text-center">
+      <Badge variant="secondary" className="text-xs font-semibold uppercase tracking-wider text-primary">
+        {label}
+      </Badge>
+      <h2 className="mt-3 font-heading text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
+        {title}
+      </h2>
+      {description ? (
+        <p className="mt-3 text-base leading-relaxed text-muted-foreground">
+          {description}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
 export function LandingStats() {
   return (
     <section className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6">
-      <div className="grid gap-6 rounded-3xl border border-border bg-card p-8 sm:grid-cols-3">
-        {STATS.map((stat) => (
-          <div key={stat.label} className="text-center">
-            <p className="font-heading text-4xl font-semibold text-primary sm:text-5xl">
-              {stat.value}
-            </p>
-            <p className="mt-1 text-sm text-muted-foreground">{stat.label}</p>
-          </div>
-        ))}
-      </div>
+      <Card className="rounded-3xl py-8">
+        <CardContent className="grid gap-6 sm:grid-cols-3">
+          {STATS.map((stat) => (
+            <div key={stat.label} className="text-center">
+              <p className="font-heading text-4xl font-semibold text-primary sm:text-5xl">
+                {stat.value}
+              </p>
+              <p className="mt-1 text-sm text-muted-foreground">{stat.label}</p>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
     </section>
   );
 }
@@ -122,35 +166,29 @@ export function LandingStats() {
 export function LandingFeatures() {
   return (
     <section id="kelebihan" className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6">
-      <div className="mx-auto max-w-2xl text-center">
-        <span className="text-xs font-semibold uppercase tracking-wider text-primary">
-          Kelebihan Program
-        </span>
-        <h2 className="mt-3 font-heading text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-          Pengalaman pelatihan yang aplikatif
-        </h2>
-        <p className="mt-3 text-base leading-relaxed text-muted-foreground">
-          Didesain secara khusus untuk memberikan pengalaman pelatihan yang
-          aplikatif dan relevan dengan kebutuhan industri saat ini.
-        </p>
-      </div>
+      <SectionHeading
+        label="Kelebihan Program"
+        title="Pengalaman pelatihan yang aplikatif"
+        description="Didesain secara khusus untuk memberikan pengalaman pelatihan yang aplikatif dan relevan dengan kebutuhan industri saat ini."
+      />
 
       <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {FEATURES.map((feature) => (
-          <div
-            key={feature.title}
-            className="flex flex-col gap-3 rounded-3xl border border-border bg-card p-6"
-          >
-            <span className="flex size-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
-              <feature.icon className="size-5" />
-            </span>
-            <h3 className="font-heading text-lg font-semibold text-foreground">
-              {feature.title}
-            </h3>
-            <p className="text-sm leading-relaxed text-muted-foreground">
-              {feature.description}
-            </p>
-          </div>
+          <Card key={feature.title} className="rounded-3xl">
+            <CardHeader>
+              <Badge className="size-11 rounded-xl bg-primary/10 p-0 text-primary">
+                <feature.icon className="size-5" />
+              </Badge>
+              <CardTitle className="font-heading text-lg font-semibold">
+                {feature.title}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <CardDescription className="text-sm leading-relaxed">
+                {feature.description}
+              </CardDescription>
+            </CardContent>
+          </Card>
         ))}
       </div>
     </section>
@@ -160,35 +198,42 @@ export function LandingFeatures() {
 export function LandingSteps() {
   return (
     <section id="program" className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6">
-      <div className="rounded-3xl bg-sidebar p-8 text-sidebar-foreground sm:p-12">
-        <div className="max-w-xl">
-          <span className="text-xs font-semibold uppercase tracking-wider text-sidebar-primary">
+      <Card className="rounded-3xl border-0 bg-sidebar py-8 text-sidebar-foreground ring-0 sm:py-12">
+        <CardHeader className="max-w-xl">
+          <Badge
+            variant="secondary"
+            className="text-xs font-semibold uppercase tracking-wider text-sidebar-primary"
+          >
             Cara kerja
-          </span>
-          <h2 className="mt-3 font-heading text-3xl font-semibold tracking-tight text-sidebar-foreground sm:text-4xl">
+          </Badge>
+          <CardTitle className="mt-3 font-heading text-3xl font-semibold tracking-tight text-sidebar-foreground sm:text-4xl">
             Mulai perjalanan belajar Anda dalam tiga langkah.
-          </h2>
-        </div>
+          </CardTitle>
+        </CardHeader>
 
-        <div className="mt-10 grid gap-4 md:grid-cols-3">
+        <CardContent className="grid gap-4 md:grid-cols-3">
           {STEPS.map((step, index) => (
-            <div
+            <Card
               key={step.title}
-              className="rounded-2xl border border-sidebar-border bg-sidebar-accent/40 p-6"
+              className="rounded-2xl border-sidebar-border bg-sidebar-accent/40 text-sidebar-foreground ring-sidebar-border"
             >
-              <span className="flex size-9 items-center justify-center rounded-full bg-sidebar-primary text-sm font-semibold text-sidebar-primary-foreground">
-                {index + 1}
-              </span>
-              <h3 className="mt-4 font-heading text-lg font-semibold text-sidebar-foreground">
-                {step.title}
-              </h3>
-              <p className="mt-2 text-sm leading-relaxed text-sidebar-muted-foreground">
-                {step.description}
-              </p>
-            </div>
+              <CardHeader>
+                <Badge className="size-9 rounded-full bg-sidebar-primary p-0 text-sm font-semibold text-sidebar-primary-foreground">
+                  {index + 1}
+                </Badge>
+                <CardTitle className="font-heading text-lg font-semibold text-sidebar-foreground">
+                  {step.title}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="text-sm leading-relaxed text-sidebar-muted-foreground">
+                  {step.description}
+                </CardDescription>
+              </CardContent>
+            </Card>
           ))}
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </section>
   );
 }
@@ -196,39 +241,38 @@ export function LandingSteps() {
 export function LandingTestimonials() {
   return (
     <section id="testimoni" className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6">
-      <div className="mx-auto max-w-2xl text-center">
-        <span className="text-xs font-semibold uppercase tracking-wider text-primary">
-          Suara Peserta
-        </span>
-        <h2 className="mt-3 font-heading text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-          Apa kata mereka yang telah bergabung
-        </h2>
-      </div>
+      <SectionHeading
+        label="Suara Peserta"
+        title="Apa kata mereka yang telah bergabung"
+      />
 
       <div className="mt-10 grid gap-6 sm:grid-cols-2">
         {TESTIMONIALS.map((testimonial) => (
-          <figure
-            key={testimonial.name}
-            className="flex flex-col gap-4 rounded-3xl border border-border bg-card p-8"
-          >
-            <IconQuote className="size-8 text-primary/40" />
-            <blockquote className="text-base leading-relaxed text-foreground">
-              {testimonial.quote}
-            </blockquote>
-            <figcaption className="mt-2 flex items-center gap-3">
-              <span className="flex size-10 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
-                {testimonial.name.charAt(0)}
-              </span>
-              <span>
-                <span className="block text-sm font-semibold text-foreground">
-                  {testimonial.name}
+          <Card key={testimonial.name} className="rounded-3xl">
+            <CardHeader>
+              <IconQuote className="size-8 text-primary/40" />
+            </CardHeader>
+            <CardContent className="flex flex-col gap-4">
+              <blockquote className="text-base leading-relaxed text-foreground">
+                {testimonial.quote}
+              </blockquote>
+              <figcaption className="flex items-center gap-3">
+                <Avatar>
+                  <AvatarFallback className="bg-primary/10 text-sm font-semibold text-primary">
+                    {testimonial.name.charAt(0)}
+                  </AvatarFallback>
+                </Avatar>
+                <span>
+                  <span className="block text-sm font-semibold text-foreground">
+                    {testimonial.name}
+                  </span>
+                  <span className="block text-xs text-muted-foreground">
+                    {testimonial.role}
+                  </span>
                 </span>
-                <span className="block text-xs text-muted-foreground">
-                  {testimonial.role}
-                </span>
-              </span>
-            </figcaption>
-          </figure>
+              </figcaption>
+            </CardContent>
+          </Card>
         ))}
       </div>
     </section>
@@ -238,33 +282,23 @@ export function LandingTestimonials() {
 export function LandingFaq() {
   return (
     <section id="faq" className="mx-auto w-full max-w-3xl px-4 py-12 sm:px-6">
-      <div className="mx-auto max-w-2xl text-center">
-        <span className="text-xs font-semibold uppercase tracking-wider text-primary">
-          Pertanyaan Umum
-        </span>
-        <h2 className="mt-3 font-heading text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-          Temukan jawaban yang Anda cari
-        </h2>
-      </div>
+      <SectionHeading
+        label="Pertanyaan Umum"
+        title="Temukan jawaban yang Anda cari"
+      />
 
-      <div className="mt-10 flex flex-col gap-3">
+      <Accordion className="mt-10 rounded-2xl border-border">
         {FAQS.map((faq) => (
-          <details
-            key={faq.question}
-            className="group rounded-2xl border border-border bg-card px-5 py-4 [&_summary::-webkit-details-marker]:hidden"
-          >
-            <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-sm font-semibold text-foreground">
+          <AccordionItem key={faq.question} value={faq.question}>
+            <AccordionTrigger className="px-5 py-4 text-sm font-semibold">
               {faq.question}
-              <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary transition-transform group-open:rotate-45">
-                +
-              </span>
-            </summary>
-            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+            </AccordionTrigger>
+            <AccordionContent className="px-5 text-sm leading-relaxed text-muted-foreground">
               {faq.answer}
-            </p>
-          </details>
+            </AccordionContent>
+          </AccordionItem>
         ))}
-      </div>
+      </Accordion>
     </section>
   );
 }
@@ -272,64 +306,69 @@ export function LandingFaq() {
 export function LandingCta() {
   return (
     <section id="kontak" className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6">
-      <div className="overflow-hidden rounded-3xl bg-sidebar p-8 text-sidebar-foreground sm:p-14">
-        <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
+      <Card className="overflow-hidden rounded-3xl border-0 bg-sidebar py-8 text-sidebar-foreground ring-0 sm:py-14">
+        <CardContent className="grid gap-10 lg:grid-cols-2 lg:items-center">
           <div className="max-w-lg">
-            <h2 className="font-heading text-3xl font-semibold tracking-tight text-sidebar-foreground sm:text-4xl">
+            <CardTitle className="font-heading text-3xl font-semibold tracking-tight text-sidebar-foreground sm:text-4xl">
               Siap menjadi generasi digital leader berikutnya?
-            </h2>
-            <p className="mt-3 text-sm leading-relaxed text-sidebar-muted-foreground">
+            </CardTitle>
+            <CardDescription className="mt-3 text-sm leading-relaxed text-sidebar-muted-foreground">
               Ada pertanyaan lebih lanjut atau tertarik untuk berkolaborasi? Tim
               kami siap membantu Anda.
-            </p>
+            </CardDescription>
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-              <Link
+              <ButtonLink
                 href="/register"
-                className="inline-flex items-center justify-center gap-1.5 rounded-full bg-sidebar-primary px-6 py-3 text-sm font-semibold text-sidebar-primary-foreground transition-colors hover:opacity-90"
+                size="lg"
+                className="rounded-full bg-sidebar-primary px-6 py-3 text-sm font-semibold text-sidebar-primary-foreground hover:bg-sidebar-primary/90"
               >
                 Buat Akun
                 <IconArrowRight className="size-4" />
-              </Link>
-              <Link
+              </ButtonLink>
+              <ButtonLink
                 href="/login"
-                className="inline-flex items-center justify-center rounded-full border border-sidebar-border px-6 py-3 text-sm font-medium text-sidebar-foreground transition-colors hover:bg-sidebar-accent"
+                variant="outline"
+                size="lg"
+                className="rounded-full border-sidebar-border px-6 py-3 text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent"
               >
                 Masuk
-              </Link>
+              </ButtonLink>
             </div>
           </div>
 
-          <dl className="grid gap-4 rounded-2xl border border-sidebar-border bg-sidebar-accent/40 p-6">
-            <div className="flex items-start gap-3">
-              <IconMapPin className="mt-0.5 size-5 shrink-0 text-sidebar-primary" />
-              <div>
-                <dt className="text-xs uppercase tracking-wider text-sidebar-muted-foreground">
-                  Lokasi
-                </dt>
-                <dd className="text-sm font-medium text-sidebar-foreground">
-                  Kota Padang, Sumatera Barat
-                </dd>
+          <Card className="rounded-2xl border-sidebar-border bg-sidebar-accent/40 text-sidebar-foreground ring-sidebar-border">
+            <CardContent className="grid gap-4 p-6">
+              <div className="flex items-start gap-3">
+                <IconMapPin className="mt-0.5 size-5 shrink-0 text-sidebar-primary" />
+                <div>
+                  <CardDescription className="text-xs uppercase tracking-wider text-sidebar-muted-foreground">
+                    Lokasi
+                  </CardDescription>
+                  <CardTitle className="text-sm font-medium text-sidebar-foreground">
+                    Kota Padang, Sumatera Barat
+                  </CardTitle>
+                </div>
               </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <IconMail className="mt-0.5 size-5 shrink-0 text-sidebar-primary" />
-              <div>
-                <dt className="text-xs uppercase tracking-wider text-sidebar-muted-foreground">
-                  Email
-                </dt>
-                <dd className="text-sm font-medium text-sidebar-foreground">
-                  <a
-                    href="mailto:support@en-protech.com"
-                    className="hover:underline"
-                  >
-                    support@en-protech.com
-                  </a>
-                </dd>
+              <div className="flex items-start gap-3">
+                <IconMail className="mt-0.5 size-5 shrink-0 text-sidebar-primary" />
+                <div>
+                  <CardDescription className="text-xs uppercase tracking-wider text-sidebar-muted-foreground">
+                    Email
+                  </CardDescription>
+                  <CardTitle className="text-sm font-medium text-sidebar-foreground">
+                    <a
+                      href="mailto:support@en-protech.com"
+                      className="hover:underline"
+                    >
+                      support@en-protech.com
+                    </a>
+                  </CardTitle>
+                </div>
               </div>
-            </div>
-          </dl>
-        </div>
-      </div>
+            </CardContent>
+          </Card>
+        </CardContent>
+      </Card>
     </section>
   );
 }

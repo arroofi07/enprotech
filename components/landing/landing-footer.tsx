@@ -9,6 +9,10 @@ import {
   IconSparkles,
 } from "@tabler/icons-react";
 
+import { Badge } from "@/components/ui/badge";
+import { ButtonLink } from "@/components/ui/button-link";
+import { Separator } from "@/components/ui/separator";
+
 const FOOTER_COLUMNS = [
   {
     title: "Program",
@@ -48,9 +52,9 @@ export function LandingFooter() {
         <div className="grid gap-10 lg:grid-cols-[1.6fr_1fr_1fr_1.2fr]">
           <div className="flex flex-col gap-4">
             <Link href="/" className="flex items-center gap-2">
-              <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+              <Badge className="size-8 rounded-lg p-0">
                 <IconSparkles className="size-4" />
-              </span>
+              </Badge>
               <span className="font-heading text-base font-semibold tracking-tight">
                 enprotech
               </span>
@@ -61,14 +65,16 @@ export function LandingFooter() {
             </p>
             <div className="flex items-center gap-2">
               {SOCIAL_LINKS.map((social) => (
-                <a
+                <ButtonLink
                   key={social.label}
                   href={social.href}
+                  variant="outline"
+                  size="icon"
                   aria-label={social.label}
-                  className="flex size-9 items-center justify-center rounded-lg border border-border text-muted-foreground transition-colors hover:border-primary hover:text-primary"
+                  className="text-muted-foreground hover:border-primary hover:text-primary"
                 >
                   <social.icon className="size-4" />
-                </a>
+                </ButtonLink>
               ))}
             </div>
           </div>
@@ -79,13 +85,14 @@ export function LandingFooter() {
                 {column.title}
               </p>
               {column.links.map((link) => (
-                <Link
+                <ButtonLink
                   key={link.label}
                   href={link.href}
-                  className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                  variant="link"
+                  className="h-auto justify-start p-0 text-sm text-muted-foreground hover:text-foreground"
                 >
                   {link.label}
-                </Link>
+                </ButtonLink>
               ))}
             </div>
           ))}
@@ -104,11 +111,10 @@ export function LandingFooter() {
           </div>
         </div>
 
-        <div className="mt-10 border-t border-border pt-6">
-          <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} enprotech. Seluruh hak cipta dilindungi.
-          </p>
-        </div>
+        <Separator className="mt-10" />
+        <p className="pt-6 text-xs text-muted-foreground">
+          © {new Date().getFullYear()} enprotech. Seluruh hak cipta dilindungi.
+        </p>
       </div>
     </footer>
   );

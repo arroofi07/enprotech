@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { startTransition, useActionState, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -14,6 +13,12 @@ import {
 } from "@/app/actions/auth";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { ButtonLink } from "@/components/ui/button-link";
+import {
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Field,
   FieldError,
@@ -74,14 +79,14 @@ export function RegisterForm() {
 
   return (
     <div className="w-full">
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold tracking-tight text-foreground">
+      <CardHeader className="mb-2 px-0">
+        <CardTitle className="text-2xl font-bold tracking-tight">
           Buat akun baru
-        </h2>
-        <p className="mt-1 text-sm text-muted-foreground">
+        </CardTitle>
+        <CardDescription>
           Akun akan aktif setelah disetujui Admin.
-        </p>
-      </div>
+        </CardDescription>
+      </CardHeader>
 
       <form onSubmit={onSubmit} className="space-y-4">
         <FieldGroup>
@@ -179,9 +184,13 @@ export function RegisterForm() {
 
       <p className="mt-4 text-center text-xs text-muted-foreground">
         Sudah punya akun?{" "}
-        <Link href="/login" className="text-primary underline-offset-4 hover:underline">
+        <ButtonLink
+          href="/login"
+          variant="link"
+          className="h-auto p-0 text-xs"
+        >
           Masuk di sini
-        </Link>
+        </ButtonLink>
       </p>
     </div>
   );

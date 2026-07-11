@@ -5,6 +5,23 @@ import {
   IconChartBar,
 } from "@tabler/icons-react";
 
+import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Item,
+  ItemContent,
+  ItemGroup,
+  ItemMedia,
+  ItemTitle,
+} from "@/components/ui/item";
+import { Progress } from "@/components/ui/progress";
+
 const valueProps = [
   {
     icon: IconBook,
@@ -22,7 +39,7 @@ const valueProps = [
 
 export function AuthBrandPanel() {
   return (
-    <div className="relative hidden overflow-hidden bg-linear-to-br from-primary via-primary to-sidebar p-12 text-primary-foreground lg:flex lg:flex-col lg:justify-between [&_h2]:text-primary-foreground">
+    <div className="relative hidden overflow-hidden bg-linear-to-br from-primary via-primary to-sidebar p-12 text-primary-foreground lg:flex lg:flex-col lg:justify-between **:data-[slot=card-description]:text-primary-foreground/90 **:data-[slot=card-title]:text-primary-foreground">
       <div
         aria-hidden
         className="pointer-events-none absolute -top-24 -right-24 size-72 rounded-full bg-primary-foreground/10 blur-3xl"
@@ -37,66 +54,83 @@ export function AuthBrandPanel() {
       />
 
       <div className="relative z-10">
-        <span className="inline-flex items-center rounded-full border border-primary-foreground/30 bg-primary-foreground/15 px-3 py-1 text-xs font-medium text-primary-foreground backdrop-blur">
+        <Badge className="border-primary-foreground/30 bg-primary-foreground/15 text-primary-foreground hover:bg-primary-foreground/15">
           E-Training Enprotech
-        </span>
+        </Badge>
       </div>
 
       <div className="relative z-10 space-y-8">
         <div className="space-y-4">
-          <h2 className="text-3xl font-bold tracking-tight text-primary-foreground">
+          <CardTitle className="text-3xl font-bold tracking-tight">
             Tingkatkan kompetensi lewat pelatihan internal.
-          </h2>
-          <p className="max-w-md text-sm leading-relaxed text-primary-foreground/90">
+          </CardTitle>
+          <CardDescription className="max-w-md text-sm leading-relaxed text-primary-foreground/90">
             Platform terpadu untuk mengelola modul pelatihan, memantau progres
             peserta, dan menyelesaikan evaluasi serta sertifikasi.
-          </p>
+          </CardDescription>
         </div>
 
-        <ul className="space-y-3">
+        <ItemGroup className="gap-3">
           {valueProps.map(({ icon: Icon, label }) => (
-            <li key={label} className="flex items-center gap-3">
-              <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary-foreground/15 text-primary-foreground backdrop-blur">
+            <Item
+              key={label}
+              className="border-transparent p-0 hover:bg-transparent"
+            >
+              <ItemMedia
+                variant="icon"
+                className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary-foreground/15 text-primary-foreground backdrop-blur"
+              >
                 <Icon className="size-4" />
-              </span>
-              <span className="text-sm font-medium text-primary-foreground">{label}</span>
-            </li>
+              </ItemMedia>
+              <ItemContent>
+                <ItemTitle className="text-sm font-medium text-primary-foreground">
+                  {label}
+                </ItemTitle>
+              </ItemContent>
+            </Item>
           ))}
-        </ul>
+        </ItemGroup>
       </div>
 
       <div className="relative z-10 my-4 flex justify-center">
-        <div className="relative aspect-4/3 w-full max-w-[380px] overflow-hidden rounded-2xl border border-primary-foreground/15 bg-primary-foreground/5 shadow-2xl backdrop-blur-xs">
-          <Image
-            src="/auth-illustration.png"
-            alt="Ilustrasi Mahasiswa Belajar"
-            fill
-            className="object-cover"
-            priority
-          />
-        </div>
+        <Card className="w-full max-w-[380px] overflow-hidden rounded-2xl border-primary-foreground/15 bg-primary-foreground/5 py-0 shadow-2xl ring-primary-foreground/15 backdrop-blur-xs">
+          <AspectRatio ratio={4 / 3}>
+            <Image
+              src="/auth-illustration.png"
+              alt="Ilustrasi Mahasiswa Belajar"
+              fill
+              className="object-cover"
+              priority
+            />
+          </AspectRatio>
+        </Card>
       </div>
 
       <div className="relative z-10 flex gap-4">
-        <div className="rounded-2xl border border-primary-foreground/25 bg-primary-foreground/12 p-4 backdrop-blur">
-          <p className="text-xs font-medium text-primary-foreground/90">
-            Progres belajar
-          </p>
-          <p className="mt-1 text-2xl font-bold text-primary-foreground">78%</p>
-          <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-primary-foreground/20">
-            <div className="h-full w-[78%] rounded-full bg-primary-foreground" />
-          </div>
-        </div>
+        <Card className="flex-1 rounded-2xl border-primary-foreground/25 bg-primary-foreground/12 py-4 ring-primary-foreground/25 backdrop-blur">
+          <CardContent className="p-0 px-4">
+            <CardDescription className="text-xs font-medium text-primary-foreground/90">
+              Progres belajar
+            </CardDescription>
+            <CardTitle className="mt-1 text-2xl font-bold">78%</CardTitle>
+            <Progress
+              value={78}
+              className="mt-3 w-full gap-0 **:data-[slot=progress-indicator]:rounded-full **:data-[slot=progress-indicator]:bg-primary-foreground **:data-[slot=progress-track]:h-1.5 **:data-[slot=progress-track]:rounded-full **:data-[slot=progress-track]:bg-primary-foreground/20"
+            />
+          </CardContent>
+        </Card>
 
-        <div className="rounded-2xl border border-primary-foreground/25 bg-primary-foreground/12 p-4 backdrop-blur">
-          <p className="text-xs font-medium text-primary-foreground/90">
-            Modul selesai
-          </p>
-          <p className="mt-1 text-2xl font-bold text-primary-foreground">12</p>
-          <p className="mt-2 text-xs text-primary-foreground/80">
-            dari 16 modul aktif
-          </p>
-        </div>
+        <Card className="flex-1 rounded-2xl border-primary-foreground/25 bg-primary-foreground/12 py-4 ring-primary-foreground/25 backdrop-blur">
+          <CardContent className="p-0 px-4">
+            <CardDescription className="text-xs font-medium text-primary-foreground/90">
+              Modul selesai
+            </CardDescription>
+            <CardTitle className="mt-1 text-2xl font-bold">12</CardTitle>
+            <CardDescription className="mt-2 text-xs text-primary-foreground/80">
+              dari 16 modul aktif
+            </CardDescription>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
