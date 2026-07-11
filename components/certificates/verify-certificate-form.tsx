@@ -6,11 +6,16 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 
 export function VerifyCertificateForm({
   initialNumber = "",
+  inputClassName,
+  buttonClassName,
 }: {
   initialNumber?: string;
+  inputClassName?: string;
+  buttonClassName?: string;
 }) {
   const router = useRouter();
   const [certificateNumber, setCertificateNumber] = useState(initialNumber);
@@ -35,10 +40,10 @@ export function VerifyCertificateForm({
           placeholder="CERT-TRAINING-2026-0001"
           value={certificateNumber}
           onChange={(event) => setCertificateNumber(event.target.value)}
-          className="h-10"
+          className={cn("h-10", inputClassName)}
         />
       </div>
-      <Button type="submit" className="w-full">
+      <Button type="submit" className={cn("w-full", buttonClassName)}>
         Verifikasi
       </Button>
     </form>

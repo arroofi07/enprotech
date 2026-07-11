@@ -186,68 +186,117 @@ export function LandingCertificateVerification() {
         description="Verifikasi sertifikat digital yang diterbitkan melalui platform E-Training Enprotech. Cocok untuk recruiter, institusi, atau peserta yang ingin memastikan sertifikat asli."
       />
 
-      <div className="mt-10 grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-        <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
-          {CERTIFICATE_VERIFICATION_POINTS.map((point) => (
-            <Card key={point.title} className="rounded-3xl">
-              <CardHeader>
-                <Badge className="size-11 rounded-xl bg-primary/10 p-0 text-primary">
-                  <point.icon className="size-5" />
-                </Badge>
-                <CardTitle className="font-heading text-lg font-semibold">
-                  {point.title}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CardDescription className="text-sm leading-relaxed">
-                  {point.description}
-                </CardDescription>
-              </CardContent>
-            </Card>
-          ))}
+      <Card className="mt-10 overflow-hidden rounded-3xl border-0 py-0 shadow-xl ring-0">
+        <CardContent className="grid gap-0 p-0 lg:grid-cols-[1.05fr_0.95fr]">
+          <div className="relative flex flex-col justify-between gap-8 bg-linear-to-br from-primary via-primary to-sidebar p-8 text-primary-foreground sm:p-10 lg:p-12">
+            <div
+              aria-hidden
+              className="pointer-events-none absolute -top-16 -right-16 size-56 rounded-full bg-primary-foreground/10 blur-3xl"
+            />
+            <div
+              aria-hidden
+              className="pointer-events-none absolute -bottom-20 -left-10 size-48 rounded-full bg-primary-foreground/10 blur-3xl"
+            />
 
-          <Card className="rounded-3xl border-dashed">
-            <CardContent className="space-y-2 p-6">
-              <CardDescription className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            <div className="relative z-10 space-y-6">
+              <Badge className="w-fit border-primary-foreground/20 bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/10">
+                <IconCertificate className="size-3.5" />
+                Official Enprotech
+              </Badge>
+
+              <div className="space-y-3">
+                <CardTitle className="font-heading text-2xl font-semibold tracking-tight text-primary-foreground sm:text-3xl">
+                  Verifikasi keaslian dalam hitungan detik
+                </CardTitle>
+                <CardDescription className="max-w-md text-sm leading-relaxed text-primary-foreground/85">
+                  Setiap sertifikat resmi memiliki nomor unik yang terdaftar di
+                  sistem E-Training Enprotech dan dapat diperiksa kapan saja.
+                </CardDescription>
+              </div>
+
+              <ul className="space-y-4">
+                {CERTIFICATE_VERIFICATION_POINTS.map((point) => (
+                  <li key={point.title} className="flex gap-4">
+                    <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary-foreground/12 text-primary-foreground">
+                      <point.icon className="size-5" />
+                    </span>
+                    <div className="space-y-1">
+                      <p className="text-sm font-semibold text-primary-foreground">
+                        {point.title}
+                      </p>
+                      <p className="text-sm leading-relaxed text-primary-foreground/80">
+                        {point.description}
+                      </p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="relative z-10 rounded-2xl border border-primary-foreground/15 bg-primary-foreground/8 p-5 backdrop-blur-sm">
+              <p className="text-xs font-semibold uppercase tracking-wider text-primary-foreground/70">
                 Format nomor resmi
-              </CardDescription>
-              <CardTitle className="font-mono text-sm font-medium text-foreground">
+              </p>
+              <p className="mt-2 font-mono text-sm font-medium text-primary-foreground">
                 CERT-&#123;KODE-TRAINING&#125;-&#123;TAHUN&#125;-&#123;URUTAN&#125;
+              </p>
+              <p className="mt-2 text-sm text-primary-foreground/75">
+                Contoh:{" "}
+                <span className="font-mono text-primary-foreground">
+                  CERT-DEP-2026-0001
+                </span>
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-col justify-center gap-6 bg-card p-8 sm:p-10 lg:p-12">
+            <div className="space-y-2">
+              <CardTitle className="font-heading text-2xl font-semibold">
+                Cek Sertifikat Sekarang
               </CardTitle>
               <CardDescription className="text-sm leading-relaxed">
-                Contoh: <span className="font-mono text-foreground">CERT-DEP-2026-0001</span>
+                Masukkan nomor sertifikat untuk memeriksa keasliannya. Verifikasi
+                ini gratis dan dapat diakses tanpa login.
               </CardDescription>
-            </CardContent>
-          </Card>
-        </div>
+            </div>
 
-        <Card className="rounded-3xl">
-          <CardHeader>
-            <Badge className="w-fit gap-1.5 bg-primary/10 px-3 py-1 text-xs font-semibold text-primary hover:bg-primary/10">
-              <IconCertificate className="size-3.5" />
-              Official Enprotech
-            </Badge>
-            <CardTitle className="font-heading text-2xl font-semibold">
-              Cek Sertifikat Sekarang
-            </CardTitle>
-            <CardDescription className="text-sm leading-relaxed">
-              Masukkan nomor sertifikat untuk memeriksa keasliannya. Verifikasi
-              ini gratis dan dapat diakses tanpa login.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <VerifyCertificateForm />
+            <div className="rounded-2xl border bg-muted/20 p-5 sm:p-6">
+              <VerifyCertificateForm
+                inputClassName="h-11 bg-background text-sm md:text-sm"
+                buttonClassName="h-11 rounded-full text-sm font-semibold"
+              />
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="rounded-xl border bg-muted/15 p-4">
+                <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                  Status
+                </p>
+                <p className="mt-1 text-sm font-semibold text-foreground">
+                  Valid / Tidak Valid
+                </p>
+              </div>
+              <div className="rounded-xl border bg-muted/15 p-4">
+                <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                  Data ditampilkan
+                </p>
+                <p className="mt-1 text-sm font-semibold text-foreground">
+                  Nama, training, nilai
+                </p>
+              </div>
+            </div>
+
             <ButtonLink
               href="/verify"
               variant="outline"
-              className="w-full rounded-full"
+              className="h-11 w-full rounded-full"
             >
               Buka halaman verifikasi lengkap
               <IconArrowRight className="size-4" />
             </ButtonLink>
-          </CardContent>
-        </Card>
-      </div>
+          </div>
+        </CardContent>
+      </Card>
     </section>
   );
 }
