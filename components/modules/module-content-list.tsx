@@ -9,6 +9,7 @@ import {
 } from "@/app/actions/modules";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
+import { useActionToast } from "@/hooks/use-action-toast";
 import type { ModuleContentRecord } from "@/lib/infrastructure/db/repositories/module-repository";
 
 const initialState: ModuleActionState = {};
@@ -37,6 +38,8 @@ export function ModuleContentList({
     initialState,
   );
 
+  useActionToast(deleteState);
+
   if (contents.length === 0) {
     return (
       <p className="rounded-lg border border-dashed p-4 text-center text-sm text-muted-foreground">
@@ -47,10 +50,6 @@ export function ModuleContentList({
 
   return (
     <div className="space-y-3">
-      {deleteState.message ? (
-        <p className="text-sm text-muted-foreground">{deleteState.message}</p>
-      ) : null}
-
       <ul className="space-y-2">
         {contents.map((content) => (
           <li

@@ -24,9 +24,9 @@ import {
   reorderModulesAction,
   type ModuleActionState,
 } from "@/app/actions/modules";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
+import { useActionToast } from "@/hooks/use-action-toast";
 import type { ModuleWithContents } from "@/lib/infrastructure/db/repositories/module-repository";
 import { cn } from "@/lib/utils";
 
@@ -57,6 +57,8 @@ export function ModuleSortableList({
     initialState,
   );
 
+  useActionToast(state);
+
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -79,12 +81,6 @@ export function ModuleSortableList({
 
   return (
     <div className="space-y-4">
-      {state.message ? (
-        <Alert>
-          <AlertDescription>{state.message}</AlertDescription>
-        </Alert>
-      ) : null}
-
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}

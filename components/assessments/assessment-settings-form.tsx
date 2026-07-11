@@ -6,11 +6,11 @@ import {
   updateAssessmentSettingsAction,
   type AssessmentActionState,
 } from "@/app/actions/assessments";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
+import { useActionToast } from "@/hooks/use-action-toast";
 import { getEffectiveDisplayCount } from "@/lib/domain/assessments/prepare-attempt-questions";
 import type { AssessmentType } from "@/lib/domain/assessments/types";
 import type { AssessmentRecord } from "@/lib/infrastructure/db/repositories/assessment-repository";
@@ -37,6 +37,8 @@ export function AssessmentSettingsForm({
     initialState,
   );
 
+  useActionToast(state);
+
   const effectiveCount = getEffectiveDisplayCount(
     totalQuestions,
     assessment.questionDisplayCount,
@@ -56,12 +58,6 @@ export function AssessmentSettingsForm({
           diacak setiap attempt baru.
         </p>
       </div>
-
-      {state.message ? (
-        <Alert variant={state.error ? "destructive" : "default"}>
-          <AlertDescription>{state.message}</AlertDescription>
-        </Alert>
-      ) : null}
 
       <FieldGroup className="gap-4 sm:grid-cols-2">
         <Field>

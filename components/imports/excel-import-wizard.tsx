@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { IconUpload } from "@tabler/icons-react";
+import { toast } from "sonner";
 
 import { ImportTemplateDownload } from "@/components/imports/import-template-download";
 
@@ -87,7 +88,6 @@ export function ExcelImportWizard({ kind, trainings }: ExcelImportWizardProps) {
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<ImportPreview<Record<string, unknown>> | null>(null);
   const [result, setResult] = useState<ImportCommitResult | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   const [trainingId, setTrainingId] = useState("");
@@ -121,12 +121,12 @@ export function ExcelImportWizard({ kind, trainings }: ExcelImportWizardProps) {
 
   async function resolveAssessmentId(): Promise<string | null> {
     if (!trainingId) {
-      setError("Pilih training terlebih dahulu.");
+      toast.error("Pilih training terlebih dahulu.");
       return null;
     }
 
     if (!moduleId) {
-      setError("Pilih modul terlebih dahulu.");
+      toast.error("Pilih modul terlebih dahulu.");
       return null;
     }
 
@@ -134,7 +134,7 @@ export function ExcelImportWizard({ kind, trainings }: ExcelImportWizardProps) {
       `/api/modules/${moduleId}/assessments?type=${assessmentType}`,
     );
     if (!response.ok) {
-      setError("Gagal mengambil assessment modul.");
+      toast.error("Gagal mengambil assessment modul.");
       return null;
     }
 
@@ -145,12 +145,11 @@ export function ExcelImportWizard({ kind, trainings }: ExcelImportWizardProps) {
 
   async function handlePreview() {
     if (!file) {
-      setError("Pilih file Excel terlebih dahulu.");
+      toast.error("Pilih file Excel terlebih dahulu.");
       return;
     }
 
     setLoading(true);
-    setError(null);
 
     try {
       const formData = new FormData();
@@ -178,7 +177,7 @@ export function ExcelImportWizard({ kind, trainings }: ExcelImportWizardProps) {
       setPreview(body as ImportPreview<Record<string, unknown>>);
       setStep("preview");
     } catch (previewError) {
-      setError(
+      toast.error(
         previewError instanceof Error
           ? previewError.message
           : "Gagal memproses preview.",
@@ -194,7 +193,6 @@ export function ExcelImportWizard({ kind, trainings }: ExcelImportWizardProps) {
     }
 
     setLoading(true);
-    setError(null);
 
     try {
       const formData = new FormData();
@@ -219,10 +217,20 @@ export function ExcelImportWizard({ kind, trainings }: ExcelImportWizardProps) {
         throw new Error(body.message ?? "Gagal mengimport data.");
       }
 
-      setResult(body as ImportCommitResult);
+      const commitResult = body as ImportCommitResult;
+      if (commitResult.failedCount > 0) {
+        toast.warning(
+          `Import selesai. Berhasil ${commitResult.successCount}, gagal ${commitResult.failedCount}.`,
+        );
+      } else {
+        toast.success(
+          `Import selesai. ${commitResult.successCount} baris berhasil.`,
+        );
+      }
+      setResult(commitResult);
       setStep("result");
     } catch (commitError) {
-      setError(
+      toast.error(
         commitError instanceof Error
           ? commitError.message
           : "Gagal mengimport data.",
@@ -244,7 +252,7 @@ export function ExcelImportWizard({ kind, trainings }: ExcelImportWizardProps) {
     });
 
     if (!response.ok) {
-      setError("Gagal mengunduh laporan error.");
+      toast.error("Gagal mengunduh laporan error.");
       return;
     }
 
@@ -262,7 +270,6 @@ export function ExcelImportWizard({ kind, trainings }: ExcelImportWizardProps) {
     setFile(null);
     setPreview(null);
     setResult(null);
-    setError(null);
     setAssessmentId("");
   }
 
@@ -272,12 +279,6 @@ export function ExcelImportWizard({ kind, trainings }: ExcelImportWizardProps) {
         <CardTitle>{KIND_LABELS[kind]}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        {error ? (
-          <Alert variant="destructive">
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        ) : null}
-
         {step === "upload" ? (
           <div className="space-y-4">
             <ImportTemplateDownload kind={kind} />

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
+import { toast } from "sonner";
 
 import { AssessmentAttemptHistory } from "@/components/assessments/assessment-attempt-history";
 import {
@@ -84,7 +85,6 @@ export function AssessmentTakeView({
       : null,
   );
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<SubmitResult | null>(null);
   const [attemptHistory, setAttemptHistory] = useState(attempts);
 
@@ -120,7 +120,6 @@ export function AssessmentTakeView({
 
   async function handleStart() {
     setLoading(true);
-    setError(null);
     setResult(null);
 
     try {
@@ -130,7 +129,7 @@ export function AssessmentTakeView({
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.message ?? "Gagal memulai attempt.");
+        toast.error(data.message ?? "Gagal memulai attempt.");
         return;
       }
 
@@ -149,7 +148,7 @@ export function AssessmentTakeView({
         answers,
       });
     } catch {
-      setError("Gagal memulai attempt.");
+      toast.error("Gagal memulai attempt.");
     } finally {
       setLoading(false);
     }
@@ -171,7 +170,6 @@ export function AssessmentTakeView({
     }
 
     setLoading(true);
-    setError(null);
 
     try {
       await saveAnswers(session.attemptId, session.answers);
@@ -182,10 +180,15 @@ export function AssessmentTakeView({
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.message ?? "Gagal submit jawaban.");
+        toast.error(data.message ?? "Gagal submit jawaban.");
         return;
       }
 
+      toast.success(
+        data.passed
+          ? `Selamat! Anda lulus dengan nilai ${data.score}%.`
+          : `Jawaban terkirim. Nilai Anda ${data.score}%.`,
+      );
       setResult(data);
       setSession(null);
       setAttemptHistory((current) => [
@@ -202,7 +205,7 @@ export function AssessmentTakeView({
         ...current,
       ]);
     } catch {
-      setError("Gagal submit jawaban.");
+      toast.error("Gagal submit jawaban.");
     } finally {
       setLoading(false);
     }
@@ -243,12 +246,6 @@ export function AssessmentTakeView({
           <Badge variant="secondary">Belum Lulus</Badge>
         )}
       </div>
-
-      {error ? (
-        <Alert variant="destructive">
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      ) : null}
 
       {result ? (
         <>

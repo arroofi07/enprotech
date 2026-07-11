@@ -2,6 +2,7 @@
 
 import { useActionState, useMemo, useState } from "react";
 import { IconExternalLink, IconListCheck, IconPencil } from "@tabler/icons-react";
+import { toast } from "sonner";
 
 import {
   deleteModuleAction,
@@ -22,7 +23,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { ButtonLink } from "@/components/ui/button-link";
 import {
@@ -54,13 +54,16 @@ export function ModuleEditCard({
     () => async (prevState: ModuleActionState, formData: FormData) => {
       const result = await updateModuleAction(prevState, formData);
       if (result.success) {
+        toast.success(result.message ?? "Modul berhasil diperbarui.");
         onSuccess?.();
+      } else if (result.message) {
+        toast.error(result.message);
       }
       return result;
     },
     [onSuccess],
   );
-  const [updateState, updateFormAction, updatePending] = useActionState(
+  const [, updateFormAction, updatePending] = useActionState(
     updateAction,
     initialState,
   );
@@ -71,13 +74,16 @@ export function ModuleEditCard({
         result.success ||
         result.error === ModuleErrorCode.MODULE_NOT_FOUND
       ) {
+        toast.success(result.message ?? "Modul berhasil dihapus.");
         onSuccess?.();
+      } else if (result.message) {
+        toast.error(result.message);
       }
       return result;
     },
     [onSuccess],
   );
-  const [deleteState, deleteFormAction, deletePending] = useActionState(
+  const [, deleteFormAction, deletePending] = useActionState(
     deleteAction,
     initialState,
   );
@@ -122,12 +128,6 @@ export function ModuleEditCard({
           Kelola Latihan
         </ButtonLink>
       </div>
-
-      {updateState.message ? (
-        <Alert variant={updateState.error ? "destructive" : "default"}>
-          <AlertDescription>{updateState.message}</AlertDescription>
-        </Alert>
-      ) : null}
 
       <form action={updateFormAction} className="space-y-4">
         <input type="hidden" name="moduleId" value={module.id} />
@@ -302,11 +302,6 @@ export function ModuleEditCard({
               </Button>
             </form>
           </AlertDialogFooter>
-          {deleteState.message && !deleteState.success ? (
-            <Alert variant="destructive">
-              <AlertDescription>{deleteState.message}</AlertDescription>
-            </Alert>
-          ) : null}
         </AlertDialogContent>
       </AlertDialog>
     </div>

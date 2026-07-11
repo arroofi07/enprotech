@@ -1,8 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { IconCalendar, IconPhoto, IconPlus, IconSchool } from "@tabler/icons-react";
 
 import { createTrainingFormAction } from "@/app/actions/trainings";
+import { ModuleFileUpload } from "@/components/modules/module-file-upload";
 import { Button } from "@/components/ui/button";
 import {
   Field,
@@ -15,8 +17,12 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
 export function TrainingCreateForm() {
+  const [thumbnailUrl, setThumbnailUrl] = useState("");
+  const [thumbnailName, setThumbnailName] = useState("");
+
   return (
     <form action={createTrainingFormAction} className="space-y-8">
+      <input type="hidden" name="thumbnail" value={thumbnailUrl} />
       <FieldGroup className="gap-5">
         <div className="space-y-1">
           <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
@@ -61,19 +67,24 @@ export function TrainingCreateForm() {
         </Field>
 
         <Field>
-          <FieldLabel htmlFor="thumbnail" className="flex items-center gap-1.5">
+          <FieldLabel className="flex items-center gap-1.5">
             <IconPhoto className="size-3.5 text-muted-foreground" />
-            URL Thumbnail
+            Thumbnail
           </FieldLabel>
-          <Input
-            id="thumbnail"
-            name="thumbnail"
-            type="url"
-            placeholder="https://example.com/thumbnail.jpg"
-            className="h-10 text-sm md:text-sm"
+          <ModuleFileUpload
+            purpose="thumbnail"
+            uploadedFileName={thumbnailName || undefined}
+            onUploaded={({ url, fileName }) => {
+              setThumbnailUrl(url);
+              setThumbnailName(fileName);
+            }}
+            onClear={() => {
+              setThumbnailUrl("");
+              setThumbnailName("");
+            }}
           />
           <FieldDescription>
-            Opsional. Gunakan URL gambar publik untuk kartu training.
+            Opsional. JPG, JPEG, PNG, WEBP · maksimal 1 MB.
           </FieldDescription>
         </Field>
       </FieldGroup>

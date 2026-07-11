@@ -7,13 +7,13 @@ import {
   updateQuestionAction,
   type AssessmentActionState,
 } from "@/app/actions/assessments";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { DialogClose, DialogFooter } from "@/components/ui/dialog";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
+import { useActionToast } from "@/hooks/use-action-toast";
 import type { AssessmentType } from "@/lib/domain/assessments/types";
 import type { QuestionRecord } from "@/lib/infrastructure/db/repositories/assessment-repository";
 
@@ -65,6 +65,8 @@ export function AssessmentQuestionForm({
   const action = question ? updateQuestionAction : createQuestionAction;
   const [state, formAction, pending] = useActionState(action, initialState);
 
+  useActionToast(state);
+
   const defaultCorrectLabel =
     question?.options.findIndex((option) => option.isCorrect) ?? -1;
   const correctAnswer =
@@ -91,18 +93,6 @@ export function AssessmentQuestionForm({
       ) : null}
 
       <div className="flex-1 space-y-4 overflow-y-auto px-6 py-4">
-        {state.error ? (
-          <Alert variant="destructive">
-            <AlertDescription>{state.message}</AlertDescription>
-          </Alert>
-        ) : null}
-
-        {state.success ? (
-          <Alert>
-            <AlertDescription>{state.message}</AlertDescription>
-          </Alert>
-        ) : null}
-
         <QuestionFormSection title="Pertanyaan">
           <Field>
             <FieldLabel htmlFor="questionText">Teks Soal</FieldLabel>

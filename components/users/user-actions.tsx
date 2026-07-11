@@ -28,6 +28,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { useActionToast } from "@/hooks/use-action-toast";
 import { formatUserDisplayName } from "@/lib/domain/users/format-display-name";
 import type { PublicUserRecord } from "@/lib/infrastructure/db/repositories/user-repository";
 
@@ -37,19 +38,6 @@ type UserActionsProps = {
   user: PublicUserRecord;
   currentUserId: string;
 };
-
-function latestFeedback(
-  states: UserActionState[],
-): { message: string; isError: boolean } | null {
-  for (let i = states.length - 1; i >= 0; i -= 1) {
-    const state = states[i];
-    if (state.message) {
-      return { message: state.message, isError: Boolean(state.error) };
-    }
-  }
-
-  return null;
-}
 
 export function UserActions({ user, currentUserId }: UserActionsProps) {
   const isSelf = user.id === currentUserId;
@@ -67,9 +55,12 @@ export function UserActions({ user, currentUserId }: UserActionsProps) {
   );
   const [roleOpen, setRoleOpen] = useState(false);
 
+  useActionToast(approveState);
+  useActionToast(roleState);
+  useActionToast(statusState);
+
   // Close controlled dialog once role update succeeds (page will also revalidate).
   const effectiveRoleOpen = roleState.success ? false : roleOpen;
-  const feedback = latestFeedback([approveState, roleState, statusState]);
 
   return (
     <div className="flex flex-col items-end gap-1">
@@ -210,18 +201,6 @@ export function UserActions({ user, currentUserId }: UserActionsProps) {
           </form>
         ) : null}
       </div>
-
-      {feedback ? (
-        <p
-          className={
-            feedback.isError
-              ? "max-w-56 text-right text-[0.625rem] text-destructive"
-              : "max-w-56 text-right text-[0.625rem] text-muted-foreground"
-          }
-        >
-          {feedback.message}
-        </p>
-      ) : null}
     </div>
   );
 }

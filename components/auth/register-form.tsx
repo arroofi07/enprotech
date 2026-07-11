@@ -11,7 +11,6 @@ import {
   registerAction,
   type AuthActionState,
 } from "@/app/actions/auth";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { ButtonLink } from "@/components/ui/button-link";
 import {
@@ -74,8 +73,10 @@ export function RegisterForm() {
     if (state.success && state.message) {
       toast.success(state.message);
       router.push("/login");
+    } else if (state.error) {
+      toast.error(state.message ?? getAuthErrorMessage(state.error));
     }
-  }, [state.success, state.message, router]);
+  }, [state, router]);
 
   return (
     <div className="w-full">
@@ -90,14 +91,6 @@ export function RegisterForm() {
 
       <form onSubmit={onSubmit} className="space-y-4">
         <FieldGroup>
-          {state.error ? (
-            <Alert variant="destructive">
-              <AlertDescription>
-                {state.message ?? getAuthErrorMessage(state.error)}
-              </AlertDescription>
-            </Alert>
-          ) : null}
-
           <Field data-invalid={!!errors.name}>
             <FieldLabel htmlFor="name">Nama Lengkap</FieldLabel>
             <Input

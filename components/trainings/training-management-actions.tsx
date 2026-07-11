@@ -7,7 +7,6 @@ import {
   publishTrainingAction,
   type TrainingActionState,
 } from "@/app/actions/trainings";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -20,6 +19,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
+import { useActionToast } from "@/hooks/use-action-toast";
 import type { TrainingStatus } from "@/lib/domain/trainings/types";
 
 const initialState: TrainingActionState = {};
@@ -41,18 +41,12 @@ export function TrainingManagementActions({
     archiveTrainingAction,
     initialState,
   );
-  const feedback = [publishState, archiveState]
-    .reverse()
-    .find((state) => state.message);
+
+  useActionToast(publishState);
+  useActionToast(archiveState);
 
   return (
     <div className="space-y-4">
-      {feedback?.message ? (
-        <Alert variant={feedback.error ? "destructive" : "default"}>
-          <AlertDescription>{feedback.message}</AlertDescription>
-        </Alert>
-      ) : null}
-
       <div className="flex flex-wrap gap-2">
         {status === "draft" ? (
           <form action={publishAction}>

@@ -8,7 +8,7 @@ import { TrainingsPagination } from "@/components/trainings/trainings-pagination
 import { TrainingStatusBadge } from "@/components/trainings/training-status-badge";
 import { ButtonLink } from "@/components/ui/button-link";
 import {
-  Card,
+  Card,                           
   CardContent,
   CardDescription,
   CardHeader,

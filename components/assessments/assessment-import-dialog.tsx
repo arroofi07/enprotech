@@ -7,12 +7,12 @@ import {
   importQuestionsAction,
   type AssessmentActionState,
 } from "@/app/actions/assessments";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { DialogFooter } from "@/components/ui/dialog";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
+import { useActionToast } from "@/hooks/use-action-toast";
 import type { AssessmentType } from "@/lib/domain/assessments/types";
 
 const initialState: AssessmentActionState = {};
@@ -37,6 +37,8 @@ export function AssessmentImportDialog({
     initialState,
   );
 
+  useActionToast(state);
+
   useEffect(() => {
     if (state.success) {
       onSuccess?.();
@@ -51,18 +53,6 @@ export function AssessmentImportDialog({
         <input type="hidden" name="moduleId" value={moduleId} />
       ) : null}
       <input type="hidden" name="type" value={type} />
-
-      {state.error ? (
-        <Alert variant="destructive">
-          <AlertDescription>{state.message}</AlertDescription>
-        </Alert>
-      ) : null}
-
-      {state.success ? (
-        <Alert>
-          <AlertDescription>{state.message}</AlertDescription>
-        </Alert>
-      ) : null}
 
       <Field>
         <FieldLabel htmlFor="file">Upload File Excel (.xlsx)</FieldLabel>

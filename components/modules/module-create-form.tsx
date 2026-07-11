@@ -1,13 +1,13 @@
 "use client";
 
 import { useActionState, useMemo, useState, type ReactNode } from "react";
+import { toast } from "sonner";
 
 import {
   createModuleAction,
   type ModuleActionState,
 } from "@/app/actions/modules";
 import { ModuleFileUpload } from "@/components/modules/module-file-upload";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { DialogClose, DialogFooter } from "@/components/ui/dialog";
 import { Field, FieldLabel } from "@/components/ui/field";
@@ -65,13 +65,16 @@ export function ModuleCreateForm({
     () => async (prevState: ModuleActionState, formData: FormData) => {
       const result = await createModuleAction(prevState, formData);
       if (result.success) {
+        toast.success(result.message ?? "Modul berhasil dibuat.");
         onSuccess?.();
+      } else if (result.message) {
+        toast.error(result.message);
       }
       return result;
     },
     [onSuccess],
   );
-  const [state, formAction, pending] = useActionState(
+  const [, formAction, pending] = useActionState(
     createAction,
     initialState,
   );
@@ -86,18 +89,6 @@ export function ModuleCreateForm({
       ) : null}
 
       <div className="flex-1 space-y-4 overflow-y-auto px-6 py-4">
-        {state.error ? (
-          <Alert variant="destructive">
-            <AlertDescription>{state.message}</AlertDescription>
-          </Alert>
-        ) : null}
-
-        {state.success ? (
-          <Alert>
-            <AlertDescription>{state.message}</AlertDescription>
-          </Alert>
-        ) : null}
-
         <ModuleFormSection title="Informasi Modul">
           <div className="grid gap-4 sm:grid-cols-[1fr_7rem]">
             <Field>

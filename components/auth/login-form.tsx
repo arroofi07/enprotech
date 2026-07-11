@@ -5,12 +5,12 @@ import { startTransition, useActionState, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { IconEye, IconEyeOff } from "@tabler/icons-react";
+import { toast } from "sonner";
 
 import {
   loginAction,
   type AuthActionState,
 } from "@/app/actions/auth";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { ButtonLink } from "@/components/ui/button-link";
 import {
@@ -58,6 +58,12 @@ export function LoginForm() {
   });
 
   useEffect(() => {
+    if (state.error) {
+      toast.error(state.message ?? getAuthErrorMessage(state.error));
+    }
+  }, [state]);
+
+  useEffect(() => {
     if (state.success && state.redirectTo) {
       router.replace(state.redirectTo);
       router.refresh();
@@ -83,14 +89,6 @@ export function LoginForm() {
 
       <form onSubmit={onSubmit} className="space-y-4">
         <FieldGroup>
-          {state.error ? (
-            <Alert variant="destructive">
-              <AlertDescription>
-                {state.message ?? getAuthErrorMessage(state.error)}
-              </AlertDescription>
-            </Alert>
-          ) : null}
-
           <Field data-invalid={!!errors.email}>
             <FieldLabel htmlFor="email">Email</FieldLabel>
             <Input

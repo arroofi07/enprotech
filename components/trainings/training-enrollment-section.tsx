@@ -8,7 +8,6 @@ import {
   removeEnrollmentAction,
   type TrainingActionState,
 } from "@/app/actions/trainings";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -40,6 +39,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useActionToast } from "@/hooks/use-action-toast";
 import type { TrainingDetail } from "@/lib/application/trainings/get-training";
 import type { UserRole } from "@/lib/domain/auth/types";
 import type { PublicUserRecord } from "@/lib/infrastructure/db/repositories/user-repository";
@@ -71,6 +71,9 @@ export function TrainingEnrollmentSection({
   );
   const [selectedStudentIds, setSelectedStudentIds] = useState<string[]>([]);
   const [search, setSearch] = useState("");
+
+  useActionToast(enrollState);
+  useActionToast(removeState);
 
   const enrolledStudentIds = useMemo(
     () => new Set(training.enrollments.map((item) => item.studentId)),
@@ -110,10 +113,6 @@ export function TrainingEnrollmentSection({
       selectedStudentIds.includes(student.id),
     );
 
-  const feedback = [enrollState, removeState]
-    .reverse()
-    .find((state) => state.message);
-
   function toggleStudent(studentId: string, checked: boolean) {
     setSelectedStudentIds((current) =>
       checked
@@ -138,12 +137,6 @@ export function TrainingEnrollmentSection({
 
   return (
     <div className="space-y-6">
-      {feedback?.message ? (
-        <Alert variant={feedback.error ? "destructive" : "default"}>
-          <AlertDescription>{feedback.message}</AlertDescription>
-        </Alert>
-      ) : null}
-
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Tambah Peserta</CardTitle>

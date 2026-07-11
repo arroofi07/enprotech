@@ -10,7 +10,6 @@ import {
 import { TrainingEnrollmentSection } from "@/components/trainings/training-enrollment-section";
 import { TrainingManagementActions } from "@/components/trainings/training-management-actions";
 import { TrainingStatusBadge } from "@/components/trainings/training-status-badge";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
   Field,
@@ -26,6 +25,7 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { useActionToast } from "@/hooks/use-action-toast";
 import type { TrainingDetail } from "@/lib/application/trainings/get-training";
 import type { PublicUserRecord } from "@/lib/infrastructure/db/repositories/user-repository";
 
@@ -53,9 +53,8 @@ export function TrainingEditPanel({
     initialState,
   );
 
-  const feedback = [updateState, pretestState]
-    .reverse()
-    .find((state) => state.message);
+  useActionToast(updateState);
+  useActionToast(pretestState);
 
   return (
     <div className="space-y-6">
@@ -77,12 +76,6 @@ export function TrainingEditPanel({
           </form>
         ) : null}
       </div>
-
-      {feedback?.message ? (
-        <Alert variant={feedback.error ? "destructive" : "default"}>
-          <AlertDescription>{feedback.message}</AlertDescription>
-        </Alert>
-      ) : null}
 
       <Tabs defaultValue="detail">
         <TabsList>

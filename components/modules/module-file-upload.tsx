@@ -3,8 +3,8 @@
 import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { IconCheck, IconUpload, IconX } from "@tabler/icons-react";
+import { toast } from "sonner";
 
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import {
@@ -32,7 +32,6 @@ export function ModuleFileUpload({
   variant = "default",
 }: ModuleFileUploadProps) {
   const [uploading, setUploading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [localFileName, setLocalFileName] = useState<string | null>(null);
 
   const onDrop = useCallback(
@@ -43,7 +42,6 @@ export function ModuleFileUpload({
       }
 
       setUploading(true);
-      setError(null);
 
       try {
         const formData = new FormData();
@@ -62,14 +60,15 @@ export function ModuleFileUpload({
         };
 
         if (!response.ok || !payload.url || payload.size === undefined) {
-          setError(payload.message ?? "Gagal mengunggah file.");
+          toast.error(payload.message ?? "Gagal mengunggah file.");
           return;
         }
 
         setLocalFileName(file.name);
+        toast.success("File berhasil diunggah.");
         onUploaded({ url: payload.url, size: payload.size, fileName: file.name });
       } catch {
-        setError("Gagal mengunggah file.");
+        toast.error("Gagal mengunggah file.");
       } finally {
         setUploading(false);
       }
@@ -116,7 +115,6 @@ export function ModuleFileUpload({
             size="icon-sm"
             onClick={() => {
               setLocalFileName(null);
-              setError(null);
               onClear();
             }}
           >
@@ -163,12 +161,6 @@ export function ModuleFileUpload({
           <p className="text-xs text-muted-foreground">{hint}</p>
         </div>
       </div>
-
-      {error ? (
-        <Alert variant="destructive">
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      ) : null}
     </div>
   );
 }

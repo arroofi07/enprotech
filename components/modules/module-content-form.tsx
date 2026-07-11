@@ -7,7 +7,6 @@ import {
   type ModuleActionState,
 } from "@/app/actions/modules";
 import { ModuleFileUpload } from "@/components/modules/module-file-upload";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
@@ -18,6 +17,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
+import { useActionToast } from "@/hooks/use-action-toast";
 import type { ModuleContentType } from "@/lib/domain/modules/types";
 
 const initialState: ModuleActionState = {};
@@ -42,20 +42,10 @@ export function ModuleContentForm({
     initialState,
   );
 
+  useActionToast(state);
+
   return (
     <div className="space-y-4">
-      {state.error ? (
-        <Alert variant="destructive">
-          <AlertDescription>{state.message}</AlertDescription>
-        </Alert>
-      ) : null}
-
-      {state.success ? (
-        <Alert>
-          <AlertDescription>{state.message}</AlertDescription>
-        </Alert>
-      ) : null}
-
       <Tabs
         value={contentType}
         onValueChange={(value) => setContentType(value as ModuleContentType)}

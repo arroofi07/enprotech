@@ -9,6 +9,7 @@ import {
 } from "@/app/actions/assessments";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/data-table";
+import { useActionToast } from "@/hooks/use-action-toast";
 import type { AssessmentType } from "@/lib/domain/assessments/types";
 import type { QuestionRecord } from "@/lib/infrastructure/db/repositories/assessment-repository";
 
@@ -38,6 +39,8 @@ function DeleteQuestionButton({
     initialState,
   );
 
+  useActionToast(state);
+
   return (
     <form action={formAction}>
       <input type="hidden" name="questionId" value={question.id} />
@@ -60,9 +63,6 @@ function DeleteQuestionButton({
         <IconTrash className="size-3.5" />
         Hapus
       </Button>
-      {state.error ? (
-        <p className="mt-1 text-xs text-destructive">{state.message}</p>
-      ) : null}
     </form>
   );
 }

@@ -9,9 +9,9 @@ import {
 } from "@/app/actions/modules";
 import { ModuleContentList } from "@/components/modules/module-content-list";
 import { ModuleProgressBadge } from "@/components/modules/module-progress-badge";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
+import { useActionToast } from "@/hooks/use-action-toast";
 import type { StudentModuleDetail } from "@/lib/infrastructure/db/repositories/module-repository";
 
 const initialState: ModuleActionState = {};
@@ -28,6 +28,8 @@ export function StudentModuleView({ module, trainingId }: StudentModuleViewProps
   );
 
   const status = module.progress?.status ?? "not_started";
+
+  useActionToast(state);
 
   useEffect(() => {
     if (status === "not_started") {
@@ -116,12 +118,6 @@ export function StudentModuleView({ module, trainingId }: StudentModuleViewProps
           trainingId={trainingId}
         />
       </div>
-
-      {state.message ? (
-        <Alert>
-          <AlertDescription>{state.message}</AlertDescription>
-        </Alert>
-      ) : null}
 
       {status !== "completed" ? (
         <form action={formAction}>

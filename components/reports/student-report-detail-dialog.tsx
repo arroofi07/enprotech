@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -31,12 +32,10 @@ export function StudentReportDetailDialog({
 }: StudentReportDetailDialogProps) {
   const [open, setOpen] = useState(false);
   const [detail, setDetail] = useState<StudentReportDetail | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   async function loadDetail() {
     setLoading(true);
-    setError(null);
 
     try {
       const params = new URLSearchParams({
@@ -55,7 +54,7 @@ export function StudentReportDetailDialog({
       setDetail(data);
     } catch (fetchError) {
       setDetail(null);
-      setError(
+      toast.error(
         fetchError instanceof Error
           ? fetchError.message
           : "Gagal memuat detail rekap.",
@@ -87,12 +86,6 @@ export function StudentReportDetailDialog({
 
         {loading ? (
           <p className="text-sm text-muted-foreground">Memuat detail...</p>
-        ) : null}
-
-        {error ? (
-          <p className="rounded-md border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive">
-            {error}
-          </p>
         ) : null}
 
         {detail ? (
