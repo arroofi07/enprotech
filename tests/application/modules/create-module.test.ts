@@ -5,7 +5,7 @@ import { uploadModuleFile } from "@/lib/application/modules/upload-module-file";
 import type { SessionUser } from "@/lib/domain/auth/types";
 import { ModuleErrorCode } from "@/lib/domain/modules/errors";
 import * as moduleRepository from "@/lib/infrastructure/db/repositories/module-repository";
-import * as blobStorage from "@/lib/infrastructure/storage/blob-storage";
+import * as storage from "@/lib/infrastructure/storage/supabase-storage";
 
 const trainer: SessionUser = {
   id: "11111111-1111-4111-8111-111111111111",
@@ -115,8 +115,8 @@ describe("uploadModuleFile", () => {
   });
 
   it("uploads valid document", async () => {
-    vi.spyOn(blobStorage, "uploadFileToBlob").mockResolvedValue({
-      url: "https://blob.example/doc.pdf",
+    vi.spyOn(storage, "uploadFileToStorage").mockResolvedValue({
+      url: "https://example.supabase.co/storage/v1/object/public/uploads/documents/materi.pdf",
       size: 1024,
     });
 
@@ -128,7 +128,7 @@ describe("uploadModuleFile", () => {
 
     expect(result.success).toBe(true);
     if (result.success) {
-      expect(result.data.url).toContain("blob.example");
+      expect(result.data.url).toContain("supabase.co");
     }
   });
 });

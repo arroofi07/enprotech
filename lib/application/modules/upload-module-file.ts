@@ -7,7 +7,8 @@ import {
   type ModuleResult,
 } from "@/lib/domain/modules/errors";
 import type { UploadPurpose } from "@/lib/domain/modules/types";
-import { uploadFileToBlob } from "@/lib/infrastructure/storage/blob-storage";
+import { uploadFileToStorage } from "@/lib/infrastructure/storage/supabase-storage";
+import { SupabaseConfigError } from "@/utils/supabase/admin";
 import { uploadFileSchema } from "@/lib/validations/module-schemas";
 
 import { assertModuleTrainerOrAdmin } from "./assert-access";
@@ -49,7 +50,7 @@ export async function uploadModuleFile(
 
   try {
     const buffer = Buffer.from(await file.arrayBuffer());
-    const uploaded = await uploadFileToBlob({
+    const uploaded = await uploadFileToStorage({
       filename: file.name,
       contentType: file.type,
       data: buffer,
@@ -61,7 +62,17 @@ export async function uploadModuleFile(
       size: uploaded.size,
       purpose: parsed.data.purpose,
     });
-  } catch {
+  } catch (error) {
+    if (error instanceof SupabaseConfigError) {
+      console.error("[uploadModuleFile]", error.message);
+      return {
+        success: false,
+        error: ModuleErrorCode.UPLOAD_FAILED,
+        message: error.message,
+      };
+    }
+
+    console.error("[uploadModuleFile]", error);
     return moduleFailure(ModuleErrorCode.UPLOAD_FAILED);
   }
 }

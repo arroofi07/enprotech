@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState, type ReactNode } from "react";
+import { useActionState, useMemo, useState, type ReactNode } from "react";
 
 import {
   createModuleAction,
@@ -20,6 +20,7 @@ const initialState: ModuleActionState = {};
 type ModuleCreateFormProps = {
   trainingId: string;
   defaultOrder: number;
+  onSuccess?: () => void;
 };
 
 type ModuleFormSectionProps = {
@@ -49,14 +50,29 @@ function ModuleFormSection({
 export function ModuleCreateForm({
   trainingId,
   defaultOrder,
+  onSuccess,
 }: ModuleCreateFormProps) {
+  const [order, setOrder] = useState(String(defaultOrder));
+  const [minQuizScore, setMinQuizScore] = useState("0");
+  const [minLatihanScore, setMinLatihanScore] = useState("0");
+  const [minAttendance, setMinAttendance] = useState("0");
   const [thumbnailUrl, setThumbnailUrl] = useState("");
   const [thumbnailName, setThumbnailName] = useState("");
   const [materialUrl, setMaterialUrl] = useState("");
   const [materialName, setMaterialName] = useState("");
   const [materialSize, setMaterialSize] = useState<number | undefined>();
+  const createAction = useMemo(
+    () => async (prevState: ModuleActionState, formData: FormData) => {
+      const result = await createModuleAction(prevState, formData);
+      if (result.success) {
+        onSuccess?.();
+      }
+      return result;
+    },
+    [onSuccess],
+  );
   const [state, formAction, pending] = useActionState(
-    createModuleAction,
+    createAction,
     initialState,
   );
 
@@ -100,7 +116,8 @@ export function ModuleCreateForm({
                 name="order"
                 type="number"
                 min={1}
-                defaultValue={defaultOrder}
+                value={order}
+                onChange={(event) => setOrder(event.target.value)}
                 required
               />
             </Field>
@@ -130,7 +147,8 @@ export function ModuleCreateForm({
                 type="number"
                 min={0}
                 max={100}
-                defaultValue={0}
+                value={minQuizScore}
+                onChange={(event) => setMinQuizScore(event.target.value)}
               />
             </Field>
             <Field>
@@ -143,7 +161,8 @@ export function ModuleCreateForm({
                 type="number"
                 min={0}
                 max={100}
-                defaultValue={0}
+                value={minLatihanScore}
+                onChange={(event) => setMinLatihanScore(event.target.value)}
               />
             </Field>
             <Field>
@@ -154,7 +173,8 @@ export function ModuleCreateForm({
                 type="number"
                 min={0}
                 max={100}
-                defaultValue={0}
+                value={minAttendance}
+                onChange={(event) => setMinAttendance(event.target.value)}
               />
             </Field>
           </div>

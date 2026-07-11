@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useMemo, useState } from "react";
 import { IconExternalLink, IconListCheck, IconPencil } from "@tabler/icons-react";
 
 import {
@@ -8,6 +8,7 @@ import {
   updateModuleAction,
   type ModuleActionState,
 } from "@/app/actions/modules";
+import { ModuleErrorCode } from "@/lib/domain/modules/errors";
 import { ModuleContentForm } from "@/components/modules/module-content-form";
 import { ModuleContentList } from "@/components/modules/module-content-list";
 import { ModuleFileUpload } from "@/components/modules/module-file-upload";
@@ -40,16 +41,44 @@ const initialState: ModuleActionState = {};
 type ModuleEditCardProps = {
   module: ModuleWithContents;
   trainingId: string;
+  onSuccess?: () => void;
 };
 
-export function ModuleEditCard({ module, trainingId }: ModuleEditCardProps) {
+export function ModuleEditCard({
+  module,
+  trainingId,
+  onSuccess,
+}: ModuleEditCardProps) {
   const [thumbnailUrl, setThumbnailUrl] = useState(module.thumbnail ?? "");
-  const [updateState, updateAction, updatePending] = useActionState(
-    updateModuleAction,
+  const updateAction = useMemo(
+    () => async (prevState: ModuleActionState, formData: FormData) => {
+      const result = await updateModuleAction(prevState, formData);
+      if (result.success) {
+        onSuccess?.();
+      }
+      return result;
+    },
+    [onSuccess],
+  );
+  const [updateState, updateFormAction, updatePending] = useActionState(
+    updateAction,
     initialState,
   );
-  const [deleteState, deleteAction, deletePending] = useActionState(
-    deleteModuleAction,
+  const deleteAction = useMemo(
+    () => async (prevState: ModuleActionState, formData: FormData) => {
+      const result = await deleteModuleAction(prevState, formData);
+      if (
+        result.success ||
+        result.error === ModuleErrorCode.MODULE_NOT_FOUND
+      ) {
+        onSuccess?.();
+      }
+      return result;
+    },
+    [onSuccess],
+  );
+  const [deleteState, deleteFormAction, deletePending] = useActionState(
+    deleteAction,
     initialState,
   );
 
@@ -100,7 +129,7 @@ export function ModuleEditCard({ module, trainingId }: ModuleEditCardProps) {
         </Alert>
       ) : null}
 
-      <form action={updateAction} className="space-y-4">
+      <form action={updateFormAction} className="space-y-4">
         <input type="hidden" name="moduleId" value={module.id} />
         <input type="hidden" name="trainingId" value={trainingId} />
         <input type="hidden" name="thumbnail" value={thumbnailUrl} />
@@ -265,7 +294,7 @@ export function ModuleEditCard({ module, trainingId }: ModuleEditCardProps) {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Batal</AlertDialogCancel>
-            <form action={deleteAction}>
+            <form action={deleteFormAction}>
               <input type="hidden" name="moduleId" value={module.id} />
               <input type="hidden" name="trainingId" value={trainingId} />
               <Button type="submit" variant="destructive" disabled={deletePending}>
@@ -273,8 +302,10 @@ export function ModuleEditCard({ module, trainingId }: ModuleEditCardProps) {
               </Button>
             </form>
           </AlertDialogFooter>
-          {deleteState.message ? (
-            <p className="text-sm text-muted-foreground">{deleteState.message}</p>
+          {deleteState.message && !deleteState.success ? (
+            <Alert variant="destructive">
+              <AlertDescription>{deleteState.message}</AlertDescription>
+            </Alert>
           ) : null}
         </AlertDialogContent>
       </AlertDialog>

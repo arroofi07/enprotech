@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { IconArrowsSort, IconPlus } from "@tabler/icons-react";
 
 import { ModuleCreateForm } from "@/components/modules/module-create-form";
@@ -51,7 +51,19 @@ export function ModuleManagementPanel({
     null,
   );
   const [createOpen, setCreateOpen] = useState(false);
+  const [createFormKey, setCreateFormKey] = useState(0);
   const [reorderOpen, setReorderOpen] = useState(false);
+
+  const handleCreateOpenChange = useCallback((open: boolean) => {
+    setCreateOpen(open);
+    if (open) {
+      setCreateFormKey((key) => key + 1);
+    }
+  }, []);
+
+  const handleCreateSuccess = useCallback(() => {
+    setCreateOpen(false);
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -102,7 +114,7 @@ export function ModuleManagementPanel({
             </DialogContent>
           </Dialog>
 
-          <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+          <Dialog open={createOpen} onOpenChange={handleCreateOpenChange}>
             <DialogTrigger render={<Button />}>
               <IconPlus className="size-4" />
               Buat Modul
@@ -114,10 +126,14 @@ export function ModuleManagementPanel({
                   Lengkapi informasi modul, materi, dan target pelatihan.
                 </DialogDescription>
               </DialogHeader>
-              <ModuleCreateForm
-                trainingId={trainingId}
-                defaultOrder={allModules.length + 1}
-              />
+              {createOpen ? (
+                <ModuleCreateForm
+                  key={createFormKey}
+                  trainingId={trainingId}
+                  defaultOrder={allModules.length + 1}
+                  onSuccess={handleCreateSuccess}
+                />
+              ) : null}
             </DialogContent>
           </Dialog>
         </div>
@@ -169,6 +185,7 @@ export function ModuleManagementPanel({
                 <ModuleEditCard
                   module={selectedModule}
                   trainingId={trainingId}
+                  onSuccess={() => setSelectedModule(null)}
                 />
               </div>
             </>

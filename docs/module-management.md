@@ -35,7 +35,7 @@ Akses modul dari halaman edit training lewat tombol **Kelola Modul**.
 | Thumbnail | JPEG, PNG, WebP, GIF | 2 MB |
 | Dokumen | PDF, DOC, DOCX, XLS, XLSX | 1 MB |
 
-File disimpan di **Vercel Blob**. Set `BLOB_READ_WRITE_TOKEN` di environment.
+File disimpan di **Supabase Storage**. Set variabel Supabase di environment.
 
 ## Jenis Konten (`module_contents`)
 
@@ -87,7 +87,7 @@ Server Actions tersedia di `app/actions/modules.ts` untuk form UI.
 ```
 lib/domain/modules/          → errors, types, file-validation
 lib/application/modules/     → use cases
-lib/infrastructure/          → module-repository, blob-storage
+lib/infrastructure/          → module-repository, supabase-storage
 app/api/                     → REST endpoints
 app/actions/modules.ts       → Server Actions
 components/modules/          → UI components
@@ -96,7 +96,12 @@ components/modules/          → UI components
 ## Environment
 
 ```env
-BLOB_READ_WRITE_TOKEN=vercel_blob_rw_...
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your_publishable_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+SUPABASE_STORAGE_BUCKET=uploads
 ```
 
-Tanpa token, upload file akan gagal dengan error `UPLOAD_FAILED`.
+Buat bucket `uploads` di Supabase Dashboard dan set sebagai **public** agar file dapat diakses via URL.
+
+Tanpa konfigurasi Supabase, upload file akan gagal dengan error `UPLOAD_FAILED`.
