@@ -8,11 +8,13 @@ import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
 import { useQueryFilters } from "@/hooks/use-query-filters";
 
-type ModulesFiltersProps = {
+type TrainingAssessmentHubFiltersProps = {
   search?: string;
 };
 
-export function ModulesFilters({ search }: ModulesFiltersProps) {
+export function TrainingAssessmentHubFilters({
+  search,
+}: TrainingAssessmentHubFiltersProps) {
   const { isPending, onFilterSubmit } = useQueryFilters();
 
   return (
@@ -22,14 +24,14 @@ export function ModulesFilters({ search }: ModulesFiltersProps) {
     >
       <div className="flex-1 space-y-2">
         <Label htmlFor="search" className="text-sm font-medium">
-          Cari Modul
+          Cari Training
         </Label>
         <div className="relative">
           <IconSearch className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             id="search"
             name="search"
-            placeholder="Cari judul atau deskripsi modul..."
+            placeholder="Cari judul training..."
             defaultValue={search ?? ""}
             className="h-10 pl-9"
           />

@@ -37,10 +37,11 @@ export async function listEnrolledTrainings(
     return trainingFailure(TrainingErrorCode.VALIDATION_ERROR);
   }
 
-  const { page, pageSize } = parsed.data;
+  const { page, pageSize, search } = parsed.data;
   const result = await listEnrolledTrainingsByStudent(actor!.id, {
     page,
     pageSize,
+    search,
   });
   const enriched = await enrichEnrolledTrainingsWithProgress(
     actor!.id,

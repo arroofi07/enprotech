@@ -413,12 +413,19 @@ export async function setPretestActive(
 
 export async function listEnrolledTrainingsByStudent(
   studentId: string,
-  query: { page: number; pageSize: number },
+  query: { page: number; pageSize: number; search?: string },
 ): Promise<{ items: EnrolledTrainingBase[]; total: number }> {
-  const where = and(
+  const conditions: SQL[] = [
     eq(enrollments.studentId, studentId),
     notInArray(trainings.status, ["draft", "archived"]),
-  );
+  ];
+
+  if (query.search?.trim()) {
+    const term = `%${query.search.trim()}%`;
+    conditions.push(ilike(trainings.title, term));
+  }
+
+  const where = and(...conditions);
   const offset = (query.page - 1) * query.pageSize;
 
   const [rows, totalResult] = await Promise.all([

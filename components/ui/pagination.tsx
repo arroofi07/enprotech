@@ -1,4 +1,5 @@
 import * as React from "react"
+import Link from "next/link"
 
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
@@ -36,27 +37,45 @@ function PaginationItem({ ...props }: React.ComponentProps<"li">) {
 type PaginationLinkProps = {
   isActive?: boolean
   size?: "default" | "icon"
-} &
-  React.ComponentProps<"a">
+  href?: string
+} & Omit<React.ComponentProps<typeof Link>, "href" | "size">
 
 function PaginationLink({
   className,
   isActive,
   size = "icon",
+  href = "#",
   ...props
 }: PaginationLinkProps) {
+  const classes = cn(
+    buttonVariants({
+      variant: isActive ? "outline" : "ghost",
+      size,
+    }),
+    className
+  )
+
+  if (!href || href === "#") {
+    return (
+      <span
+        aria-current={isActive ? "page" : undefined}
+        aria-disabled="true"
+        data-slot="pagination-link"
+        data-active={isActive}
+        className={classes}
+        {...(props as React.ComponentProps<"span">)}
+      />
+    )
+  }
+
   return (
-    <a
+    <Link
+      href={href}
+      scroll={false}
       aria-current={isActive ? "page" : undefined}
       data-slot="pagination-link"
       data-active={isActive}
-      className={cn(
-        buttonVariants({
-          variant: isActive ? "outline" : "ghost",
-          size,
-        }),
-        className
-      )}
+      className={classes}
       {...props}
     />
   )
@@ -112,8 +131,7 @@ function PaginationEllipsis({
       )}
       {...props}
     >
-      <IconDots
-      />
+      <IconDots />
       <span className="sr-only">More pages</span>
     </span>
   )

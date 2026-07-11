@@ -1,8 +1,12 @@
+"use client";
+
 import { IconSearch } from "@tabler/icons-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Spinner } from "@/components/ui/spinner";
+import { useQueryFilters } from "@/hooks/use-query-filters";
 
 type ModuleAssessmentHubFiltersProps = {
   search?: string;
@@ -11,8 +15,13 @@ type ModuleAssessmentHubFiltersProps = {
 export function ModuleAssessmentHubFilters({
   search,
 }: ModuleAssessmentHubFiltersProps) {
+  const { isPending, onFilterSubmit } = useQueryFilters();
+
   return (
-    <form method="get" className="flex flex-col gap-4 sm:flex-row sm:items-end">
+    <form
+      onSubmit={onFilterSubmit}
+      className="flex flex-col gap-4 sm:flex-row sm:items-end"
+    >
       <div className="flex-1 space-y-2">
         <Label htmlFor="search" className="text-sm font-medium">
           Cari Modul
@@ -29,7 +38,8 @@ export function ModuleAssessmentHubFilters({
         </div>
       </div>
 
-      <Button type="submit" className="h-10">
+      <Button type="submit" className="h-10" disabled={isPending}>
+        {isPending ? <Spinner className="size-4" /> : null}
         Terapkan Filter
       </Button>
     </form>

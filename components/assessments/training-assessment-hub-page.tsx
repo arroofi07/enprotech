@@ -6,6 +6,7 @@ import {
   type StudentAssessmentHubRow,
   type TrainerAssessmentHubRow,
 } from "@/components/assessments/training-assessment-hub-table";
+import { TrainingAssessmentHubFilters } from "@/components/assessments/training-assessment-hub-filters";
 import { StudentHeader } from "@/components/student/student-header";
 import { TrainerHeader } from "@/components/trainer/trainer-header";
 import { Card, CardContent } from "@/components/ui/card";
@@ -24,6 +25,7 @@ type TrainingAssessmentHubPageProps = {
   role: "student" | "trainer";
   searchParams?: {
     page?: string;
+    search?: string;
   };
 };
 
@@ -52,6 +54,7 @@ export async function TrainingAssessmentHubPage({
 
   if (role === "student") {
     const trainingsResult = await listEnrolledTrainings(user, {
+      search: searchParams.search,
       page,
       pageSize: PAGE_SIZE,
     });
@@ -106,7 +109,9 @@ export async function TrainingAssessmentHubPage({
 
             <Card>
               <CardContent className="p-6">
-                <div className="space-y-4">
+                <div className="space-y-6">
+                  <TrainingAssessmentHubFilters search={searchParams.search} />
+
                   <div className="flex items-center justify-between">
                     <p className="text-sm text-muted-foreground">
                       Menampilkan{" "}
@@ -129,6 +134,7 @@ export async function TrainingAssessmentHubPage({
                     page={page}
                     totalPages={totalPages}
                     basePath={basePath}
+                    searchParams={{ search: searchParams.search }}
                   />
                 </div>
               </CardContent>
@@ -140,6 +146,7 @@ export async function TrainingAssessmentHubPage({
   }
 
   const trainingsResult = await listTrainings(user, {
+    search: searchParams.search,
     page,
     pageSize: PAGE_SIZE,
   });
@@ -174,7 +181,9 @@ export async function TrainingAssessmentHubPage({
 
           <Card>
             <CardContent className="p-6">
-              <div className="space-y-4">
+              <div className="space-y-6">
+                <TrainingAssessmentHubFilters search={searchParams.search} />
+
                 <div className="flex items-center justify-between">
                   <p className="text-sm text-muted-foreground">
                     Menampilkan{" "}
@@ -197,6 +206,7 @@ export async function TrainingAssessmentHubPage({
                   page={currentPage}
                   totalPages={totalPages}
                   basePath={basePath}
+                  searchParams={{ search: searchParams.search }}
                 />
               </div>
             </CardContent>

@@ -59,4 +59,21 @@ describe("getCurrentUser", () => {
       status: "active",
     });
   });
+
+  it("falls back to session when database is temporarily unreachable", async () => {
+    const session = {
+      id: "user-1",
+      email: "user@example.com",
+      name: "User",
+      role: "trainer" as const,
+      status: "active" as const,
+    };
+
+    vi.spyOn(sessionManager, "getSession").mockResolvedValue(session);
+    vi.spyOn(userRepository, "findUserById").mockRejectedValue({
+      cause: { code: "CONNECT_TIMEOUT" },
+    });
+
+    await expect(getCurrentUser()).resolves.toEqual(session);
+  });
 });

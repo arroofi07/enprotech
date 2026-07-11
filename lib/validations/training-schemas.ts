@@ -68,7 +68,9 @@ export const listTrainingsQuerySchema = z.object({
   pageSize: listPaginationQuerySchema.shape.pageSize,
 });
 
-export const listEnrolledTrainingsQuerySchema = listPaginationQuerySchema;
+export const listEnrolledTrainingsQuerySchema = listPaginationQuerySchema.extend({
+  search: z.preprocess(emptyToUndefined, z.string().trim().optional()),
+});
 
 export const getTrainingSchema = z.object({
   trainingId: z.uuid("ID training tidak valid."),

@@ -7,7 +7,13 @@ import { TrainingsFilters } from "@/components/trainings/trainings-filters";
 import { TrainingsPagination } from "@/components/trainings/trainings-pagination";
 import { TrainingStatusBadge } from "@/components/trainings/training-status-badge";
 import { ButtonLink } from "@/components/ui/button-link";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { DataTable } from "@/components/ui/data-table";
 import { getCurrentUser } from "@/lib/application/auth/get-session";
 import { listTrainings } from "@/lib/application/trainings/list-trainings";
@@ -61,20 +67,28 @@ export default async function TrainerTrainingsNewPage({
             description="Buat program training baru atau kelola detail, enrollment, dan pengaturan training yang sudah ada."
           />
 
-          <Card>
-            <CardHeader>
+          <Card className="overflow-hidden">
+            <CardHeader className="border-b bg-muted/30">
               <CardTitle className="text-lg">Buat Training Baru</CardTitle>
+              <CardDescription>
+                Lengkapi informasi dasar program. Setelah dibuat, Anda dapat
+                mengatur modul, enrollment, dan status publikasi.
+              </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-6">
               <TrainingCreateForm />
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
+          <Card className="overflow-hidden">
+            <CardHeader className="border-b bg-muted/30">
               <CardTitle className="text-lg">Pengaturan Training</CardTitle>
+              <CardDescription>
+                Cari dan kelola training yang sudah ada tanpa meninggalkan
+                halaman ini.
+              </CardDescription>
             </CardHeader>
-            <CardContent className="p-6 pt-0">
+            <CardContent className="p-6">
               <div className="space-y-6">
                 <TrainingsFilters
                   search={params.search}

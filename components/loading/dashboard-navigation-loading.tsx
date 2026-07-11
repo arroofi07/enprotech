@@ -54,11 +54,8 @@ export function DashboardNavigationLoading({
   variant = "table",
 }: DashboardNavigationLoadingProps) {
   const pathname = usePathname();
-  const [pending, setPending] = useState(false);
-
-  useEffect(() => {
-    setPending(false);
-  }, [pathname]);
+  const [targetPath, setTargetPath] = useState<string | null>(null);
+  const pending = Boolean(targetPath && targetPath !== pathname);
 
   useEffect(() => {
     if (!pending) {
@@ -66,7 +63,7 @@ export function DashboardNavigationLoading({
     }
 
     const timeout = window.setTimeout(() => {
-      setPending(false);
+      setTargetPath(null);
     }, 8_000);
 
     return () => window.clearTimeout(timeout);
@@ -93,11 +90,12 @@ export function DashboardNavigationLoading({
         return;
       }
 
+      // Same-path query changes (search/pagination) should not replace the page with a skeleton.
       if (url.pathname === window.location.pathname) {
         return;
       }
 
-      setPending(true);
+      setTargetPath(url.pathname);
     };
 
     document.addEventListener("click", handleClick, true);

@@ -1,8 +1,12 @@
+"use client";
+
 import { IconSearch } from "@tabler/icons-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Spinner } from "@/components/ui/spinner";
+import { useQueryFilters } from "@/hooks/use-query-filters";
 import type { ReportFilterOption } from "@/lib/infrastructure/db/repositories/report-repository";
 
 type CertificateFiltersProps = {
@@ -25,8 +29,13 @@ export function CertificateFilters({
   trainings,
   basePath = "/trainer/certificates",
 }: CertificateFiltersProps) {
+  const { isPending, onFilterSubmit } = useQueryFilters();
+
   return (
-    <form action={basePath} className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+    <form
+      onSubmit={(event) => onFilterSubmit(event, { pathname: basePath })}
+      className="grid gap-4 md:grid-cols-2 xl:grid-cols-3"
+    >
       <div className="space-y-2 xl:col-span-2">
         <Label htmlFor="search" className="text-sm font-medium">
           Cari
@@ -82,7 +91,8 @@ export function CertificateFilters({
       </div>
 
       <div className="flex items-end md:col-span-2 xl:col-span-3">
-        <Button type="submit" className="h-10">
+        <Button type="submit" className="h-10" disabled={isPending}>
+          {isPending ? <Spinner className="size-4" /> : null}
           Terapkan Filter
         </Button>
       </div>
