@@ -5,11 +5,13 @@ import { TrainerHeader } from "@/components/trainer/trainer-header";
 import { TrainingsFilters } from "@/components/trainings/trainings-filters";
 import { TrainingsPagination } from "@/components/trainings/trainings-pagination";
 import { TrainingStatusBadge } from "@/components/trainings/training-status-badge";
+import { Badge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button-link";
 import { Card, CardContent } from "@/components/ui/card";
 import { DataTable } from "@/components/ui/data-table";
 import { getCurrentUser } from "@/lib/application/auth/get-session";
 import { listTrainings } from "@/lib/application/trainings/list-trainings";
+import { countModulesByTrainingIds } from "@/lib/infrastructure/db/repositories/module-repository";
 
 type TrainerModulesHubPageProps = {
   searchParams: Promise<{
@@ -41,6 +43,13 @@ export default async function TrainerModulesHubPage({
   }
 
   const { items, page, totalPages, total } = result.data;
+  const moduleCounts = await countModulesByTrainingIds(
+    items.map((training) => training.id),
+  );
+  const rows = items.map((training) => ({
+    ...training,
+    moduleCount: moduleCounts[training.id] ?? 0,
+  }));
 
   return (
     <>
@@ -68,7 +77,7 @@ export default async function TrainerModulesHubPage({
                   <p className="text-sm text-muted-foreground">
                     Menampilkan{" "}
                     <span className="font-medium text-foreground">
-                      {items.length}
+                      {rows.length}
                     </span>{" "}
                     dari{" "}
                     <span className="font-medium text-foreground">{total}</span>{" "}
@@ -77,7 +86,7 @@ export default async function TrainerModulesHubPage({
                 </div>
 
                 <DataTable
-                  data={items}
+                  data={rows}
                   getRowKey={(training) => training.id}
                   emptyState={{
                     message: "Belum ada training. Buat training terlebih dahulu.",
@@ -96,6 +105,18 @@ export default async function TrainerModulesHubPage({
                       cell: (training) => (
                         <TrainingStatusBadge status={training.status} />
                       ),
+                    },
+                    {
+                      id: "modules",
+                      header: "Jumlah Modul",
+                      cell: (training) =>
+                        training.moduleCount > 0 ? (
+                          <Badge variant="secondary">
+                            {training.moduleCount} modul
+                          </Badge>
+                        ) : (
+                          <Badge variant="outline">Belum ada modul</Badge>
+                        ),
                     },
                     {
                       id: "actions",

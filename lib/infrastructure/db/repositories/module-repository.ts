@@ -1,4 +1,4 @@
-import { and, asc, eq, inArray, notInArray } from "drizzle-orm";
+import { and, asc, eq, inArray, notInArray, sql } from "drizzle-orm";
 
 import { db } from "@/lib/db";
 import {
@@ -568,4 +568,31 @@ export async function getStudentModuleDetail(
     contents: contentRows.map(mapContent),
     progress,
   };
+}
+
+export async function countModulesByTrainingIds(
+  trainingIds: string[],
+): Promise<Record<string, number>> {
+  const counts = Object.fromEntries(
+    trainingIds.map((trainingId) => [trainingId, 0]),
+  );
+
+  if (trainingIds.length === 0) {
+    return counts;
+  }
+
+  const rows = await db
+    .select({
+      trainingId: modules.trainingId,
+      moduleCount: sql<number>`cast(count(${modules.id}) as int)`,
+    })
+    .from(modules)
+    .where(inArray(modules.trainingId, trainingIds))
+    .groupBy(modules.trainingId);
+
+  for (const row of rows) {
+    counts[row.trainingId] = Number(row.moduleCount ?? 0);
+  }
+
+  return counts;
 }

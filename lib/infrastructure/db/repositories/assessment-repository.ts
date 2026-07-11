@@ -1,4 +1,4 @@
-import { and, asc, count, desc, eq, ilike, isNull, or, sql } from "drizzle-orm";
+import { and, asc, count, desc, eq, ilike, inArray, isNull, or, sql } from "drizzle-orm";
 
 import { db } from "@/lib/db";
 import {
@@ -644,4 +644,39 @@ export async function listModuleAssessmentHub(query: {
     })),
     total: totalResult[0]?.value ?? 0,
   };
+}
+
+export async function countQuestionsByTrainingIds(
+  trainingIds: string[],
+  type: TrainingAssessmentType,
+): Promise<Record<string, number>> {
+  const counts = Object.fromEntries(
+    trainingIds.map((trainingId) => [trainingId, 0]),
+  );
+
+  if (trainingIds.length === 0) {
+    return counts;
+  }
+
+  const rows = await db
+    .select({
+      trainingId: assessments.trainingId,
+      questionCount: sql<number>`cast(count(${questions.id}) as int)`,
+    })
+    .from(assessments)
+    .leftJoin(questions, eq(questions.assessmentId, assessments.id))
+    .where(
+      and(
+        isNull(assessments.moduleId),
+        eq(assessments.type, type),
+        inArray(assessments.trainingId, trainingIds),
+      ),
+    )
+    .groupBy(assessments.trainingId);
+
+  for (const row of rows) {
+    counts[row.trainingId] = Number(row.questionCount ?? 0);
+  }
+
+  return counts;
 }

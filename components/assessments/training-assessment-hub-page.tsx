@@ -17,6 +17,7 @@ import { listEnrolledTrainings } from "@/lib/application/trainings/list-enrolled
 import { listTrainings } from "@/lib/application/trainings/list-trainings";
 import { getAssessmentTypeLabel } from "@/lib/domain/assessments/labels";
 import type { TrainingAssessmentType } from "@/lib/domain/assessments/types";
+import { countQuestionsByTrainingIds } from "@/lib/infrastructure/db/repositories/assessment-repository";
 
 const PAGE_SIZE = 10;
 
@@ -158,11 +159,17 @@ export async function TrainingAssessmentHubPage({
   const { items: trainings, total, page: currentPage, totalPages } =
     trainingsResult.data;
 
+  const questionCounts = await countQuestionsByTrainingIds(
+    trainings.map((training) => training.id),
+    assessmentType,
+  );
+
   const items: TrainerAssessmentHubRow[] = trainings.map((training) => ({
     id: training.id,
     title: training.title,
     status: training.status,
     isPretestActive: training.isPretestActive,
+    questionCount: questionCounts[training.id] ?? 0,
   }));
 
   return (

@@ -11,6 +11,7 @@ export type TrainerAssessmentHubRow = {
   title: string;
   status: TrainingStatus;
   isPretestActive: boolean;
+  questionCount: number;
 };
 
 export type StudentAssessmentHubRow = {
@@ -66,6 +67,18 @@ export function TrainingAssessmentHubTable(props: TrainingAssessmentHubTableProp
             cell: (training) => (
               <TrainingStatusBadge status={training.status} />
             ),
+          },
+          {
+            id: "questions",
+            header: "Jumlah Soal",
+            cell: (training) =>
+              training.questionCount > 0 ? (
+                <Badge variant="secondary">
+                  {training.questionCount} soal
+                </Badge>
+              ) : (
+                <Badge variant="outline">Belum ada soal</Badge>
+              ),
           },
           ...(props.assessmentType === "pre_test"
             ? [
