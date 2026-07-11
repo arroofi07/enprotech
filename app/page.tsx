@@ -2,6 +2,7 @@ import { LandingFooter } from "@/components/landing/landing-footer";
 import { LandingHeader } from "@/components/landing/landing-header";
 import { LandingHero } from "@/components/landing/landing-hero";
 import {
+  LandingCertificateVerification,
   LandingCta,
   LandingFaq,
   LandingFeatures,
@@ -24,6 +25,7 @@ export default async function HomePage() {
         <LandingStats />
         <LandingFeatures />
         <LandingSteps />
+        <LandingCertificateVerification />
         <LandingTestimonials />
         <LandingFaq />
         <LandingCta />

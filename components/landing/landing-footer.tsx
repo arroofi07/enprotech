@@ -19,6 +19,7 @@ const FOOTER_COLUMNS = [
     links: [
       { label: "Kelebihan", href: "#kelebihan" },
       { label: "Cara Kerja", href: "#program" },
+      { label: "Verifikasi Sertifikat", href: "#verifikasi-sertifikat" },
       { label: "Testimoni", href: "#testimoni" },
       { label: "FAQ", href: "#faq" },
     ],

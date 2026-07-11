@@ -19,6 +19,7 @@ import {
 const NAV_LINKS = [
   { label: "Kelebihan", href: "#kelebihan" },
   { label: "Program", href: "#program" },
+  { label: "Verifikasi", href: "#verifikasi-sertifikat" },
   { label: "Testimoni", href: "#testimoni" },
   { label: "FAQ", href: "#faq" },
 ] as const;

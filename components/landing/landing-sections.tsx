@@ -3,12 +3,16 @@ import {
   IconBriefcase,
   IconCertificate,
   IconChalkboard,
+  IconCircleCheckFilled,
   IconDeviceLaptop,
   IconMail,
   IconMapPin,
   IconQuote,
+  IconScan,
+  IconShieldCheck,
 } from "@tabler/icons-react";
 
+import { VerifyCertificateForm } from "@/components/certificates/verify-certificate-form";
 import {
   Accordion,
   AccordionContent,
@@ -55,7 +59,7 @@ const FEATURES = [
     icon: IconCertificate,
     title: "Sertifikat Resmi",
     description:
-      "Sertifikat digital yang diakui untuk meningkatkan portofolio profesional Anda.",
+      "Sertifikat digital resmi Enprotech yang dapat diverifikasi keasliannya secara online kapan saja.",
   },
 ] as const;
 
@@ -110,11 +114,37 @@ const FAQS = [
   {
     question: "Apakah mendapat sertifikat?",
     answer:
-      "Ya, sertifikat digital resmi diberikan setelah evaluasi proyek akhir.",
+      "Ya, sertifikat digital resmi diberikan setelah evaluasi proyek akhir dan dapat diverifikasi keasliannya melalui halaman verifikasi Enprotech.",
+  },
+  {
+    question: "Bagaimana cara memverifikasi sertifikat?",
+    answer:
+      "Masukkan nomor sertifikat resmi (format CERT-KODE-TRAINING-TAHUN-URUTAN) di halaman verifikasi. Sistem akan menampilkan status keaslian beserta detail peserta dan training.",
   },
   {
     question: "Berapa lama durasi pelatihan?",
     answer: "Rata-rata 8–12 minggu dengan sistem pengerjaan proyek.",
+  },
+] as const;
+
+const CERTIFICATE_VERIFICATION_POINTS = [
+  {
+    icon: IconShieldCheck,
+    title: "Resmi Enprotech",
+    description:
+      "Setiap sertifikat diterbitkan oleh platform E-Training Enprotech setelah peserta lulus evaluasi pelatihan.",
+  },
+  {
+    icon: IconScan,
+    title: "Nomor Unik Terdaftar",
+    description:
+      "Nomor sertifikat tercatat di database resmi sehingga dapat diperiksa kapan saja oleh pihak manapun.",
+  },
+  {
+    icon: IconCircleCheckFilled,
+    title: "Verifikasi Instan",
+    description:
+      "Hasil verifikasi menampilkan status keaslian, nama peserta, training, tanggal terbit, dan nilai akhir.",
   },
 ] as const;
 
@@ -141,6 +171,84 @@ function SectionHeading({
         </p>
       ) : null}
     </div>
+  );
+}
+
+export function LandingCertificateVerification() {
+  return (
+    <section
+      id="verifikasi-sertifikat"
+      className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6"
+    >
+      <SectionHeading
+        label="Verifikasi Sertifikat"
+        title="Pastikan keaslian sertifikat resmi Enprotech"
+        description="Verifikasi sertifikat digital yang diterbitkan melalui platform E-Training Enprotech. Cocok untuk recruiter, institusi, atau peserta yang ingin memastikan sertifikat asli."
+      />
+
+      <div className="mt-10 grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+        <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
+          {CERTIFICATE_VERIFICATION_POINTS.map((point) => (
+            <Card key={point.title} className="rounded-3xl">
+              <CardHeader>
+                <Badge className="size-11 rounded-xl bg-primary/10 p-0 text-primary">
+                  <point.icon className="size-5" />
+                </Badge>
+                <CardTitle className="font-heading text-lg font-semibold">
+                  {point.title}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="text-sm leading-relaxed">
+                  {point.description}
+                </CardDescription>
+              </CardContent>
+            </Card>
+          ))}
+
+          <Card className="rounded-3xl border-dashed">
+            <CardContent className="space-y-2 p-6">
+              <CardDescription className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Format nomor resmi
+              </CardDescription>
+              <CardTitle className="font-mono text-sm font-medium text-foreground">
+                CERT-&#123;KODE-TRAINING&#125;-&#123;TAHUN&#125;-&#123;URUTAN&#125;
+              </CardTitle>
+              <CardDescription className="text-sm leading-relaxed">
+                Contoh: <span className="font-mono text-foreground">CERT-DEP-2026-0001</span>
+              </CardDescription>
+            </CardContent>
+          </Card>
+        </div>
+
+        <Card className="rounded-3xl">
+          <CardHeader>
+            <Badge className="w-fit gap-1.5 bg-primary/10 px-3 py-1 text-xs font-semibold text-primary hover:bg-primary/10">
+              <IconCertificate className="size-3.5" />
+              Official Enprotech
+            </Badge>
+            <CardTitle className="font-heading text-2xl font-semibold">
+              Cek Sertifikat Sekarang
+            </CardTitle>
+            <CardDescription className="text-sm leading-relaxed">
+              Masukkan nomor sertifikat untuk memeriksa keasliannya. Verifikasi
+              ini gratis dan dapat diakses tanpa login.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <VerifyCertificateForm />
+            <ButtonLink
+              href="/verify"
+              variant="outline"
+              className="w-full rounded-full"
+            >
+              Buka halaman verifikasi lengkap
+              <IconArrowRight className="size-4" />
+            </ButtonLink>
+          </CardContent>
+        </Card>
+      </div>
+    </section>
   );
 }
 
