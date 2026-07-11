@@ -21,6 +21,7 @@ type AssessmentQuestionTableProps = {
   moduleId?: string;
   type: AssessmentType;
   onEdit: (question: QuestionRecord) => void;
+  emptyMessage?: string;
 };
 
 function DeleteQuestionButton({
@@ -73,12 +74,17 @@ export function AssessmentQuestionTable({
   moduleId,
   type,
   onEdit,
+  emptyMessage,
 }: AssessmentQuestionTableProps) {
   return (
     <DataTable
       data={questions}
       getRowKey={(question) => question.id}
-      emptyState={{ message: "Belum ada soal. Tambahkan soal atau impor dari Excel." }}
+      emptyState={{
+        message:
+          emptyMessage ??
+          "Belum ada soal. Tambahkan soal atau impor dari Excel.",
+      }}
       columns={[
         {
           id: "order",

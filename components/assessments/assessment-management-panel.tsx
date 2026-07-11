@@ -4,6 +4,7 @@ import { useState } from "react";
 import { IconFileImport, IconPlus } from "@tabler/icons-react";
 
 import { AssessmentImportDialog } from "@/components/assessments/assessment-import-dialog";
+import { AssessmentQuestionFilters } from "@/components/assessments/assessment-question-filters";
 import { AssessmentQuestionForm } from "@/components/assessments/assessment-question-form";
 import { AssessmentQuestionTable } from "@/components/assessments/assessment-question-table";
 import { AssessmentSettingsForm } from "@/components/assessments/assessment-settings-form";
@@ -43,6 +44,8 @@ type AssessmentManagementPanelProps = {
   questionTotalPages: number;
   questionTotal: number;
   paginationBasePath: string;
+  enableQuestionSearch?: boolean;
+  questionSearch?: string;
 };
 
 export function AssessmentManagementPanel({
@@ -57,6 +60,8 @@ export function AssessmentManagementPanel({
   questionTotalPages,
   questionTotal,
   paginationBasePath,
+  enableQuestionSearch = false,
+  questionSearch,
 }: AssessmentManagementPanelProps) {
   const [createOpen, setCreateOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
@@ -155,7 +160,12 @@ export function AssessmentManagementPanel({
       />
 
       <div className="space-y-4">
+        {enableQuestionSearch ? (
+          <AssessmentQuestionFilters search={questionSearch} />
+        ) : null}
+
         <div className="flex items-center justify-between">
+          <p className="text-sm font-medium">Daftar Soal</p>
           <p className="text-sm text-muted-foreground">
             Menampilkan{" "}
             <span className="font-medium text-foreground">
@@ -173,12 +183,20 @@ export function AssessmentManagementPanel({
           moduleId={moduleId}
           type={type}
           onEdit={setEditingQuestion}
+          emptyMessage={
+            questionSearch?.trim()
+              ? "Tidak ada soal yang cocok dengan pencarian."
+              : undefined
+          }
         />
 
         <ListPagination
           page={questionPage}
           totalPages={questionTotalPages}
           basePath={paginationBasePath}
+          searchParams={
+            enableQuestionSearch ? { search: questionSearch } : undefined
+          }
         />
       </div>
 

@@ -2,7 +2,7 @@ import { TrainerTrainingAssessmentPage } from "@/components/assessments/trainer-
 
 type PageProps = {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ page?: string }>;
+  searchParams: Promise<{ page?: string; search?: string }>;
 };
 
 export default function TrainerPreTestPage({

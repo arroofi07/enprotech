@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { getCurrentUser } from "@/lib/application/auth/get-session";
 import { getOrCreateTrainingAssessment } from "@/lib/application/assessments/get-or-create-training-assessment";
 import { getTraining } from "@/lib/application/trainings/get-training";
+import { filterQuestions } from "@/lib/domain/assessments/filter-questions";
 import { getAssessmentTypeLabel } from "@/lib/domain/assessments/labels";
 import { resolvePassingGrade } from "@/lib/domain/assessments/resolve-passing-grade";
 import type { TrainingAssessmentType } from "@/lib/domain/assessments/types";
@@ -18,7 +19,7 @@ const QUESTION_PAGE_SIZE = 10;
 
 type TrainerTrainingAssessmentPageProps = {
   params: Promise<{ id: string }>;
-  searchParams?: Promise<{ page?: string }>;
+  searchParams?: Promise<{ page?: string; search?: string }>;
   assessmentType: TrainingAssessmentType;
 };
 
@@ -60,8 +61,13 @@ export async function TrainerTrainingAssessmentPage({
     trainingPassingGrade,
   });
 
-  const paginatedQuestions = paginateArray(
+  const filteredQuestions = filterQuestions(
     assessmentResult.data.questions,
+    query.search,
+  );
+
+  const paginatedQuestions = paginateArray(
+    filteredQuestions,
     page,
     QUESTION_PAGE_SIZE,
   );
@@ -108,6 +114,8 @@ export async function TrainerTrainingAssessmentPage({
                 questionTotalPages={paginatedQuestions.totalPages}
                 questionTotal={paginatedQuestions.total}
                 paginationBasePath={paginationBasePath}
+                enableQuestionSearch
+                questionSearch={query.search}
               />
             </CardContent>
           </Card>
