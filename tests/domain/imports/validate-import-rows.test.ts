@@ -9,7 +9,6 @@ function buildRows(rows: Record<string, string | number>[]) {
   const worksheet = XLSX.utils.json_to_sheet(rows);
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
-  const buffer = XLSX.write(workbook, { type: "array", bookType: "xlsx" });
   const sheet = workbook.Sheets.Sheet1!;
   return XLSX.utils.sheet_to_json<Record<string, string>>(sheet, {
     defval: "",
@@ -22,8 +21,26 @@ function buildRows(rows: Record<string, string | number>[]) {
   });
 }
 
+const validIndonesianRow = {
+  Pertanyaan: "Pertanyaan?",
+  "Pilihan A": "A",
+  "Pilihan B": "B",
+  "Pilihan C": "C",
+  "Pilihan D": "D",
+  "Pilihan E": "E",
+  "Jawaban Benar": "A",
+};
+
 describe("validateQuestionRows", () => {
-  it("accepts valid question rows", () => {
+  it("accepts valid question rows with Indonesian headers", () => {
+    const rows = validateQuestionRows(buildRows([validIndonesianRow]));
+
+    expect(rows).toHaveLength(1);
+    expect(rows[0]?.isValid).toBe(true);
+    expect(rows[0]?.data?.options).toHaveLength(5);
+  });
+
+  it("accepts valid question rows with legacy English headers", () => {
     const rows = validateQuestionRows(
       buildRows([
         {
@@ -32,6 +49,7 @@ describe("validateQuestionRows", () => {
           option_b: "B",
           option_c: "C",
           option_d: "D",
+          option_e: "E",
           correct_answer: "A",
         },
       ]),
@@ -41,22 +59,46 @@ describe("validateQuestionRows", () => {
     expect(rows[0]?.isValid).toBe(true);
   });
 
-  it("reports row errors for invalid correct answer", () => {
+  it("ignores legacy no column when other fields are valid", () => {
     const rows = validateQuestionRows(
       buildRows([
         {
-          question: "Pertanyaan?",
-          option_a: "A",
-          option_b: "B",
-          option_c: "C",
-          option_d: "D",
-          correct_answer: "Z",
+          no: 1,
+          ...validIndonesianRow,
+        },
+      ]),
+    );
+
+    expect(rows).toHaveLength(1);
+    expect(rows[0]?.isValid).toBe(true);
+  });
+
+  it("reports row errors when Pilihan E is empty", () => {
+    const rows = validateQuestionRows(
+      buildRows([
+        {
+          ...validIndonesianRow,
+          "Pilihan E": "",
         },
       ]),
     );
 
     expect(rows[0]?.isValid).toBe(false);
-    expect(rows[0]?.errors[0]).toContain("correct_answer");
+    expect(rows[0]?.errors[0]).toContain("Pilihan E");
+  });
+
+  it("reports row errors for invalid correct answer", () => {
+    const rows = validateQuestionRows(
+      buildRows([
+        {
+          ...validIndonesianRow,
+          "Jawaban Benar": "Z",
+        },
+      ]),
+    );
+
+    expect(rows[0]?.isValid).toBe(false);
+    expect(rows[0]?.errors[0]).toContain("Jawaban Benar");
   });
 });
 

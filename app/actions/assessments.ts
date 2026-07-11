@@ -44,7 +44,7 @@ function revalidateAssessmentPaths(
 }
 
 function parseOptions(formData: FormData) {
-  return ["A", "B", "C", "D"].map((label) => ({
+  return ["A", "B", "C", "D", "E"].map((label) => ({
     text: String(formData.get(`option_${label}`) ?? "").trim(),
     isCorrect: formData.get("correctAnswer") === label,
   }));

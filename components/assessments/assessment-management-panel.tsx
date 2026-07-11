@@ -131,7 +131,7 @@ export function AssessmentManagementPanel({
               <DialogHeader className="shrink-0 border-b px-6 py-4">
                 <DialogTitle>Tambah Soal {typeLabel}</DialogTitle>
                 <DialogDescription>
-                  Buat soal pilihan ganda dengan 4 opsi jawaban.
+                  Buat soal pilihan ganda dengan 5 opsi jawaban.
                 </DialogDescription>
               </DialogHeader>
               <AssessmentQuestionForm

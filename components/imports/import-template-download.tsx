@@ -5,7 +5,7 @@ import type { ImportKind } from "@/lib/domain/imports/types";
 
 const TEMPLATE_COLUMNS: Record<ImportKind, string> = {
   questions:
-    "no, question, option_a, option_b, option_c, option_d, correct_answer (A/B/C/D)",
+    "Pertanyaan, Pilihan A, Pilihan B, Pilihan C, Pilihan D, Pilihan E, Jawaban Benar (A/B/C/D/E)",
   enrollments: "student_email, training_id",
   scores:
     "student_email, training_id, module_name, assessment_type, score",

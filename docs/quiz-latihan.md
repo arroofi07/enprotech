@@ -5,7 +5,7 @@ Panduan mengelola quiz dan latihan per modul training.
 ## Ringkasan
 
 - Setiap modul dapat memiliki **satu quiz** dan **satu latihan**
-- Format soal: pilihan ganda (4 opsi, 1 jawaban benar)
+- Format soal: pilihan ganda (5 opsi, 1 jawaban benar)
 - Student dapat retry unlimited sampai mencapai passing grade
 - Nilai tertinggi dari semua attempt yang disimpan
 - Setelah passing, retry diblokir (AC-13)
@@ -40,13 +40,15 @@ Kolom wajib:
 
 | Kolom | Keterangan |
 |-------|------------|
-| no | Nomor urut (opsional) |
-| question | Teks pertanyaan |
-| option_a | Opsi A |
-| option_b | Opsi B |
-| option_c | Opsi C |
-| option_d | Opsi D |
-| correct_answer | A, B, C, atau D |
+| Pertanyaan | Teks pertanyaan |
+| Pilihan A | Opsi A |
+| Pilihan B | Opsi B |
+| Pilihan C | Opsi C |
+| Pilihan D | Opsi D |
+| Pilihan E | Opsi E |
+| Jawaban Benar | A, B, C, D, atau E |
+
+Urutan soal diatur otomatis oleh sistem; tidak perlu kolom nomor.
 
 ## Student
 

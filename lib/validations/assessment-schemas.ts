@@ -51,7 +51,7 @@ export const createQuestionSchema = z
       .max(2000, "Pertanyaan terlalu panjang."),
     options: z
       .array(optionInputSchema)
-      .length(4, "Harus ada tepat 4 opsi jawaban."),
+      .length(5, "Harus ada tepat 5 opsi jawaban."),
   })
   .superRefine((value, ctx) => {
     const correctCount = value.options.filter((option) => option.isCorrect).length;
@@ -73,7 +73,7 @@ export const updateQuestionSchema = z
       .max(2000, "Pertanyaan terlalu panjang."),
     options: z
       .array(optionInputSchema)
-      .length(4, "Harus ada tepat 4 opsi jawaban."),
+      .length(5, "Harus ada tepat 5 opsi jawaban."),
   })
   .superRefine((value, ctx) => {
     const correctCount = value.options.filter((option) => option.isCorrect).length;

@@ -12,16 +12,16 @@ function buildWorkbookBuffer(rows: Record<string, string | number>[]) {
 }
 
 describe("parseExcelQuestions", () => {
-  it("parses valid rows from excel buffer", () => {
+  it("parses valid rows from excel buffer with Indonesian headers", () => {
     const buffer = buildWorkbookBuffer([
       {
-        no: 1,
-        question: "Pertanyaan 1",
-        option_a: "Opsi A",
-        option_b: "Opsi B",
-        option_c: "Opsi C",
-        option_d: "Opsi D",
-        correct_answer: "B",
+        Pertanyaan: "Pertanyaan 1",
+        "Pilihan A": "Opsi A",
+        "Pilihan B": "Opsi B",
+        "Pilihan C": "Opsi C",
+        "Pilihan D": "Opsi D",
+        "Pilihan E": "Opsi E",
+        "Jawaban Benar": "B",
       },
     ]);
 
@@ -29,19 +29,39 @@ describe("parseExcelQuestions", () => {
 
     expect(questions).toHaveLength(1);
     expect(questions[0]?.questionText).toBe("Pertanyaan 1");
+    expect(questions[0]?.options).toHaveLength(5);
     expect(questions[0]?.options[1]?.isCorrect).toBe(true);
+  });
+
+  it("parses valid rows from excel buffer with legacy English headers", () => {
+    const buffer = buildWorkbookBuffer([
+      {
+        question: "Pertanyaan 1",
+        option_a: "Opsi A",
+        option_b: "Opsi B",
+        option_c: "Opsi C",
+        option_d: "Opsi D",
+        option_e: "Opsi E",
+        correct_answer: "B",
+      },
+    ]);
+
+    const questions = parseExcelQuestions(buffer);
+
+    expect(questions).toHaveLength(1);
+    expect(questions[0]?.options).toHaveLength(5);
   });
 
   it("throws when no valid questions exist", () => {
     const buffer = buildWorkbookBuffer([
       {
-        no: 1,
-        question: "",
-        option_a: "A",
-        option_b: "B",
-        option_c: "C",
-        option_d: "D",
-        correct_answer: "A",
+        Pertanyaan: "",
+        "Pilihan A": "A",
+        "Pilihan B": "B",
+        "Pilihan C": "C",
+        "Pilihan D": "D",
+        "Pilihan E": "E",
+        "Jawaban Benar": "A",
       },
     ]);
 

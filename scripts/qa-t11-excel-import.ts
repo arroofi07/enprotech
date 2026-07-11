@@ -151,20 +151,22 @@ async function main() {
 
   const questionsBuffer = buildWorkbook([
     {
-      question: "QA import question?",
-      option_a: "A",
-      option_b: "B",
-      option_c: "C",
-      option_d: "D",
-      correct_answer: "B",
+      Pertanyaan: "QA import question?",
+      "Pilihan A": "A",
+      "Pilihan B": "B",
+      "Pilihan C": "C",
+      "Pilihan D": "D",
+      "Pilihan E": "E",
+      "Jawaban Benar": "B",
     },
     {
-      question: "",
-      option_a: "A",
-      option_b: "B",
-      option_c: "C",
-      option_d: "D",
-      correct_answer: "Z",
+      Pertanyaan: "",
+      "Pilihan A": "A",
+      "Pilihan B": "B",
+      "Pilihan C": "C",
+      "Pilihan D": "D",
+      "Pilihan E": "E",
+      "Jawaban Benar": "Z",
     },
   ]);
 

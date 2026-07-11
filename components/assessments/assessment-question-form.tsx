@@ -19,7 +19,7 @@ import type { QuestionRecord } from "@/lib/infrastructure/db/repositories/assess
 
 const initialState: AssessmentActionState = {};
 
-const OPTION_LABELS = ["A", "B", "C", "D"] as const;
+const OPTION_LABELS = ["A", "B", "C", "D", "E"] as const;
 
 type AssessmentQuestionFormProps = {
   assessmentId: string;
@@ -109,7 +109,7 @@ export function AssessmentQuestionForm({
 
         <QuestionFormSection
           title="Opsi Jawaban"
-          description="Isi keempat opsi jawaban untuk soal pilihan ganda."
+          description="Isi kelima opsi jawaban untuk soal pilihan ganda."
         >
           <div className="grid gap-4 lg:grid-cols-2">
             {OPTION_LABELS.map((label, index) => (
@@ -135,7 +135,7 @@ export function AssessmentQuestionForm({
           <RadioGroup
             name="correctAnswer"
             defaultValue={correctAnswer}
-            className="grid grid-cols-2 gap-3 sm:grid-cols-4"
+            className="grid grid-cols-2 gap-3 sm:grid-cols-5"
           >
             {OPTION_LABELS.map((label) => (
               <label

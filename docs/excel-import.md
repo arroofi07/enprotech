@@ -27,10 +27,15 @@ Gunakan query `?mode=preview` atau `?mode=commit` pada endpoint import.
 
 | Kolom | Wajib | Keterangan |
 |-------|-------|------------|
-| no | Tidak | Nomor urut |
-| question | Ya | Teks pertanyaan |
-| option_a..d | Ya | Empat opsi jawaban |
-| correct_answer | Ya | A, B, C, atau D |
+| Pertanyaan | Ya | Teks pertanyaan |
+| Pilihan A | Ya | Opsi jawaban |
+| Pilihan B | Ya | Opsi jawaban |
+| Pilihan C | Ya | Opsi jawaban |
+| Pilihan D | Ya | Opsi jawaban |
+| Pilihan E | Ya | Opsi jawaban |
+| Jawaban Benar | Ya | A, B, C, D, atau E |
+
+Urutan soal diatur otomatis oleh sistem; tidak perlu kolom nomor.
 
 Import soal memerlukan `assessmentId` (dipilih via training + modul + jenis assessment di UI).
 
