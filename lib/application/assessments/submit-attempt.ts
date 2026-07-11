@@ -13,7 +13,6 @@ import { isTrainingAssessmentType } from "@/lib/domain/assessments/types";
 import {
   findAssessmentById,
   findAttemptById,
-  findModuleContextById,
   getBestSubmittedScore,
   getTrainingPassingGrade,
   listQuestionsByAssessment,
@@ -24,6 +23,7 @@ import {
 
 import { assertAssessmentStudent } from "./assert-access";
 import { issueCertificateIfEligible } from "../certificates/issue-certificate-if-eligible";
+import { tryAutoCompleteModuleAfterAssessmentSubmit } from "../modules/check-module-access";
 import { buildAttemptQuestionSet } from "./attempt-questions";
 
 export type SubmitAttemptResult = {
@@ -40,28 +40,9 @@ async function resolvePassingGradeForAssessment(
 ): Promise<number> {
   const trainingPassingGrade = await getTrainingPassingGrade(assessment.trainingId);
 
-  if (isTrainingAssessmentType(assessment.type)) {
-    return resolvePassingGrade({
-      type: assessment.type,
-      assessmentPassingGrade: assessment.passingGrade,
-      trainingPassingGrade,
-    });
-  }
-
-  if (!assessment.moduleId) {
-    return trainingPassingGrade;
-  }
-
-  const module = await findModuleContextById(assessment.moduleId);
-  if (!module) {
-    return trainingPassingGrade;
-  }
-
   return resolvePassingGrade({
     type: assessment.type,
     assessmentPassingGrade: assessment.passingGrade,
-    minQuizScore: module.minQuizScore,
-    minLatihanScore: module.minLatihanScore,
     trainingPassingGrade,
   });
 }
@@ -136,6 +117,13 @@ export async function submitAttemptUseCase(
   ]);
 
   const wrongAnswers = getWrongAnswerReviews(questions, submitted.answers);
+
+  if (assessment.moduleId && (assessment.type === "quiz" || assessment.type === "latihan")) {
+    await tryAutoCompleteModuleAfterAssessmentSubmit(
+      actor!.id,
+      assessment.moduleId,
+    );
+  }
 
   if (
     assessment.type === "post_test" &&

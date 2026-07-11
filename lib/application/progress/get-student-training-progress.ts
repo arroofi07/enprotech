@@ -11,6 +11,7 @@ import { isStudentEnrolledInTraining } from "@/lib/infrastructure/db/repositorie
 import { getStudentTrainingProgressRawData } from "@/lib/infrastructure/db/repositories/progress-repository";
 import { getTrainingProgressSchema } from "@/lib/validations/progress-schemas";
 
+import { getModuleProgressionState } from "../modules/check-module-access";
 import { assertStudent } from "../trainings/assert-student";
 
 export async function getStudentTrainingProgress(
@@ -35,13 +36,15 @@ export async function getStudentTrainingProgress(
     return trainingFailure(TrainingErrorCode.FORBIDDEN);
   }
 
-  const raw = await getStudentTrainingProgressRawData(
-    actor!.id,
-    parsed.data.trainingId,
-  );
+  const [raw, progressionState] = await Promise.all([
+    getStudentTrainingProgressRawData(actor!.id, parsed.data.trainingId),
+    getModuleProgressionState(actor!.id, parsed.data.trainingId),
+  ]);
   if (!raw) {
     return trainingFailure(TrainingErrorCode.TRAINING_NOT_FOUND);
   }
 
-  return trainingSuccess(mapStudentTrainingProgress(raw));
+  return trainingSuccess(
+    mapStudentTrainingProgress(raw, progressionState.lockedByModuleId),
+  );
 }

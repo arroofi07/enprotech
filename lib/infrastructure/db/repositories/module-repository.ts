@@ -19,6 +19,7 @@ export type ModuleRecord = {
   description: string | null;
   thumbnail: string | null;
   videoConferenceLink: string | null;
+  videoConferenceScheduledAt: Date | null;
   minQuizScore: number;
   minLatihanScore: number;
   minAttendance: number;
@@ -61,6 +62,7 @@ const moduleColumns = {
   description: modules.description,
   thumbnail: modules.thumbnail,
   videoConferenceLink: modules.videoConferenceLink,
+  videoConferenceScheduledAt: modules.videoConferenceScheduledAt,
   minQuizScore: modules.minQuizScore,
   minLatihanScore: modules.minLatihanScore,
   minAttendance: modules.minAttendance,
@@ -88,6 +90,7 @@ function mapModule(row: typeof modules.$inferSelect): ModuleRecord {
     description: row.description,
     thumbnail: row.thumbnail,
     videoConferenceLink: row.videoConferenceLink,
+    videoConferenceScheduledAt: row.videoConferenceScheduledAt,
     minQuizScore: row.minQuizScore,
     minLatihanScore: row.minLatihanScore,
     minAttendance: row.minAttendance,
@@ -289,6 +292,7 @@ export async function updateModule(
     description?: string | null;
     thumbnail?: string | null;
     videoConferenceLink?: string | null;
+    videoConferenceScheduledAt?: Date | null;
     minQuizScore?: number;
     minLatihanScore?: number;
     minAttendance?: number;
@@ -592,6 +596,39 @@ export async function countModulesByTrainingIds(
 
   for (const row of rows) {
     counts[row.trainingId] = Number(row.moduleCount ?? 0);
+  }
+
+  return counts;
+}
+
+export async function countScheduledVideoConferencesByTrainingIds(
+  trainingIds: string[],
+): Promise<Record<string, number>> {
+  const counts = Object.fromEntries(
+    trainingIds.map((trainingId) => [trainingId, 0]),
+  );
+
+  if (trainingIds.length === 0) {
+    return counts;
+  }
+
+  const rows = await db
+    .select({
+      trainingId: modules.trainingId,
+      scheduledCount: sql<number>`cast(count(${modules.id}) as int)`,
+    })
+    .from(modules)
+    .where(
+      and(
+        inArray(modules.trainingId, trainingIds),
+        sql`${modules.videoConferenceLink} is not null`,
+        sql`${modules.videoConferenceScheduledAt} is not null`,
+      ),
+    )
+    .groupBy(modules.trainingId);
+
+  for (const row of rows) {
+    counts[row.trainingId] = Number(row.scheduledCount ?? 0);
   }
 
   return counts;

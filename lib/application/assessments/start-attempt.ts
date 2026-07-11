@@ -14,7 +14,6 @@ import {
   createAttempt,
   findAssessmentById,
   findInProgressAttempt,
-  findModuleContextById,
   getBestSubmittedScore,
   getTrainingPassingGrade,
   listQuestionsByAssessment,
@@ -29,6 +28,7 @@ import {
 import { assessmentIdSchema } from "@/lib/validations/assessment-schemas";
 
 import { assertAssessmentStudent } from "./assert-access";
+import { canStudentAccessModule } from "../modules/check-module-access";
 import {
   buildAttemptQuestionSet,
   getAttemptQuestionIds,
@@ -44,28 +44,9 @@ async function resolvePassingGradeForAssessment(
 ): Promise<number> {
   const trainingPassingGrade = await getTrainingPassingGrade(assessment.trainingId);
 
-  if (isTrainingAssessmentType(assessment.type)) {
-    return resolvePassingGrade({
-      type: assessment.type,
-      assessmentPassingGrade: assessment.passingGrade,
-      trainingPassingGrade,
-    });
-  }
-
-  if (!assessment.moduleId) {
-    return trainingPassingGrade;
-  }
-
-  const module = await findModuleContextById(assessment.moduleId);
-  if (!module) {
-    return trainingPassingGrade;
-  }
-
   return resolvePassingGrade({
     type: assessment.type,
     assessmentPassingGrade: assessment.passingGrade,
-    minQuizScore: module.minQuizScore,
-    minLatihanScore: module.minLatihanScore,
     trainingPassingGrade,
   });
 }
@@ -130,6 +111,15 @@ export async function startAttempt(
     }
   } else if (!assessment.moduleId) {
     return assessmentFailure(AssessmentErrorCode.ASSESSMENT_NOT_FOUND);
+  } else {
+    const canAccess = await canStudentAccessModule(
+      actor!.id,
+      assessment.trainingId,
+      assessment.moduleId,
+    );
+    if (!canAccess) {
+      return assessmentFailure(AssessmentErrorCode.MODULE_LOCKED);
+    }
   }
 
   const questions = await listQuestionsByAssessment(assessment.id);

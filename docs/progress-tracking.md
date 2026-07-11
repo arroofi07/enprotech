@@ -25,21 +25,21 @@ Progress % = round((completed / total) * 100), dibatasi 0–100
 | Item | Dianggap selesai jika |
 |------|------------------------|
 | Pre-test | Sudah submit (tidak wajib lulus) |
-| Modul | `module_progress.status = completed` |
-| Quiz | Nilai tertinggi ≥ passing grade |
-| Latihan | Nilai tertinggi ≥ passing grade |
+| Modul | Quiz dan latihan modul sudah disubmit (otomatis) |
+| Quiz | Sudah submit (tidak wajib lulus) |
+| Latihan | Sudah submit (tidak wajib lulus) |
 | Post-test | Nilai tertinggi ≥ passing grade |
 
 Pre-test dianggap **terkunci** jika trainer belum mengaktifkan pre-test.
+Modul berikutnya **terkunci** sampai quiz dan latihan modul sebelumnya disubmit.
 Post-test dianggap **terkunci** sampai semua modul selesai.
 
 ## Passing Grade
 
-Mengikuti aturan T05/T06:
+Mengikuti aturan assessment/training:
 
 1. `assessments.passing_grade` (jika di-set)
-2. `modules.min_quiz_score` / `modules.min_latihan_score` (quiz/latihan)
-3. `trainings.passing_grade` (default 70%)
+2. `trainings.passing_grade` (default 70%)
 
 ## API
 

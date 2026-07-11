@@ -16,6 +16,7 @@ import {
 
 export function mapStudentTrainingProgress(
   raw: StudentTrainingProgressRawData,
+  lockedByModuleId: Record<string, boolean> = {},
 ): StudentTrainingProgress {
   const trainingPassingGrade = raw.training.passingGrade;
   const preTestAssessment = findTrainingAssessment(raw.assessments, "pre_test");
@@ -58,29 +59,29 @@ export function mapStudentTrainingProgress(
     const quizPassingGrade = resolvePassingGrade({
       type: "quiz",
       assessmentPassingGrade: quizAssessment?.passingGrade ?? null,
-      minQuizScore: module.minQuizScore,
       trainingPassingGrade,
     });
     const latihanPassingGrade = resolvePassingGrade({
       type: "latihan",
       assessmentPassingGrade: latihanAssessment?.passingGrade ?? null,
-      minLatihanScore: module.minLatihanScore,
       trainingPassingGrade,
     });
+    const isLocked = lockedByModuleId[module.id] ?? false;
 
     return {
       id: module.id,
       title: module.title,
       order: module.order,
       status: module.progressStatus,
+      isLocked,
       quiz: buildAssessmentProgressItem({
         assessmentId: quizAssessment?.id ?? null,
         bestScore: quizStats.submittedCount > 0 ? quizStats.bestScore : null,
         passingGrade: quizPassingGrade,
         submittedCount: quizStats.submittedCount,
         hasInProgressAttempt: quizStats.hasInProgressAttempt,
-        locked: false,
-        requirePass: true,
+        locked: isLocked,
+        requirePass: false,
       }),
       latihan: buildAssessmentProgressItem({
         assessmentId: latihanAssessment?.id ?? null,
@@ -89,8 +90,8 @@ export function mapStudentTrainingProgress(
         passingGrade: latihanPassingGrade,
         submittedCount: latihanStats.submittedCount,
         hasInProgressAttempt: latihanStats.hasInProgressAttempt,
-        locked: false,
-        requirePass: true,
+        locked: isLocked,
+        requirePass: false,
       }),
     };
   });

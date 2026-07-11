@@ -20,6 +20,7 @@ export type ModuleProgressItem = {
   title: string;
   order: number;
   status: ModuleProgressStatus;
+  isLocked: boolean;
   quiz: AssessmentProgressItem;
   latihan: AssessmentProgressItem;
 };

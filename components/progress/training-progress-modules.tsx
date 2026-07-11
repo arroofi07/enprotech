@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 type TrainingProgressModulesProps = {
   trainingId: string;
   modules: ModuleProgressItem[];
-  locked?: boolean;
+  preTestLocked?: boolean;
 };
 
 function hasPendingWork(module: ModuleProgressItem): boolean {
@@ -26,7 +26,7 @@ function hasPendingWork(module: ModuleProgressItem): boolean {
 export function TrainingProgressModules({
   trainingId,
   modules,
-  locked = false,
+  preTestLocked = false,
 }: TrainingProgressModulesProps) {
   if (modules.length === 0) {
     return null;
@@ -37,12 +37,14 @@ export function TrainingProgressModules({
       <div>
         <h3 className="text-sm font-semibold">Detail Modul</h3>
         <p className="mt-1 text-sm text-muted-foreground">
-          Status modul, quiz, dan latihan beserta nilai tertinggi Anda.
+          Status modul, quiz, dan latihan. Modul berikutnya terbuka setelah quiz
+          dan latihan modul sebelumnya disubmit.
         </p>
       </div>
 
       <div className="space-y-3">
         {modules.map((module) => {
+          const locked = preTestLocked || module.isLocked;
           const pending = hasPendingWork(module);
 
           return (
@@ -50,15 +52,20 @@ export function TrainingProgressModules({
               key={module.id}
               className={cn(
                 pending && !locked && "border-dashed border-muted-foreground/30",
+                locked && "opacity-70",
               )}
             >
               <CardHeader className="pb-3">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="space-y-1">
                     <CardTitle className="text-base">{module.title}</CardTitle>
-                    {locked ? (
+                    {preTestLocked ? (
                       <p className="text-sm text-muted-foreground">
                         Terkunci sampai pre-test selesai.
+                      </p>
+                    ) : module.isLocked ? (
+                      <p className="text-sm text-muted-foreground">
+                        Selesaikan modul sebelumnya terlebih dahulu.
                       </p>
                     ) : null}
                   </div>

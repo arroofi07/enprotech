@@ -10,9 +10,10 @@ import { deleteModuleContent } from "@/lib/application/modules/delete-module-con
 import { reorderModuleContents } from "@/lib/application/modules/reorder-module-contents";
 import { reorderModules } from "@/lib/application/modules/reorder-modules";
 import { updateModule } from "@/lib/application/modules/update-module";
+import { updateModuleVideoConference } from "@/lib/application/modules/update-module-video-conference";
 import { updateModuleContent } from "@/lib/application/modules/update-module-content";
 import { updateStudentModuleProgress } from "@/lib/application/modules/update-student-module-progress";
-import type { ModuleErrorCode } from "@/lib/domain/modules/errors";
+import { ModuleErrorCode } from "@/lib/domain/modules/errors";
 
 export type ModuleActionState = {
   error?: ModuleErrorCode;
@@ -67,9 +68,6 @@ export async function createModuleAction(
       formData.get("videoConferenceLink"),
     ),
     order: parseOptionalNumber(formData.get("order")),
-    minQuizScore: parseOptionalNumber(formData.get("minQuizScore")),
-    minLatihanScore: parseOptionalNumber(formData.get("minLatihanScore")),
-    minAttendance: parseOptionalNumber(formData.get("minAttendance")),
     videoUrl: parseOptionalString(formData.get("videoUrl")),
     pptUrl: parseOptionalString(formData.get("pptUrl")),
     materialUrl: parseOptionalString(formData.get("materialUrl")),
@@ -108,13 +106,6 @@ export async function updateModuleAction(
       formData.get("thumbnail") === ""
         ? null
         : parseOptionalString(formData.get("thumbnail")),
-    videoConferenceLink:
-      formData.get("videoConferenceLink") === ""
-        ? null
-        : parseOptionalString(formData.get("videoConferenceLink")),
-    minQuizScore: parseOptionalNumber(formData.get("minQuizScore")),
-    minLatihanScore: parseOptionalNumber(formData.get("minLatihanScore")),
-    minAttendance: parseOptionalNumber(formData.get("minAttendance")),
     order: parseOptionalNumber(formData.get("order")),
   });
 
@@ -250,4 +241,62 @@ export async function markModuleCompleteAction(
 
   revalidateModulePaths(trainingId, moduleId);
   return { success: true, message: "Modul ditandai selesai.", moduleId, trainingId };
+}
+
+function parseOptionalDateTime(
+  value: FormDataEntryValue | null,
+): Date | null | undefined {
+  const text = String(value ?? "").trim();
+  if (!text) {
+    return null;
+  }
+
+  const parsed = new Date(text);
+  return Number.isNaN(parsed.getTime()) ? undefined : parsed;
+}
+
+export async function updateModuleVideoConferenceAction(
+  _prevState: ModuleActionState,
+  formData: FormData,
+): Promise<ModuleActionState> {
+  const actor = await getCurrentUser();
+  const moduleId = String(formData.get("moduleId") ?? "");
+  const trainingId = String(formData.get("trainingId") ?? "");
+  const linkRaw = String(formData.get("videoConferenceLink") ?? "").trim();
+  const scheduledAt = parseOptionalDateTime(
+    formData.get("videoConferenceScheduledAt"),
+  );
+
+  if (scheduledAt === undefined) {
+    return {
+      error: ModuleErrorCode.VALIDATION_ERROR,
+      message: "Jadwal video conference tidak valid.",
+      success: false,
+    };
+  }
+
+  const result = await updateModuleVideoConference(actor, {
+    moduleId,
+    trainingId,
+    videoConferenceLink: linkRaw || null,
+    videoConferenceScheduledAt: scheduledAt,
+  });
+
+  if (!result.success) {
+    return { error: result.error, message: result.message, success: false };
+  }
+
+  revalidateModulePaths(trainingId, moduleId);
+  revalidatePath("/trainer/video-conference");
+  revalidatePath(`/trainer/video-conference/${trainingId}`);
+  revalidatePath("/student/video-conference");
+
+  return {
+    success: true,
+    message: linkRaw
+      ? "Jadwal video conference berhasil disimpan."
+      : "Jadwal video conference berhasil dihapus.",
+    moduleId,
+    trainingId,
+  };
 }

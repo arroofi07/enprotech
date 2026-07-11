@@ -62,7 +62,7 @@ export default async function TrainerModulesHubPage({
         <div className="container max-w-7xl space-y-6 p-6 md:p-8">
           <AdminPageHeader
             title="Kelola Modul"
-            description="Pilih training untuk mengatur modul, materi, dan video conference."
+            description="Pilih training untuk mengatur modul dan materi pembelajaran."
           />
 
           <Card>

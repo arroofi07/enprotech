@@ -10,6 +10,7 @@ export const ModuleErrorCode = {
   FILE_TOO_LARGE: "FILE_TOO_LARGE",
   UPLOAD_FAILED: "UPLOAD_FAILED",
   PRETEST_REQUIRED: "PRETEST_REQUIRED",
+  MODULE_LOCKED: "MODULE_LOCKED",
 } as const;
 
 export type ModuleErrorCode =
@@ -30,6 +31,8 @@ const MODULE_ERROR_MESSAGES: Record<ModuleErrorCode, string> = {
   [ModuleErrorCode.UPLOAD_FAILED]: "Gagal mengunggah file.",
   [ModuleErrorCode.PRETEST_REQUIRED]:
     "Selesaikan pre-test terlebih dahulu sebelum mengakses modul.",
+  [ModuleErrorCode.MODULE_LOCKED]:
+    "Selesaikan modul sebelumnya terlebih dahulu.",
 };
 
 export function getModuleErrorMessage(code: ModuleErrorCode): string {

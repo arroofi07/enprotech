@@ -15,24 +15,23 @@ import type { ModuleProgressItem } from "@/lib/domain/trainings/progress-types";
 type StudentModuleCardProps = {
   module: StudentModuleListItem;
   trainingId: string;
-  locked?: boolean;
+  preTestLocked?: boolean;
   progressItem?: ModuleProgressItem;
 };
 
 export function StudentModuleCard({
   module,
   trainingId,
-  locked = false,
+  preTestLocked = false,
   progressItem,
 }: StudentModuleCardProps) {
   const status = module.progress?.status ?? "not_started";
+  const locked = preTestLocked || module.isLocked;
 
   const card = (
     <Card
       className={`h-full transition-colors ${
-        locked
-          ? "opacity-60"
-          : "hover:bg-muted/40"
+        locked ? "opacity-60" : "hover:bg-muted/40"
       }`}
     >
       {module.thumbnail ? (
@@ -60,9 +59,11 @@ export function StudentModuleCard({
       </CardHeader>
       <CardContent className="space-y-3">
         <p className="text-sm text-muted-foreground">
-          {locked
+          {preTestLocked
             ? "Selesaikan pre-test untuk membuka modul."
-            : `${module.contents.length} materi`}
+            : module.isLocked
+              ? "Selesaikan modul sebelumnya terlebih dahulu."
+              : `${module.contents.length} materi`}
         </p>
 
         {progressItem && !locked ? (

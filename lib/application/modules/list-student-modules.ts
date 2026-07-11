@@ -19,9 +19,11 @@ import { getModuleSchema, listModulesSchema } from "@/lib/validations/module-sch
 
 import { assertModuleStudent } from "./assert-access";
 import { assertStudentCanAccessModules } from "@/lib/application/training-flow/get-student-training-flow-state";
+import { canStudentAccessModule, getModuleProgressionState } from "./check-module-access";
 
 export type StudentModuleListItem = ModuleWithContents & {
   progress: ModuleProgressRecord | null;
+  isLocked: boolean;
 };
 
 export async function listStudentModules(
@@ -46,15 +48,17 @@ export async function listStudentModules(
     return moduleFailure(ModuleErrorCode.NOT_ENROLLED);
   }
 
-  const [modules, progressMap] = await Promise.all([
+  const [modules, progressMap, progressionState] = await Promise.all([
     listModulesByTraining(parsed.data.trainingId),
     listModuleProgressByTraining(actor!.id, parsed.data.trainingId),
+    getModuleProgressionState(actor!.id, parsed.data.trainingId),
   ]);
 
   return moduleSuccess(
     modules.map((module) => ({
       ...module,
       progress: progressMap.get(module.id) ?? null,
+      isLocked: progressionState.lockedByModuleId[module.id] ?? false,
     })),
   );
 }
@@ -92,6 +96,15 @@ export async function getStudentModule(
   );
   if (!canAccess) {
     return moduleFailure(ModuleErrorCode.PRETEST_REQUIRED);
+  }
+
+  const moduleUnlocked = await canStudentAccessModule(
+    actor!.id,
+    module.trainingId,
+    parsed.data.moduleId,
+  );
+  if (!moduleUnlocked) {
+    return moduleFailure(ModuleErrorCode.MODULE_LOCKED);
   }
 
   const detail = await getStudentModuleDetail(actor!.id, parsed.data.moduleId);

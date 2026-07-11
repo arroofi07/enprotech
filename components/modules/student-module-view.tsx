@@ -1,20 +1,13 @@
 "use client";
 
-import { useActionState, useEffect } from "react";
+import { useEffect } from "react";
 import { IconExternalLink, IconListCheck, IconPencil } from "@tabler/icons-react";
 
-import {
-  markModuleCompleteAction,
-  type ModuleActionState,
-} from "@/app/actions/modules";
 import { ModuleContentList } from "@/components/modules/module-content-list";
 import { ModuleProgressBadge } from "@/components/modules/module-progress-badge";
 import { Button } from "@/components/ui/button";
-import { Spinner } from "@/components/ui/spinner";
-import { useActionToast } from "@/hooks/use-action-toast";
+import { formatVideoConferenceSchedule } from "@/lib/domain/modules/format-video-conference-schedule";
 import type { StudentModuleDetail } from "@/lib/infrastructure/db/repositories/module-repository";
-
-const initialState: ModuleActionState = {};
 
 type StudentModuleViewProps = {
   module: StudentModuleDetail;
@@ -22,14 +15,7 @@ type StudentModuleViewProps = {
 };
 
 export function StudentModuleView({ module, trainingId }: StudentModuleViewProps) {
-  const [state, formAction, pending] = useActionState(
-    markModuleCompleteAction,
-    initialState,
-  );
-
   const status = module.progress?.status ?? "not_started";
-
-  useActionToast(state);
 
   useEffect(() => {
     if (status === "not_started") {
@@ -52,22 +38,31 @@ export function StudentModuleView({ module, trainingId }: StudentModuleViewProps
           {module.description ? (
             <p className="text-muted-foreground">{module.description}</p>
           ) : null}
+          <p className="text-sm text-muted-foreground">
+            Kerjakan quiz dan latihan modul ini untuk menyelesaikan modul dan
+            membuka modul berikutnya.
+          </p>
         </div>
 
-        {module.videoConferenceLink ? (
-          <Button
-            variant="outline"
-            render={
-              <a
-                href={module.videoConferenceLink}
-                target="_blank"
-                rel="noopener noreferrer"
-              />
-            }
-          >
-            <IconExternalLink className="size-4" />
-            Buka Video Conference
-          </Button>
+        {module.videoConferenceLink && module.videoConferenceScheduledAt ? (
+          <div className="space-y-2 text-right">
+            <p className="text-xs text-muted-foreground">
+              {formatVideoConferenceSchedule(module.videoConferenceScheduledAt)}
+            </p>
+            <Button
+              variant="outline"
+              render={
+                <a
+                  href={module.videoConferenceLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                />
+              }
+            >
+              <IconExternalLink className="size-4" />
+              Buka Video Conference
+            </Button>
+          </div>
         ) : null}
       </div>
 
@@ -118,16 +113,6 @@ export function StudentModuleView({ module, trainingId }: StudentModuleViewProps
           trainingId={trainingId}
         />
       </div>
-
-      {status !== "completed" ? (
-        <form action={formAction}>
-          <input type="hidden" name="moduleId" value={module.id} />
-          <input type="hidden" name="trainingId" value={trainingId} />
-          <Button type="submit" disabled={pending}>
-            {pending ? <Spinner className="size-4" /> : "Tandai Selesai"}
-          </Button>
-        </form>
-      ) : null}
     </div>
   );
 }

@@ -171,6 +171,40 @@ export const updateModuleProgressSchema = z.object({
   status: z.enum(["in_progress", "completed"]),
 });
 
+export const updateModuleVideoConferenceSchema = z
+  .object({
+    moduleId: z.uuid("ID modul tidak valid."),
+    trainingId: z.uuid("ID training tidak valid."),
+    videoConferenceLink: z.preprocess(
+      emptyToNull,
+      z.string().url("URL video conference tidak valid.").nullable(),
+    ),
+    videoConferenceScheduledAt: z.preprocess(
+      emptyToNull,
+      z.coerce.date({ message: "Jadwal tidak valid." }).nullable(),
+    ),
+  })
+  .superRefine((value, context) => {
+    const hasLink = Boolean(value.videoConferenceLink);
+    const hasSchedule = value.videoConferenceScheduledAt instanceof Date;
+
+    if (hasLink && !hasSchedule) {
+      context.addIssue({
+        code: "custom",
+        message: "Jadwal video conference wajib diisi.",
+        path: ["videoConferenceScheduledAt"],
+      });
+    }
+
+    if (!hasLink && hasSchedule) {
+      context.addIssue({
+        code: "custom",
+        message: "Link video conference wajib diisi.",
+        path: ["videoConferenceLink"],
+      });
+    }
+  });
+
 export type CreateModuleInput = z.infer<typeof createModuleSchema>;
 export type UpdateModuleInput = z.infer<typeof updateModuleSchema>;
 export type CreateModuleContentInput = z.infer<typeof createModuleContentSchema>;

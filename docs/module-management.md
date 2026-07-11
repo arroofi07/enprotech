@@ -61,10 +61,10 @@ Video conference disimpan di kolom `video_conference_link` pada tabel `modules`.
 ## Alur Student
 
 1. Buka `/student/trainings` → klik training
-2. Pilih modul dari daftar
+2. Pilih modul dari daftar (modul berikutnya terkunci sampai quiz + latihan modul sebelumnya disubmit)
 3. Akses materi (download dokumen / buka link di tab baru)
-4. **Tandai Selesai** setelah selesai mempelajari
-5. Progress modul tercermin di badge status dan progress training
+4. Kerjakan **Quiz** dan **Latihan** modul
+5. Modul otomatis selesai setelah keduanya disubmit; progress tercermin di badge status
 
 ## API
 

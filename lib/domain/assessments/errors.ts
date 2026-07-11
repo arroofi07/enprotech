@@ -14,6 +14,7 @@ export const AssessmentErrorCode = {
   PRETEST_NOT_ACTIVE: "PRETEST_NOT_ACTIVE",
   PRETEST_ALREADY_ATTEMPTED: "PRETEST_ALREADY_ATTEMPTED",
   POSTTEST_LOCKED: "POSTTEST_LOCKED",
+  MODULE_LOCKED: "MODULE_LOCKED",
   TRAINING_NOT_FOUND: "TRAINING_NOT_FOUND",
 } as const;
 
@@ -44,6 +45,8 @@ const ASSESSMENT_ERROR_MESSAGES: Record<AssessmentErrorCode, string> = {
     "Pre-test hanya dapat dikerjakan satu kali.",
   [AssessmentErrorCode.POSTTEST_LOCKED]:
     "Selesaikan semua modul terlebih dahulu sebelum mengerjakan post-test.",
+  [AssessmentErrorCode.MODULE_LOCKED]:
+    "Selesaikan modul sebelumnya terlebih dahulu.",
   [AssessmentErrorCode.TRAINING_NOT_FOUND]: "Training tidak ditemukan.",
 };
 

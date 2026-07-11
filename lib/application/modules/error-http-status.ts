@@ -7,6 +7,7 @@ export function moduleErrorHttpStatus(error: ModuleErrorCode): number {
     case "FORBIDDEN":
     case "NOT_ENROLLED":
     case "PRETEST_REQUIRED":
+    case "MODULE_LOCKED":
       return 403;
     case "TRAINING_NOT_FOUND":
     case "MODULE_NOT_FOUND":

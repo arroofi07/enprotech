@@ -84,6 +84,7 @@ describe("buildTrainingProgressSummary", () => {
     title: "Modul 1",
     order: 0,
     status: "not_started",
+    isLocked: false,
     quiz: buildAssessmentProgressItem({
       assessmentId: "quiz-1",
       bestScore: null,

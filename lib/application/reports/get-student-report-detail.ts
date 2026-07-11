@@ -30,8 +30,6 @@ async function buildAssessmentDetail(input: {
   studentId: string;
   assessment: AssessmentRecord;
   moduleTitle: string | null;
-  minQuizScore: number;
-  minLatihanScore: number;
   trainingPassingGrade: number;
 }): Promise<TrainingReportAssessmentDetail> {
   const attempts = await listSubmittedAttempts(
@@ -47,8 +45,6 @@ async function buildAssessmentDetail(input: {
   const passingGrade = resolvePassingGrade({
     type: input.assessment.type,
     assessmentPassingGrade: input.assessment.passingGrade,
-    minQuizScore: input.minQuizScore,
-    minLatihanScore: input.minLatihanScore,
     trainingPassingGrade: input.trainingPassingGrade,
   });
 
@@ -111,33 +107,18 @@ export async function getStudentReportDetail(
   const moduleTitleById = new Map(
     raw.modules.map((module) => [module.id, module.title]),
   );
-  const moduleConfigById = new Map(
-    raw.modules.map((module) => [
-      module.id,
-      {
-        minQuizScore: module.minQuizScore,
-        minLatihanScore: module.minLatihanScore,
-      },
-    ]),
-  );
 
   const assessments = await Promise.all(
-    assessmentRecords.map((assessment) => {
-      const moduleConfig = assessment.moduleId
-        ? moduleConfigById.get(assessment.moduleId)
-        : undefined;
-
-      return buildAssessmentDetail({
+    assessmentRecords.map((assessment) =>
+      buildAssessmentDetail({
         studentId,
         assessment,
         moduleTitle: assessment.moduleId
           ? (moduleTitleById.get(assessment.moduleId) ?? null)
           : null,
-        minQuizScore: moduleConfig?.minQuizScore ?? 0,
-        minLatihanScore: moduleConfig?.minLatihanScore ?? 0,
         trainingPassingGrade: training.passingGrade,
-      });
-    }),
+      }),
+    ),
   );
 
   return reportSuccess({

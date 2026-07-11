@@ -2,6 +2,8 @@ import { redirect } from "next/navigation";
 
 import { IconExternalLink } from "@tabler/icons-react";
 
+import { formatVideoConferenceSchedule } from "@/lib/domain/modules/format-video-conference-schedule";
+
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { StudentHeader } from "@/components/student/student-header";
 import { buttonVariants } from "@/components/ui/button";
@@ -46,7 +48,10 @@ export default async function StudentVideoConferencePage({
       });
       const modules =
         modulesResult.success && modulesResult.data.length > 0
-          ? modulesResult.data.filter((module) => module.videoConferenceLink)
+          ? modulesResult.data.filter(
+              (module) =>
+                module.videoConferenceLink && module.videoConferenceScheduledAt,
+            )
           : [];
 
       return { training, modules };
@@ -65,7 +70,7 @@ export default async function StudentVideoConferencePage({
         <div className="container max-w-4xl space-y-6 p-6 md:p-8">
           <AdminPageHeader
             title="Video Conference"
-            description="Link Google Meet atau Zoom untuk setiap modul training."
+            description="Jadwal video conference Google Meet atau Zoom per modul training."
           />
 
           <Card>
@@ -101,6 +106,11 @@ export default async function StudentVideoConferencePage({
                               >
                                 <div className="min-w-0">
                                   <p className="font-medium">{module.title}</p>
+                                  <p className="text-xs text-muted-foreground">
+                                    {formatVideoConferenceSchedule(
+                                      module.videoConferenceScheduledAt!,
+                                    )}
+                                  </p>
                                   <p className="truncate text-xs text-muted-foreground">
                                     {module.videoConferenceLink}
                                   </p>

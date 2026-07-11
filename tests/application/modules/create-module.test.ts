@@ -30,6 +30,7 @@ const moduleRecord = {
   description: null,
   thumbnail: null,
   videoConferenceLink: null,
+  videoConferenceScheduledAt: null,
   minQuizScore: 0,
   minLatihanScore: 0,
   minAttendance: 0,

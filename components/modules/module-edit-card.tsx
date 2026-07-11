@@ -23,7 +23,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { ButtonLink } from "@/components/ui/button-link";
 import {
   Collapsible,
@@ -97,17 +97,24 @@ export function ModuleEditCard({
             Urutan {module.order + 1} · {module.contents.length} konten
           </p>
         </div>
-        {module.videoConferenceLink ? (
-          <a
-            href={module.videoConferenceLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={buttonVariants({ variant: "outline", size: "xs" })}
+        {module.videoConferenceLink && module.videoConferenceScheduledAt ? (
+          <ButtonLink
+            variant="outline"
+            size="xs"
+            href={`/trainer/video-conference/${trainingId}`}
           >
             <IconExternalLink className="size-3.5" />
-            Meet/Zoom
-          </a>
-        ) : null}
+            Video Conference
+          </ButtonLink>
+        ) : (
+          <ButtonLink
+            variant="outline"
+            size="xs"
+            href={`/trainer/video-conference/${trainingId}`}
+          >
+            Atur Video Conference
+          </ButtonLink>
+        )}
       </div>
 
       <div className="flex flex-wrap gap-2">
@@ -165,70 +172,7 @@ export function ModuleEditCard({
               placeholder="Jelaskan target pembelajaran modul ini"
             />
           </Field>
-          <Field>
-            <FieldLabel htmlFor={`vc-${module.id}`}>
-              Link Video Conference
-            </FieldLabel>
-            <Input
-              id={`vc-${module.id}`}
-              name="videoConferenceLink"
-              type="url"
-              defaultValue={module.videoConferenceLink ?? ""}
-              placeholder="https://meet.google.com/..."
-            />
-          </Field>
         </FieldGroup>
-
-        <div className="space-y-3 rounded-lg border p-4">
-          <div>
-            <p className="text-sm font-medium">Syarat Lanjut Modul</p>
-            <p className="text-xs text-muted-foreground">
-              Tentukan nilai minimal agar peserta dapat lanjut ke modul
-              berikutnya.
-            </p>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-3">
-            <Field>
-              <FieldLabel htmlFor={`minQuiz-${module.id}`}>
-                Quiz Minimal (%)
-              </FieldLabel>
-              <Input
-                id={`minQuiz-${module.id}`}
-                name="minQuizScore"
-                type="number"
-                min={0}
-                max={100}
-                defaultValue={module.minQuizScore}
-              />
-            </Field>
-            <Field>
-              <FieldLabel htmlFor={`minLatihan-${module.id}`}>
-                Latihan Minimal (%)
-              </FieldLabel>
-              <Input
-                id={`minLatihan-${module.id}`}
-                name="minLatihanScore"
-                type="number"
-                min={0}
-                max={100}
-                defaultValue={module.minLatihanScore}
-              />
-            </Field>
-            <Field>
-              <FieldLabel htmlFor={`minAttendance-${module.id}`}>
-                Kehadiran (%)
-              </FieldLabel>
-              <Input
-                id={`minAttendance-${module.id}`}
-                name="minAttendance"
-                type="number"
-                min={0}
-                max={100}
-                defaultValue={module.minAttendance}
-              />
-            </Field>
-          </div>
-        </div>
 
         <div className="space-y-2">
           <FieldLabel>Upload Gambar Thumbnail</FieldLabel>

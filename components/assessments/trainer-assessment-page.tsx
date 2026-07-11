@@ -58,8 +58,6 @@ export async function TrainerAssessmentPage({
   const passingGrade = resolvePassingGrade({
     type: assessmentType,
     assessmentPassingGrade: assessmentResult.data.passingGrade,
-    minQuizScore: module.minQuizScore,
-    minLatihanScore: module.minLatihanScore,
     trainingPassingGrade,
   });
 

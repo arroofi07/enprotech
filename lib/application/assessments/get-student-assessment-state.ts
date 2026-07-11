@@ -24,6 +24,7 @@ import { isStudentEnrolledInTraining } from "@/lib/infrastructure/db/repositorie
 import { moduleAssessmentSchema } from "@/lib/validations/assessment-schemas";
 
 import { assertAssessmentStudent } from "./assert-access";
+import { canStudentAccessModule } from "../modules/check-module-access";
 import { buildAttemptQuestionSet } from "./attempt-questions";
 
 export type StudentAssessmentState = {
@@ -69,6 +70,15 @@ export async function getStudentAssessmentState(
     return assessmentFailure(AssessmentErrorCode.NOT_ENROLLED);
   }
 
+  const canAccess = await canStudentAccessModule(
+    actor!.id,
+    module.trainingId,
+    parsed.data.moduleId,
+  );
+  if (!canAccess) {
+    return assessmentFailure(AssessmentErrorCode.MODULE_LOCKED);
+  }
+
   const assessment = await findAssessmentByModuleAndType(
     parsed.data.moduleId,
     parsed.data.type,
@@ -88,8 +98,6 @@ export async function getStudentAssessmentState(
   const passingGrade = resolvePassingGrade({
     type: parsed.data.type,
     assessmentPassingGrade: assessment.passingGrade,
-    minQuizScore: module.minQuizScore,
-    minLatihanScore: module.minLatihanScore,
     trainingPassingGrade,
   });
 

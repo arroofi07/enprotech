@@ -50,9 +50,6 @@ export function ModuleCreateForm({
   trainingId,
   onSuccess,
 }: ModuleCreateFormProps) {
-  const [minQuizScore, setMinQuizScore] = useState("0");
-  const [minLatihanScore, setMinLatihanScore] = useState("0");
-  const [minAttendance, setMinAttendance] = useState("0");
   const [thumbnailUrl, setThumbnailUrl] = useState("");
   const [thumbnailName, setThumbnailName] = useState("");
   const [materialUrl, setMaterialUrl] = useState("");
@@ -106,52 +103,6 @@ export function ModuleCreateForm({
               placeholder="Jelaskan target pembelajaran modul ini"
             />
           </Field>
-        </ModuleFormSection>
-
-        <ModuleFormSection
-          title="Syarat Lanjut"
-          description="Tentukan syarat peserta untuk lanjut ke modul berikutnya."
-        >
-          <div className="grid gap-4 sm:grid-cols-3">
-            <Field>
-              <FieldLabel htmlFor="minQuizScore">Quiz Minimal (%)</FieldLabel>
-              <Input
-                id="minQuizScore"
-                name="minQuizScore"
-                type="number"
-                min={0}
-                max={100}
-                value={minQuizScore}
-                onChange={(event) => setMinQuizScore(event.target.value)}
-              />
-            </Field>
-            <Field>
-              <FieldLabel htmlFor="minLatihanScore">
-                Latihan Minimal (%)
-              </FieldLabel>
-              <Input
-                id="minLatihanScore"
-                name="minLatihanScore"
-                type="number"
-                min={0}
-                max={100}
-                value={minLatihanScore}
-                onChange={(event) => setMinLatihanScore(event.target.value)}
-              />
-            </Field>
-            <Field>
-              <FieldLabel htmlFor="minAttendance">Kehadiran (%)</FieldLabel>
-              <Input
-                id="minAttendance"
-                name="minAttendance"
-                type="number"
-                min={0}
-                max={100}
-                value={minAttendance}
-                onChange={(event) => setMinAttendance(event.target.value)}
-              />
-            </Field>
-          </div>
         </ModuleFormSection>
 
         <ModuleFormSection

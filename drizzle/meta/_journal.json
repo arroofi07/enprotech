@@ -29,6 +29,13 @@
       "when": 1783572000000,
       "tag": "0004_assessment_display_settings",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1783575000000,
+      "tag": "0005_video_conference_schedule",
+      "breakpoints": true
     }
   ]
 }

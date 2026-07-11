@@ -5,13 +5,12 @@ import { IconExternalLink, IconPhoto } from "@tabler/icons-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/data-table";
-import { formatModuleRequirement } from "@/lib/domain/modules/format-requirement";
+import { formatVideoConferenceSchedule } from "@/lib/domain/modules/format-video-conference-schedule";
 import type { ModuleWithContents } from "@/lib/infrastructure/db/repositories/module-repository";
 
 type ModulesTableProps = {
   modules: ModuleWithContents[];
   onManage: (module: ModuleWithContents) => void;
-  showProgressRequirements?: boolean;
 };
 
 function summarizeContents(module: ModuleWithContents) {
@@ -34,67 +33,22 @@ function formatUpdatedAt(date: Date): string {
   }).format(date);
 }
 
-export function ModulesTable({
-  modules,
-  onManage,
-  showProgressRequirements = false,
-}: ModulesTableProps) {
-  const progressColumns = showProgressRequirements
-    ? [
-        {
-          id: "moduleName",
-          header: "Syarat Lanjut",
-          className: "max-w-xs whitespace-normal",
-          cell: (module: ModuleWithContents) => (
-            <div>
-              <p className="font-medium">{module.title}</p>
-              {module.description ? (
-                <p className="mt-0.5 line-clamp-1 text-xs text-muted-foreground">
-                  {module.description}
-                </p>
-              ) : null}
-            </div>
-          ),
-        },
-        {
-          id: "minQuizScore",
-          header: "Quiz Minimal",
-          cell: (module: ModuleWithContents) => (
-            <span className="text-sm">
-              {formatModuleRequirement(module.minQuizScore)}
-            </span>
-          ),
-        },
-        {
-          id: "minLatihanScore",
-          header: "Latihan Minimal",
-          cell: (module: ModuleWithContents) => (
-            <span className="text-sm">
-              {formatModuleRequirement(module.minLatihanScore)}
-            </span>
-          ),
-        },
-        {
-          id: "minAttendance",
-          header: "Kehadiran",
-          cell: (module: ModuleWithContents) => (
-            <span className="text-sm">
-              {formatModuleRequirement(module.minAttendance)}
-            </span>
-          ),
-        },
-      ]
-    : [];
-
-  const defaultColumns = showProgressRequirements
-    ? []
-    : [
+export function ModulesTable({ modules, onManage }: ModulesTableProps) {
+  return (
+    <DataTable
+      data={modules}
+      getRowKey={(module) => module.id}
+      emptyState={{
+        message: "Tidak ada modul yang cocok dengan filter.",
+        icon: IconPhoto,
+      }}
+      columns={[
         {
           id: "order",
           header: "Urutan",
           headerClassName: "w-14",
           className: "w-14",
-          cell: (module: ModuleWithContents) => (
+          cell: (module) => (
             <span className="inline-flex size-8 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
               {module.order + 1}
             </span>
@@ -105,7 +59,7 @@ export function ModulesTable({
           header: "Thumb",
           headerClassName: "w-20",
           className: "w-20",
-          cell: (module: ModuleWithContents) =>
+          cell: (module) =>
             module.thumbnail ? (
               <div className="size-12 overflow-hidden rounded-md border bg-muted">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -125,7 +79,7 @@ export function ModulesTable({
           id: "title",
           header: "Nama Modul",
           className: "max-w-xs whitespace-normal",
-          cell: (module: ModuleWithContents) => (
+          cell: (module) => (
             <div>
               <p className="font-medium">{module.title}</p>
               {module.description ? (
@@ -144,7 +98,7 @@ export function ModulesTable({
           id: "contents",
           header: "Konten",
           className: "whitespace-normal",
-          cell: (module: ModuleWithContents) => {
+          cell: (module) => {
             const summary = summarizeContents(module);
 
             return (
@@ -167,22 +121,29 @@ export function ModulesTable({
         {
           id: "videoConference",
           header: "Video Conf.",
-          cell: (module: ModuleWithContents) =>
-            module.videoConferenceLink ? (
-              <Button
-                variant="outline"
-                size="xs"
-                render={
-                  <a
-                    href={module.videoConferenceLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  />
-                }
-              >
-                <IconExternalLink className="size-3.5" />
-                Meet/Zoom
-              </Button>
+          cell: (module) =>
+            module.videoConferenceLink && module.videoConferenceScheduledAt ? (
+              <div className="space-y-1">
+                <Button
+                  variant="outline"
+                  size="xs"
+                  render={
+                    <a
+                      href={module.videoConferenceLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    />
+                  }
+                >
+                  <IconExternalLink className="size-3.5" />
+                  Meet/Zoom
+                </Button>
+                <p className="text-xs text-muted-foreground">
+                  {formatVideoConferenceSchedule(
+                    module.videoConferenceScheduledAt,
+                  )}
+                </p>
+              </div>
             ) : (
               <span className="text-xs text-muted-foreground">—</span>
             ),
@@ -190,25 +151,12 @@ export function ModulesTable({
         {
           id: "updatedAt",
           header: "Diperbarui",
-          cell: (module: ModuleWithContents) => (
+          cell: (module) => (
             <span className="text-sm text-muted-foreground">
               {formatUpdatedAt(module.updatedAt)}
             </span>
           ),
         },
-      ];
-
-  return (
-    <DataTable
-      data={modules}
-      getRowKey={(module) => module.id}
-      emptyState={{
-        message: "Tidak ada modul yang cocok dengan filter.",
-        icon: IconPhoto,
-      }}
-      columns={[
-        ...progressColumns,
-        ...defaultColumns,
         {
           id: "actions",
           header: "Aksi",

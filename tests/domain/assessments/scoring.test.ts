@@ -147,23 +147,9 @@ describe("resolvePassingGrade", () => {
       resolvePassingGrade({
         type: "quiz",
         assessmentPassingGrade: 85,
-        minQuizScore: 60,
-        minLatihanScore: 50,
         trainingPassingGrade: 70,
       }),
     ).toBe(85);
-  });
-
-  it("uses module minimum for quiz", () => {
-    expect(
-      resolvePassingGrade({
-        type: "quiz",
-        assessmentPassingGrade: null,
-        minQuizScore: 60,
-        minLatihanScore: 50,
-        trainingPassingGrade: 70,
-      }),
-    ).toBe(60);
   });
 
   it("falls back to training passing grade", () => {
@@ -171,8 +157,6 @@ describe("resolvePassingGrade", () => {
       resolvePassingGrade({
         type: "latihan",
         assessmentPassingGrade: null,
-        minQuizScore: 0,
-        minLatihanScore: 0,
         trainingPassingGrade: 70,
       }),
     ).toBe(70);

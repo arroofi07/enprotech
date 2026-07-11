@@ -63,7 +63,7 @@ export default async function StudentTrainingModulesPage({
           <TrainingProgressModules
             trainingId={id}
             modules={progress.modules}
-            locked={modulesLocked}
+            preTestLocked={modulesLocked}
           />
 
           <div className="space-y-4">
@@ -87,7 +87,7 @@ export default async function StudentTrainingModulesPage({
                     key={module.id}
                     module={module}
                     trainingId={id}
-                    locked={modulesLocked}
+                    preTestLocked={modulesLocked}
                     progressItem={progress.modules.find(
                       (item) => item.id === module.id,
                     )}

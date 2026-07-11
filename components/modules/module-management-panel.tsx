@@ -7,7 +7,6 @@ import { ModuleCreateForm } from "@/components/modules/module-create-form";
 import { ModuleEditCard } from "@/components/modules/module-edit-card";
 import { ModulesFilters } from "@/components/modules/modules-filters";
 import { ModulesPagination } from "@/components/modules/modules-pagination";
-import { ModulesProgressRequirements } from "@/components/modules/modules-progress-requirements";
 import { ModuleSortableList } from "@/components/modules/module-sortable-list";
 import { ModulesTable } from "@/components/modules/modules-table";
 import { Button } from "@/components/ui/button";
@@ -139,11 +138,6 @@ export function ModuleManagementPanel({
       </div>
 
       <ModulesFilters search={search} />
-
-      <ModulesProgressRequirements
-        modules={modules}
-        onManage={setSelectedModule}
-      />
 
       <div className="flex items-center justify-between">
         <p className="text-sm font-medium">Daftar Modul</p>
