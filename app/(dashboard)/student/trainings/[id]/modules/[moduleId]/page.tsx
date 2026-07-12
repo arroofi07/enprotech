@@ -45,7 +45,11 @@ export default async function StudentModuleDetailPage({
   const now = new Date();
   const scheduledAt = moduleResult.data.videoConferenceScheduledAt;
   const quizUnlocked = getQuizScheduleState(scheduledAt, now) === "open";
-  const videoConferenceStarted = isVideoConferenceStarted(scheduledAt, now);
+  const videoConferenceStarted = isVideoConferenceStarted(
+    scheduledAt,
+    now,
+    moduleResult.data.videoConferenceEndedAt,
+  );
   // Latihan opens once the quiz is completed. When a module has no quiz to do
   // (no quiz assessment), there is nothing to gate on, so it stays open. Server
   // enforcement in getStudentAssessmentState is authoritative regardless.

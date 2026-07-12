@@ -5,16 +5,17 @@ import {
   moduleSuccess,
   type ModuleResult,
 } from "@/lib/domain/modules/errors";
+import { getVideoConferenceState } from "@/lib/domain/modules/video-conference-access";
 import {
   findModuleById,
   updateModule as updateModuleInRepo,
   type ModuleRecord,
 } from "@/lib/infrastructure/db/repositories/module-repository";
-import { updateModuleVideoConferenceSchema } from "@/lib/validations/module-schemas";
+import { endModuleVideoConferenceSchema } from "@/lib/validations/module-schemas";
 
 import { assertModuleTrainerOrAdmin } from "./assert-access";
 
-export async function updateModuleVideoConference(
+export async function endModuleVideoConference(
   actor: SessionUser | null,
   input: unknown,
 ): Promise<ModuleResult<ModuleRecord>> {
@@ -23,7 +24,7 @@ export async function updateModuleVideoConference(
     return forbidden;
   }
 
-  const parsed = updateModuleVideoConferenceSchema.safeParse(input);
+  const parsed = endModuleVideoConferenceSchema.safeParse(input);
   if (!parsed.success) {
     return moduleFailure(ModuleErrorCode.VALIDATION_ERROR);
   }
@@ -33,10 +34,22 @@ export async function updateModuleVideoConference(
     return moduleFailure(ModuleErrorCode.MODULE_NOT_FOUND);
   }
 
+  const state = getVideoConferenceState(
+    existing.videoConferenceScheduledAt,
+    existing.videoConferenceEndedAt,
+    new Date(),
+  );
+
+  if (state !== "live") {
+    return {
+      success: false,
+      error: ModuleErrorCode.VALIDATION_ERROR,
+      message: "Video conference hanya bisa diakhiri saat sedang berlangsung.",
+    };
+  }
+
   const updated = await updateModuleInRepo(parsed.data.moduleId, {
-    videoConferenceLink: parsed.data.videoConferenceLink,
-    videoConferenceScheduledAt: parsed.data.videoConferenceScheduledAt,
-    videoConferenceEndedAt: null,
+    videoConferenceEndedAt: new Date(),
   });
 
   if (!updated) {

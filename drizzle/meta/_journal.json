@@ -36,6 +36,13 @@
       "when": 1783575000000,
       "tag": "0005_video_conference_schedule",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1783578000000,
+      "tag": "0006_video_conference_ended_at",
+      "breakpoints": true
     }
   ]
 }

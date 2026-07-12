@@ -21,6 +21,9 @@ export const modules = pgTable("modules", {
   videoConferenceScheduledAt: timestamp("video_conference_scheduled_at", {
     withTimezone: true,
   }),
+  videoConferenceEndedAt: timestamp("video_conference_ended_at", {
+    withTimezone: true,
+  }),
   minQuizScore: integer("min_quiz_score").notNull().default(0),
   minLatihanScore: integer("min_latihan_score").notNull().default(0),
   minAttendance: integer("min_attendance").notNull().default(0),

@@ -9,11 +9,13 @@ import {
   IconListCheck,
   IconLock,
   IconPencil,
+  IconPlayerStop,
   IconVideo,
 } from "@tabler/icons-react";
 
 import { StudentModuleContentList } from "@/components/modules/student-module-content-list";
 import { ModuleProgressBadge } from "@/components/modules/module-progress-badge";
+import { VideoConferenceStatusBadge } from "@/components/video-conference/video-conference-status-badge";
 import {
   AssessmentProgressBadge,
   formatAssessmentScore,
@@ -23,6 +25,7 @@ import { ButtonLink } from "@/components/ui/button-link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { formatVideoConferenceSchedule } from "@/lib/domain/modules/format-video-conference-schedule";
+import { getVideoConferenceState } from "@/lib/domain/modules/video-conference-access";
 import type { ModuleProgressItem } from "@/lib/domain/trainings/progress-types";
 import type { StudentModuleDetail } from "@/lib/infrastructure/db/repositories/module-repository";
 import { cn } from "@/lib/utils";
@@ -111,6 +114,11 @@ export function StudentModuleView({
   const quizLockReason = module.videoConferenceScheduledAt
     ? `Terbuka pada ${formatVideoConferenceSchedule(module.videoConferenceScheduledAt)}.`
     : "Menunggu jadwal video conference dari trainer.";
+  const videoConferenceState = getVideoConferenceState(
+    module.videoConferenceScheduledAt,
+    module.videoConferenceEndedAt,
+    new Date(),
+  );
 
   useEffect(() => {
     if (status === "not_started") {
@@ -303,9 +311,12 @@ export function StudentModuleView({
           {module.videoConferenceLink && module.videoConferenceScheduledAt ? (
             <Card className="border-primary/20 bg-primary/5">
               <CardHeader className="pb-3">
-                <div className="flex items-center gap-2">
-                  <IconVideo className="size-4 text-primary" />
-                  <CardTitle className="text-base">Video Conference</CardTitle>
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <IconVideo className="size-4 text-primary" />
+                    <CardTitle className="text-base">Video Conference</CardTitle>
+                  </div>
+                  <VideoConferenceStatusBadge state={videoConferenceState} />
                 </div>
               </CardHeader>
               <CardContent className="space-y-3">
@@ -323,6 +334,17 @@ export function StudentModuleView({
                     <IconExternalLink className="size-4" />
                     Buka Meeting
                   </ButtonLink>
+                ) : videoConferenceState === "ended" ? (
+                  <>
+                    <Button className="w-full" variant="outline" disabled>
+                      <IconPlayerStop className="size-4" />
+                      Video Conference Selesai
+                    </Button>
+                    <p className="text-xs text-muted-foreground">
+                      Meeting telah diakhiri oleh trainer. Quiz modul tetap
+                      tersedia.
+                    </p>
+                  </>
                 ) : (
                   <>
                     <Button className="w-full" variant="outline" disabled>

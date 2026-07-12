@@ -1,9 +1,14 @@
 import { redirect } from "next/navigation";
 
-import { IconClock, IconExternalLink } from "@tabler/icons-react";
+import { IconClock, IconExternalLink, IconPlayerStop } from "@tabler/icons-react";
 
 import { formatVideoConferenceSchedule } from "@/lib/domain/modules/format-video-conference-schedule";
-import { isVideoConferenceStarted } from "@/lib/domain/modules/video-conference-access";
+import {
+  getVideoConferenceState,
+  isVideoConferenceStarted,
+} from "@/lib/domain/modules/video-conference-access";
+
+import { VideoConferenceStatusBadge } from "@/components/video-conference/video-conference-status-badge";
 
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { StudentHeader } from "@/components/student/student-header";
@@ -103,9 +108,15 @@ export default async function StudentVideoConferencePage({
                           <h3 className="font-semibold">{training.title}</h3>
                           <ul className="space-y-2">
                             {modules.map((module) => {
+                              const state = getVideoConferenceState(
+                                module.videoConferenceScheduledAt,
+                                module.videoConferenceEndedAt,
+                                now,
+                              );
                               const started = isVideoConferenceStarted(
                                 module.videoConferenceScheduledAt,
                                 now,
+                                module.videoConferenceEndedAt,
                               );
 
                               return (
@@ -113,8 +124,13 @@ export default async function StudentVideoConferencePage({
                                   key={module.id}
                                   className="flex items-center justify-between gap-3 rounded-lg border p-3"
                                 >
-                                  <div className="min-w-0">
-                                    <p className="font-medium">{module.title}</p>
+                                  <div className="min-w-0 space-y-1">
+                                    <div className="flex flex-wrap items-center gap-2">
+                                      <p className="font-medium">{module.title}</p>
+                                      {state !== "not_scheduled" ? (
+                                        <VideoConferenceStatusBadge state={state} />
+                                      ) : null}
+                                    </div>
                                     <p className="text-xs text-muted-foreground">
                                       {formatVideoConferenceSchedule(
                                         module.videoConferenceScheduledAt!,
@@ -123,6 +139,11 @@ export default async function StudentVideoConferencePage({
                                     {started ? (
                                       <p className="truncate text-xs text-muted-foreground">
                                         {module.videoConferenceLink}
+                                      </p>
+                                    ) : state === "ended" ? (
+                                      <p className="text-xs text-muted-foreground">
+                                        Video conference telah diakhiri oleh
+                                        trainer.
                                       </p>
                                     ) : (
                                       <p className="text-xs text-amber-600 dark:text-amber-500">
@@ -143,6 +164,20 @@ export default async function StudentVideoConferencePage({
                                       <IconExternalLink className="size-3.5" />
                                       Buka
                                     </a>
+                                  ) : state === "ended" ? (
+                                    <span
+                                      aria-disabled="true"
+                                      className={cn(
+                                        buttonVariants({
+                                          variant: "outline",
+                                          size: "xs",
+                                        }),
+                                        "pointer-events-none opacity-60",
+                                      )}
+                                    >
+                                      <IconPlayerStop className="size-3.5" />
+                                      Selesai
+                                    </span>
                                   ) : (
                                     <span
                                       aria-disabled="true"

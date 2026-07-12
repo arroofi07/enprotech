@@ -20,6 +20,7 @@ export type ModuleRecord = {
   thumbnail: string | null;
   videoConferenceLink: string | null;
   videoConferenceScheduledAt: Date | null;
+  videoConferenceEndedAt: Date | null;
   minQuizScore: number;
   minLatihanScore: number;
   minAttendance: number;
@@ -63,6 +64,7 @@ const moduleColumns = {
   thumbnail: modules.thumbnail,
   videoConferenceLink: modules.videoConferenceLink,
   videoConferenceScheduledAt: modules.videoConferenceScheduledAt,
+  videoConferenceEndedAt: modules.videoConferenceEndedAt,
   minQuizScore: modules.minQuizScore,
   minLatihanScore: modules.minLatihanScore,
   minAttendance: modules.minAttendance,
@@ -91,6 +93,7 @@ function mapModule(row: typeof modules.$inferSelect): ModuleRecord {
     thumbnail: row.thumbnail,
     videoConferenceLink: row.videoConferenceLink,
     videoConferenceScheduledAt: row.videoConferenceScheduledAt,
+    videoConferenceEndedAt: row.videoConferenceEndedAt,
     minQuizScore: row.minQuizScore,
     minLatihanScore: row.minLatihanScore,
     minAttendance: row.minAttendance,
@@ -293,6 +296,7 @@ export async function updateModule(
     thumbnail?: string | null;
     videoConferenceLink?: string | null;
     videoConferenceScheduledAt?: Date | null;
+    videoConferenceEndedAt?: Date | null;
     minQuizScore?: number;
     minLatihanScore?: number;
     minAttendance?: number;

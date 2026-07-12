@@ -205,6 +205,11 @@ export const updateModuleVideoConferenceSchema = z
     }
   });
 
+export const endModuleVideoConferenceSchema = z.object({
+  moduleId: z.uuid("ID modul tidak valid."),
+  trainingId: z.uuid("ID training tidak valid."),
+});
+
 export type CreateModuleInput = z.infer<typeof createModuleSchema>;
 export type UpdateModuleInput = z.infer<typeof updateModuleSchema>;
 export type CreateModuleContentInput = z.infer<typeof createModuleContentSchema>;

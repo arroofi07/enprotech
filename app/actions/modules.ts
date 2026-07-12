@@ -11,6 +11,7 @@ import { reorderModuleContents } from "@/lib/application/modules/reorder-module-
 import { reorderModules } from "@/lib/application/modules/reorder-modules";
 import { updateModule } from "@/lib/application/modules/update-module";
 import { updateModuleVideoConference } from "@/lib/application/modules/update-module-video-conference";
+import { endModuleVideoConference } from "@/lib/application/modules/end-module-video-conference";
 import { updateModuleContent } from "@/lib/application/modules/update-module-content";
 import { updateStudentModuleProgress } from "@/lib/application/modules/update-student-module-progress";
 import { ModuleErrorCode } from "@/lib/domain/modules/errors";
@@ -296,6 +297,36 @@ export async function updateModuleVideoConferenceAction(
     message: linkRaw
       ? "Jadwal video conference berhasil disimpan."
       : "Jadwal video conference berhasil dihapus.",
+    moduleId,
+    trainingId,
+  };
+}
+
+export async function endModuleVideoConferenceAction(
+  _prevState: ModuleActionState,
+  formData: FormData,
+): Promise<ModuleActionState> {
+  const actor = await getCurrentUser();
+  const moduleId = String(formData.get("moduleId") ?? "");
+  const trainingId = String(formData.get("trainingId") ?? "");
+
+  const result = await endModuleVideoConference(actor, {
+    moduleId,
+    trainingId,
+  });
+
+  if (!result.success) {
+    return { error: result.error, message: result.message, success: false };
+  }
+
+  revalidateModulePaths(trainingId, moduleId);
+  revalidatePath("/trainer/video-conference");
+  revalidatePath(`/trainer/video-conference/${trainingId}`);
+  revalidatePath("/student/video-conference");
+
+  return {
+    success: true,
+    message: "Video conference berhasil diakhiri.",
     moduleId,
     trainingId,
   };
