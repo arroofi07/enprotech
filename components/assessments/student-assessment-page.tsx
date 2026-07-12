@@ -51,7 +51,7 @@ export async function StudentAssessmentPage({
           title={typeLabel}
           breadcrumbs={[
             { label: "Training Saya", href: "/student/trainings" },
-            { label: "Modul", href: `/student/trainings/${id}` },
+            { label: "Modul", href: "/student/modules" },
             { label: typeLabel },
           ]}
         />
@@ -85,7 +85,7 @@ export async function StudentAssessmentPage({
           { label: "Training Saya", href: "/student/trainings" },
           {
             label: "Modul",
-            href: `/student/trainings/${id}`,
+            href: "/student/modules",
           },
           {
             label: state.module.title,

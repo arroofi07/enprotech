@@ -33,7 +33,7 @@ export async function StudentAssessmentHubPage({
         <div className="container max-w-3xl space-y-6 p-6 md:p-8">
           <AdminPageHeader
             title={typeLabel}
-            description={`Kerjakan ${typeLabel.toLowerCase()} dari halaman modul training Anda.`}
+            description={`Kerjakan ${typeLabel.toLowerCase()} dari halaman modul pembelajaran Anda.`}
           />
           <Card>
             <CardContent className="space-y-4 p-6">
@@ -41,7 +41,7 @@ export async function StudentAssessmentHubPage({
                 Buka modul pembelajaran, lalu pilih tombol &quot;Kerjakan{" "}
                 {typeLabel}&quot; pada modul yang ingin Anda kerjakan.
               </p>
-              <ButtonLink href="/student/trainings">Buka Training Saya</ButtonLink>
+              <ButtonLink href="/student/modules">Buka Daftar Modul</ButtonLink>
             </CardContent>
           </Card>
         </div>

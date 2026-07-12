@@ -1,12 +1,14 @@
 import { redirect } from "next/navigation";
 
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
+import { StudentModuleCard } from "@/components/modules/student-module-card";
 import { StudentHeader } from "@/components/student/student-header";
-import { StudentTrainingCard } from "@/components/trainings/student-training-card";
 import { ButtonLink } from "@/components/ui/button-link";
 import { Card, CardContent } from "@/components/ui/card";
 import { ListPagination } from "@/components/ui/list-pagination";
 import { getCurrentUser } from "@/lib/application/auth/get-session";
+import { listStudentModules } from "@/lib/application/modules/list-student-modules";
+import { getStudentTrainingFlowState } from "@/lib/application/training-flow/get-student-training-flow-state";
 import { listEnrolledTrainings } from "@/lib/application/trainings/list-enrolled-trainings";
 
 const PAGE_SIZE = 10;
@@ -37,6 +39,27 @@ export default async function StudentModulesPage({
 
   const { items: trainings, total, totalPages } = result.data;
 
+  const modulesByTraining = await Promise.all(
+    trainings.map(async (training) => {
+      const [modulesResult, flow] = await Promise.all([
+        listStudentModules(user, { trainingId: training.id }),
+        getStudentTrainingFlowState(user.id, training.id),
+      ]);
+
+      return {
+        training,
+        modules: modulesResult.success ? modulesResult.data : [],
+        preTestLocked: !(flow?.canAccessModules ?? false),
+      };
+    }),
+  );
+
+  const items = modulesByTraining.filter((entry) => entry.modules.length > 0);
+  const totalModules = items.reduce(
+    (sum, entry) => sum + entry.modules.length,
+    0,
+  );
+
   return (
     <>
       <StudentHeader title="Modul" breadcrumbs={[{ label: "Modul" }]} />
@@ -44,7 +67,7 @@ export default async function StudentModulesPage({
         <div className="container max-w-7xl space-y-6 p-6 md:p-8">
           <AdminPageHeader
             title="Modul Pembelajaran"
-            description="Pilih training untuk mengakses modul dan materi pembelajaran."
+            description="Pilih modul dari daftar untuk membuka materi pembelajaran."
             actions={
               <ButtonLink variant="outline" href="/student/dashboard">
                 Kembali ke Dashboard
@@ -59,22 +82,41 @@ export default async function StudentModulesPage({
                   <p className="text-sm text-muted-foreground">
                     Menampilkan{" "}
                     <span className="font-medium text-foreground">
-                      {trainings.length}
+                      {totalModules}
                     </span>{" "}
-                    dari{" "}
+                    modul dari{" "}
                     <span className="font-medium text-foreground">{total}</span>{" "}
                     training
                   </p>
                 </div>
 
-                {trainings.length === 0 ? (
+                {items.length === 0 ? (
                   <p className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">
-                    Anda belum terdaftar di training manapun.
+                    Belum ada modul tersedia untuk training yang Anda ikuti.
                   </p>
                 ) : (
-                  <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-                    {trainings.map((training) => (
-                      <StudentTrainingCard key={training.id} training={training} />
+                  <div className="space-y-8">
+                    {items.map(({ training, modules, preTestLocked }) => (
+                      <section key={training.id} className="space-y-4">
+                        <div>
+                          <h3 className="text-base font-semibold">
+                            {training.title}
+                          </h3>
+                          <p className="text-sm text-muted-foreground">
+                            {modules.length} modul tersedia
+                          </p>
+                        </div>
+                        <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                          {modules.map((module) => (
+                            <StudentModuleCard
+                              key={module.id}
+                              module={module}
+                              trainingId={training.id}
+                              preTestLocked={preTestLocked}
+                            />
+                          ))}
+                        </div>
+                      </section>
                     ))}
                   </div>
                 )}

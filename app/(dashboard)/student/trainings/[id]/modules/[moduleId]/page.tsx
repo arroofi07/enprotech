@@ -39,7 +39,7 @@ export default async function StudentModuleDetailPage({
           { label: "Training Saya", href: "/student/trainings" },
           {
             label: "Modul",
-            href: `/student/trainings/${id}`,
+            href: "/student/modules",
           },
           { label: result.data.title },
         ]}
@@ -50,8 +50,8 @@ export default async function StudentModuleDetailPage({
             title={result.data.title}
             description="Pelajari materi dan tandai modul selesai setelah selesai mempelajari."
             actions={
-              <ButtonLink variant="outline" href={`/student/trainings/${id}`}>
-                Daftar Modul
+              <ButtonLink variant="outline" href="/student/modules">
+                Kembali ke Daftar Modul
               </ButtonLink>
             }
           />
