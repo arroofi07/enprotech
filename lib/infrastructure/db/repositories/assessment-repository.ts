@@ -56,6 +56,7 @@ export type ModuleContext = {
   title: string;
   minQuizScore: number;
   minLatihanScore: number;
+  videoConferenceScheduledAt: Date | null;
 };
 
 const assessmentColumns = {
@@ -146,6 +147,7 @@ export async function findModuleContextById(
       title: modules.title,
       minQuizScore: modules.minQuizScore,
       minLatihanScore: modules.minLatihanScore,
+      videoConferenceScheduledAt: modules.videoConferenceScheduledAt,
     })
     .from(modules)
     .where(eq(modules.id, moduleId))

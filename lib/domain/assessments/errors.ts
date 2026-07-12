@@ -16,6 +16,9 @@ export const AssessmentErrorCode = {
   PRETEST_ALREADY_ATTEMPTED: "PRETEST_ALREADY_ATTEMPTED",
   POSTTEST_LOCKED: "POSTTEST_LOCKED",
   MODULE_LOCKED: "MODULE_LOCKED",
+  QUIZ_NOT_SCHEDULED: "QUIZ_NOT_SCHEDULED",
+  QUIZ_NOT_STARTED: "QUIZ_NOT_STARTED",
+  LATIHAN_LOCKED: "LATIHAN_LOCKED",
   TRAINING_NOT_FOUND: "TRAINING_NOT_FOUND",
 } as const;
 
@@ -50,6 +53,12 @@ const ASSESSMENT_ERROR_MESSAGES: Record<AssessmentErrorCode, string> = {
     "Selesaikan semua modul terlebih dahulu sebelum mengerjakan post-test.",
   [AssessmentErrorCode.MODULE_LOCKED]:
     "Selesaikan modul sebelumnya terlebih dahulu.",
+  [AssessmentErrorCode.QUIZ_NOT_SCHEDULED]:
+    "Quiz belum dapat diakses. Trainer belum menetapkan jadwal video conference untuk modul ini.",
+  [AssessmentErrorCode.QUIZ_NOT_STARTED]:
+    "Quiz baru dapat diakses saat jadwal video conference dimulai.",
+  [AssessmentErrorCode.LATIHAN_LOCKED]:
+    "Selesaikan quiz modul ini terlebih dahulu sebelum mengerjakan latihan.",
   [AssessmentErrorCode.TRAINING_NOT_FOUND]: "Training tidak ditemukan.",
 };
 

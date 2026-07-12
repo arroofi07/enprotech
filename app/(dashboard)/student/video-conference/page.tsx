@@ -1,8 +1,9 @@
 import { redirect } from "next/navigation";
 
-import { IconExternalLink } from "@tabler/icons-react";
+import { IconClock, IconExternalLink } from "@tabler/icons-react";
 
 import { formatVideoConferenceSchedule } from "@/lib/domain/modules/format-video-conference-schedule";
+import { isVideoConferenceStarted } from "@/lib/domain/modules/video-conference-access";
 
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { StudentHeader } from "@/components/student/student-header";
@@ -12,6 +13,7 @@ import { ListPagination } from "@/components/ui/list-pagination";
 import { getCurrentUser } from "@/lib/application/auth/get-session";
 import { listStudentModules } from "@/lib/application/modules/list-student-modules";
 import { listEnrolledTrainings } from "@/lib/application/trainings/list-enrolled-trainings";
+import { cn } from "@/lib/utils";
 
 const PAGE_SIZE = 10;
 
@@ -40,6 +42,7 @@ export default async function StudentVideoConferencePage({
   }
 
   const { items: trainings, total, totalPages } = trainingsResult.data;
+  const now = new Date();
 
   const conferences = await Promise.all(
     trainings.map(async (training) => {
@@ -99,36 +102,65 @@ export default async function StudentVideoConferencePage({
                         <CardContent className="space-y-3 p-6">
                           <h3 className="font-semibold">{training.title}</h3>
                           <ul className="space-y-2">
-                            {modules.map((module) => (
-                              <li
-                                key={module.id}
-                                className="flex items-center justify-between gap-3 rounded-lg border p-3"
-                              >
-                                <div className="min-w-0">
-                                  <p className="font-medium">{module.title}</p>
-                                  <p className="text-xs text-muted-foreground">
-                                    {formatVideoConferenceSchedule(
-                                      module.videoConferenceScheduledAt!,
-                                    )}
-                                  </p>
-                                  <p className="truncate text-xs text-muted-foreground">
-                                    {module.videoConferenceLink}
-                                  </p>
-                                </div>
-                                <a
-                                  href={module.videoConferenceLink!}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className={buttonVariants({
-                                    variant: "outline",
-                                    size: "xs",
-                                  })}
+                            {modules.map((module) => {
+                              const started = isVideoConferenceStarted(
+                                module.videoConferenceScheduledAt,
+                                now,
+                              );
+
+                              return (
+                                <li
+                                  key={module.id}
+                                  className="flex items-center justify-between gap-3 rounded-lg border p-3"
                                 >
-                                  <IconExternalLink className="size-3.5" />
-                                  Buka
-                                </a>
-                              </li>
-                            ))}
+                                  <div className="min-w-0">
+                                    <p className="font-medium">{module.title}</p>
+                                    <p className="text-xs text-muted-foreground">
+                                      {formatVideoConferenceSchedule(
+                                        module.videoConferenceScheduledAt!,
+                                      )}
+                                    </p>
+                                    {started ? (
+                                      <p className="truncate text-xs text-muted-foreground">
+                                        {module.videoConferenceLink}
+                                      </p>
+                                    ) : (
+                                      <p className="text-xs text-amber-600 dark:text-amber-500">
+                                        Link aktif saat jadwal dimulai.
+                                      </p>
+                                    )}
+                                  </div>
+                                  {started ? (
+                                    <a
+                                      href={module.videoConferenceLink!}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className={buttonVariants({
+                                        variant: "outline",
+                                        size: "xs",
+                                      })}
+                                    >
+                                      <IconExternalLink className="size-3.5" />
+                                      Buka
+                                    </a>
+                                  ) : (
+                                    <span
+                                      aria-disabled="true"
+                                      className={cn(
+                                        buttonVariants({
+                                          variant: "outline",
+                                          size: "xs",
+                                        }),
+                                        "pointer-events-none opacity-60",
+                                      )}
+                                    >
+                                      <IconClock className="size-3.5" />
+                                      Belum dimulai
+                                    </span>
+                                  )}
+                                </li>
+                              );
+                            })}
                           </ul>
                         </CardContent>
                       </Card>

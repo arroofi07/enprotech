@@ -4,8 +4,10 @@ import { useEffect } from "react";
 import {
   IconBook,
   IconCheck,
+  IconClock,
   IconExternalLink,
   IconListCheck,
+  IconLock,
   IconPencil,
   IconVideo,
 } from "@tabler/icons-react";
@@ -16,6 +18,7 @@ import {
   AssessmentProgressBadge,
   formatAssessmentScore,
 } from "@/components/progress/assessment-progress-badge";
+import { Button } from "@/components/ui/button";
 import { ButtonLink } from "@/components/ui/button-link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -31,6 +34,12 @@ type StudentModuleViewProps = {
   progressItem?: ModuleProgressItem;
   moduleNumber?: number;
   totalModules?: number;
+  /** Quiz unlocks only once the module's video conference schedule has started. */
+  quizUnlocked?: boolean;
+  /** Latihan unlocks only once the module's quiz has been completed. */
+  latihanUnlocked?: boolean;
+  /** Video conference link is joinable only from the scheduled time onward. */
+  videoConferenceStarted?: boolean;
 };
 
 function getModuleCompletionPercent(progressItem?: ModuleProgressItem): number {
@@ -91,11 +100,17 @@ export function StudentModuleView({
   progressItem,
   moduleNumber,
   totalModules,
+  quizUnlocked = true,
+  latihanUnlocked = true,
+  videoConferenceStarted = true,
 }: StudentModuleViewProps) {
   const status = module.progress?.status ?? "not_started";
   const completionPercent = getModuleCompletionPercent(progressItem);
   const quizPath = `/student/trainings/${trainingId}/modules/${module.id}/quiz`;
   const latihanPath = `/student/trainings/${trainingId}/modules/${module.id}/latihan`;
+  const quizLockReason = module.videoConferenceScheduledAt
+    ? `Terbuka pada ${formatVideoConferenceSchedule(module.videoConferenceScheduledAt)}.`
+    : "Menunggu jadwal video conference dari trainer.";
 
   useEffect(() => {
     if (status === "not_started") {
@@ -210,16 +225,31 @@ export function StudentModuleView({
                       )
                     : `Nilai minimum ${module.minQuizScore}%`}
                 </p>
-                <ButtonLink
-                  className="w-full"
-                  variant={
-                    progressItem?.quiz.hasPassed ? "outline" : "default"
-                  }
-                  href={quizPath}
-                >
-                  <IconListCheck className="size-4" />
-                  {progressItem?.quiz.hasPassed ? "Ulangi Quiz" : "Kerjakan Quiz"}
-                </ButtonLink>
+                {quizUnlocked ? (
+                  <ButtonLink
+                    className="w-full"
+                    variant={
+                      progressItem?.quiz.hasPassed ? "outline" : "default"
+                    }
+                    href={quizPath}
+                  >
+                    <IconListCheck className="size-4" />
+                    {progressItem?.quiz.hasPassed
+                      ? "Ulangi Quiz"
+                      : "Kerjakan Quiz"}
+                  </ButtonLink>
+                ) : (
+                  <div className="space-y-1.5">
+                    <Button className="w-full" variant="outline" disabled>
+                      <IconLock className="size-4" />
+                      Quiz Terkunci
+                    </Button>
+                    <p className="flex items-start gap-1.5 text-xs text-muted-foreground">
+                      <IconClock className="mt-0.5 size-3.5 shrink-0" />
+                      {quizLockReason}
+                    </p>
+                  </div>
+                )}
               </div>
 
               <div className="space-y-3 rounded-xl border p-4">
@@ -241,18 +271,31 @@ export function StudentModuleView({
                       )
                     : `Nilai minimum ${module.minLatihanScore}%`}
                 </p>
-                <ButtonLink
-                  className="w-full"
-                  variant={
-                    progressItem?.latihan.hasPassed ? "outline" : "default"
-                  }
-                  href={latihanPath}
-                >
-                  <IconPencil className="size-4" />
-                  {progressItem?.latihan.hasPassed
-                    ? "Ulangi Latihan"
-                    : "Kerjakan Latihan"}
-                </ButtonLink>
+                {latihanUnlocked ? (
+                  <ButtonLink
+                    className="w-full"
+                    variant={
+                      progressItem?.latihan.hasPassed ? "outline" : "default"
+                    }
+                    href={latihanPath}
+                  >
+                    <IconPencil className="size-4" />
+                    {progressItem?.latihan.hasPassed
+                      ? "Ulangi Latihan"
+                      : "Kerjakan Latihan"}
+                  </ButtonLink>
+                ) : (
+                  <div className="space-y-1.5">
+                    <Button className="w-full" variant="outline" disabled>
+                      <IconLock className="size-4" />
+                      Latihan Terkunci
+                    </Button>
+                    <p className="flex items-start gap-1.5 text-xs text-muted-foreground">
+                      <IconListCheck className="mt-0.5 size-3.5 shrink-0" />
+                      Selesaikan quiz modul ini terlebih dahulu.
+                    </p>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -269,16 +312,28 @@ export function StudentModuleView({
                 <p className="text-sm text-muted-foreground">
                   {formatVideoConferenceSchedule(module.videoConferenceScheduledAt)}
                 </p>
-                <ButtonLink
-                  className="w-full"
-                  variant="outline"
-                  href={module.videoConferenceLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <IconExternalLink className="size-4" />
-                  Buka Meeting
-                </ButtonLink>
+                {videoConferenceStarted ? (
+                  <ButtonLink
+                    className="w-full"
+                    variant="outline"
+                    href={module.videoConferenceLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <IconExternalLink className="size-4" />
+                    Buka Meeting
+                  </ButtonLink>
+                ) : (
+                  <>
+                    <Button className="w-full" variant="outline" disabled>
+                      <IconClock className="size-4" />
+                      Belum dimulai
+                    </Button>
+                    <p className="text-xs text-muted-foreground">
+                      Link meeting aktif saat jadwal dimulai.
+                    </p>
+                  </>
+                )}
               </CardContent>
             </Card>
           ) : null}

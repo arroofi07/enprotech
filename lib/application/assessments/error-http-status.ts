@@ -12,6 +12,9 @@ export function assessmentErrorHttpStatus(error: AssessmentErrorCode): number {
     case "PRETEST_ALREADY_ATTEMPTED":
     case "POSTTEST_LOCKED":
     case "MODULE_LOCKED":
+    case "QUIZ_NOT_SCHEDULED":
+    case "QUIZ_NOT_STARTED":
+    case "LATIHAN_LOCKED":
       return 403;
     case "MODULE_NOT_FOUND":
     case "ASSESSMENT_NOT_FOUND":

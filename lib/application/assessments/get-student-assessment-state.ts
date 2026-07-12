@@ -23,8 +23,13 @@ import {
 import { isStudentEnrolledInTraining } from "@/lib/infrastructure/db/repositories/module-repository";
 import { moduleAssessmentSchema } from "@/lib/validations/assessment-schemas";
 
+import { getQuizScheduleState } from "@/lib/domain/modules/video-conference-access";
+
 import { assertAssessmentStudent } from "./assert-access";
-import { canStudentAccessModule } from "../modules/check-module-access";
+import {
+  canStudentAccessModule,
+  isModuleQuizCompleted,
+} from "../modules/check-module-access";
 import { assertStudentCanAccessModules } from "../training-flow/get-student-training-flow-state";
 import { buildAttemptQuestionSet } from "./attempt-questions";
 
@@ -86,6 +91,27 @@ export async function getStudentAssessmentState(
   );
   if (!canAccess) {
     return assessmentFailure(AssessmentErrorCode.MODULE_LOCKED);
+  }
+
+  if (parsed.data.type === "quiz") {
+    const scheduleState = getQuizScheduleState(
+      module.videoConferenceScheduledAt,
+      new Date(),
+    );
+    if (scheduleState === "not_scheduled") {
+      return assessmentFailure(AssessmentErrorCode.QUIZ_NOT_SCHEDULED);
+    }
+    if (scheduleState === "locked") {
+      return assessmentFailure(AssessmentErrorCode.QUIZ_NOT_STARTED);
+    }
+  } else if (parsed.data.type === "latihan") {
+    const quizCompleted = await isModuleQuizCompleted(
+      actor!.id,
+      parsed.data.moduleId,
+    );
+    if (!quizCompleted) {
+      return assessmentFailure(AssessmentErrorCode.LATIHAN_LOCKED);
+    }
   }
 
   const assessment = await findAssessmentByModuleAndType(

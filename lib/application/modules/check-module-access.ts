@@ -1,6 +1,7 @@
 import { notifyModuleCompleted } from "@/lib/application/notifications/notify-module-completed";
 import {
   canAccessModuleByOrder,
+  isAssessmentRequirementMet,
   isModuleProgressionComplete,
   type ModuleAssessmentRequirement,
 } from "@/lib/domain/modules/module-progression";
@@ -76,6 +77,20 @@ export async function getModuleProgressionState(
   }
 
   return { progressionCompleteByModuleId, lockedByModuleId };
+}
+
+/**
+ * Whether the module's quiz counts as "done" for the purpose of unlocking the
+ * latihan — i.e. the student has submitted at least one quiz attempt (or the
+ * quiz has no questions to answer). Mirrors the progression rule so the latihan
+ * gate stays consistent with module completion.
+ */
+export async function isModuleQuizCompleted(
+  studentId: string,
+  moduleId: string,
+): Promise<boolean> {
+  const quiz = await getModuleAssessmentRequirement(studentId, moduleId, "quiz");
+  return isAssessmentRequirementMet(quiz.submittedCount, quiz.questionCount);
 }
 
 export async function canStudentAccessModule(
