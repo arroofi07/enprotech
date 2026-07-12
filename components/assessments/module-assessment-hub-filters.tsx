@@ -10,10 +10,14 @@ import { useQueryFilters } from "@/hooks/use-query-filters";
 
 type ModuleAssessmentHubFiltersProps = {
   search?: string;
+  searchLabel?: string;
+  searchPlaceholder?: string;
 };
 
 export function ModuleAssessmentHubFilters({
   search,
+  searchLabel = "Cari Modul",
+  searchPlaceholder = "Cari nama training atau modul...",
 }: ModuleAssessmentHubFiltersProps) {
   const { isPending, onFilterSubmit } = useQueryFilters();
 
@@ -24,14 +28,14 @@ export function ModuleAssessmentHubFilters({
     >
       <div className="flex-1 space-y-2">
         <Label htmlFor="search" className="text-sm font-medium">
-          Cari Modul
+          {searchLabel}
         </Label>
         <div className="relative">
           <IconSearch className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             id="search"
             name="search"
-            placeholder="Cari nama training atau modul..."
+            placeholder={searchPlaceholder}
             defaultValue={search ?? ""}
             className="h-10 pl-9"
           />

@@ -37,9 +37,10 @@ export async function listModuleAssessmentHubItems(
     return assessmentFailure(AssessmentErrorCode.VALIDATION_ERROR);
   }
 
-  const { page, pageSize, search, type } = parsed.data;
+  const { page, pageSize, search, type, trainingId } = parsed.data;
   const result = await listModuleAssessmentHub({
     type: type as ModuleAssessmentType,
+    trainingId,
     search,
     page,
     pageSize,

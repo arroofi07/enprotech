@@ -22,7 +22,8 @@ Urutan prioritas:
 
 ### Akses
 
-- Hub: `/trainer/quiz`, `/trainer/latihan`
+- Daftar training: `/trainer/quiz`, `/trainer/latihan`
+- Daftar modul per training: `/trainer/trainings/[id]/quiz`, `/trainer/trainings/[id]/latihan`
 - Per modul: `/trainer/trainings/[id]/modules/[moduleId]/quiz` atau `/latihan`
 - Dari panel kelola modul: tombol **Kelola Quiz** / **Kelola Latihan**
 

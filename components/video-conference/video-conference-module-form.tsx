@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useMemo } from "react";
+import { useActionState, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import {
@@ -16,6 +16,22 @@ import type { ModuleWithContents } from "@/lib/infrastructure/db/repositories/mo
 
 const initialState: ModuleActionState = {};
 
+function getScheduledAtValue(
+  scheduledAt: ModuleWithContents["videoConferenceScheduledAt"],
+): string {
+  if (!scheduledAt) {
+    return "";
+  }
+
+  const date =
+    scheduledAt instanceof Date ? scheduledAt : new Date(scheduledAt);
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
+
+  return toDateTimeLocalValue(date);
+}
+
 type VideoConferenceModuleFormProps = {
   trainingId: string;
   module: ModuleWithContents;
@@ -25,6 +41,15 @@ export function VideoConferenceModuleForm({
   trainingId,
   module,
 }: VideoConferenceModuleFormProps) {
+  const [link, setLink] = useState(() => module.videoConferenceLink ?? "");
+  const [scheduledAt, setScheduledAt] = useState(() =>
+    getScheduledAtValue(module.videoConferenceScheduledAt),
+  );
+
+  useEffect(() => {
+    setLink(module.videoConferenceLink ?? "");
+    setScheduledAt(getScheduledAtValue(module.videoConferenceScheduledAt));
+  }, [module.videoConferenceLink, module.videoConferenceScheduledAt]);
   const saveAction = useMemo(
     () => async (prevState: ModuleActionState, formData: FormData) => {
       const result = await updateModuleVideoConferenceAction(prevState, formData);
@@ -59,7 +84,8 @@ export function VideoConferenceModuleForm({
           id={`vc-link-${module.id}`}
           name="videoConferenceLink"
           type="url"
-          defaultValue={module.videoConferenceLink ?? ""}
+          value={link}
+          onChange={(event) => setLink(event.target.value)}
           placeholder="https://meet.google.com/..."
         />
       </Field>
@@ -72,11 +98,8 @@ export function VideoConferenceModuleForm({
           id={`vc-schedule-${module.id}`}
           name="videoConferenceScheduledAt"
           type="datetime-local"
-          defaultValue={
-            module.videoConferenceScheduledAt
-              ? toDateTimeLocalValue(module.videoConferenceScheduledAt)
-              : ""
-          }
+          value={scheduledAt}
+          onChange={(event) => setScheduledAt(event.target.value)}
         />
       </Field>
 

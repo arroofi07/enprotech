@@ -41,6 +41,8 @@ export async function TrainerAssessmentPage({
   const page = Number(query.page ?? "1");
   const typeLabel = getAssessmentTypeLabel(assessmentType);
   const segment = assessmentType === "quiz" ? "quiz" : "latihan";
+  const hubBasePath = `/trainer/${segment}`;
+  const trainingAssessmentPath = `/trainer/trainings/${id}/${segment}`;
   const paginationBasePath = `/trainer/trainings/${id}/modules/${moduleId}/${segment}`;
 
   const [trainingResult, module, assessmentResult, trainingPassingGrade] =
@@ -72,14 +74,10 @@ export async function TrainerAssessmentPage({
       <TrainerHeader
         title={`${typeLabel} — ${module.title}`}
         breadcrumbs={[
-          { label: "Buat Training", href: "/trainer/trainings/new" },
+          { label: typeLabel, href: hubBasePath },
           {
             label: trainingResult.data.title,
-            href: `/trainer/trainings/${id}/edit`,
-          },
-          {
-            label: "Modul",
-            href: `/trainer/trainings/${id}/modules`,
+            href: trainingAssessmentPath,
           },
           { label: module.title },
           { label: typeLabel },
@@ -92,11 +90,8 @@ export async function TrainerAssessmentPage({
             title={`Kelola ${typeLabel}`}
             description={`Buat dan kelola soal ${typeLabel.toLowerCase()} untuk modul "${module.title}".`}
             actions={
-              <ButtonLink
-                variant="outline"
-                href={`/trainer/trainings/${id}/modules`}
-              >
-                Kembali ke Modul
+              <ButtonLink variant="outline" href={trainingAssessmentPath}>
+                Kembali ke Daftar Modul
               </ButtonLink>
             }
           />

@@ -21,6 +21,10 @@ function emptyToUndefined(value: unknown): unknown {
 
 export const listModuleAssessmentHubSchema = z.object({
   type: moduleAssessmentTypeSchema,
+  trainingId: z.preprocess(
+    emptyToUndefined,
+    z.uuid("ID training tidak valid.").optional(),
+  ),
   search: z.preprocess(emptyToUndefined, z.string().trim().optional()),
   page: listPaginationQuerySchema.shape.page,
   pageSize: listPaginationQuerySchema.shape.pageSize,

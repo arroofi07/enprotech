@@ -8,6 +8,7 @@ import type { ModuleAssessmentHubRow } from "@/lib/infrastructure/db/repositorie
 type ModuleAssessmentHubTableProps = {
   type: ModuleAssessmentType;
   items: ModuleAssessmentHubRow[];
+  showTrainingColumn?: boolean;
 };
 
 function getManageHref(
@@ -22,6 +23,7 @@ function getManageHref(
 export function ModuleAssessmentHubTable({
   type,
   items,
+  showTrainingColumn = true,
 }: ModuleAssessmentHubTableProps) {
   const typeLabel = getAssessmentTypeLabel(type);
 
@@ -34,13 +36,17 @@ export function ModuleAssessmentHubTable({
           "Belum ada modul. Buat modul di halaman training terlebih dahulu.",
       }}
       columns={[
-        {
-          id: "training",
-          header: "Training",
-          cell: (item) => (
-            <span className="font-medium">{item.trainingTitle}</span>
-          ),
-        },
+        ...(showTrainingColumn
+          ? [
+              {
+                id: "training",
+                header: "Training",
+                cell: (item: ModuleAssessmentHubRow) => (
+                  <span className="font-medium">{item.trainingTitle}</span>
+                ),
+              },
+            ]
+          : []),
         {
           id: "module",
           header: "Modul",

@@ -577,22 +577,40 @@ export type ModuleAssessmentHubRow = {
   questionCount: number;
 };
 
-function buildModuleAssessmentHubSearch(search?: string) {
-  if (!search?.trim()) {
+function buildModuleAssessmentHubSearch(
+  search?: string,
+  trainingId?: string,
+) {
+  const conditions = [];
+
+  if (trainingId) {
+    conditions.push(eq(trainings.id, trainingId));
+  }
+
+  if (search?.trim()) {
+    const term = `%${search.trim()}%`;
+    conditions.push(
+      trainingId
+        ? ilike(modules.title, term)
+        : or(ilike(trainings.title, term), ilike(modules.title, term)),
+    );
+  }
+
+  if (conditions.length === 0) {
     return undefined;
   }
 
-  const term = `%${search.trim()}%`;
-  return or(ilike(trainings.title, term), ilike(modules.title, term));
+  return and(...conditions);
 }
 
 export async function listModuleAssessmentHub(query: {
   type: ModuleAssessmentType;
+  trainingId?: string;
   search?: string;
   page: number;
   pageSize: number;
 }): Promise<{ items: ModuleAssessmentHubRow[]; total: number }> {
-  const where = buildModuleAssessmentHubSearch(query.search);
+  const where = buildModuleAssessmentHubSearch(query.search, query.trainingId);
   const offset = (query.page - 1) * query.pageSize;
 
   const [rows, totalResult] = await Promise.all([
@@ -673,6 +691,43 @@ export async function countQuestionsByTrainingIds(
       ),
     )
     .groupBy(assessments.trainingId);
+
+  for (const row of rows) {
+    counts[row.trainingId] = Number(row.questionCount ?? 0);
+  }
+
+  return counts;
+}
+
+export async function countModuleQuestionsByTrainingIds(
+  trainingIds: string[],
+  type: ModuleAssessmentType,
+): Promise<Record<string, number>> {
+  const counts = Object.fromEntries(
+    trainingIds.map((trainingId) => [trainingId, 0]),
+  );
+
+  if (trainingIds.length === 0) {
+    return counts;
+  }
+
+  const rows = await db
+    .select({
+      trainingId: trainings.id,
+      questionCount: sql<number>`cast(count(${questions.id}) as int)`,
+    })
+    .from(modules)
+    .innerJoin(trainings, eq(modules.trainingId, trainings.id))
+    .leftJoin(
+      assessments,
+      and(
+        eq(assessments.moduleId, modules.id),
+        eq(assessments.type, type),
+      ),
+    )
+    .leftJoin(questions, eq(questions.assessmentId, assessments.id))
+    .where(inArray(trainings.id, trainingIds))
+    .groupBy(trainings.id);
 
   for (const row of rows) {
     counts[row.trainingId] = Number(row.questionCount ?? 0);
