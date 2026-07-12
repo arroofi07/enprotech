@@ -1,12 +1,11 @@
 import { redirect } from "next/navigation";
 
-import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { StudentModuleView } from "@/components/modules/student-module-view";
 import { StudentHeader } from "@/components/student/student-header";
 import { ButtonLink } from "@/components/ui/button-link";
-import { Card, CardContent } from "@/components/ui/card";
 import { getCurrentUser } from "@/lib/application/auth/get-session";
 import { getStudentModule } from "@/lib/application/modules/list-student-modules";
+import { getStudentTrainingProgress } from "@/lib/application/progress/get-student-training-progress";
 
 type StudentModuleDetailPageProps = {
   params: Promise<{ id: string; moduleId: string }>;
@@ -22,45 +21,49 @@ export default async function StudentModuleDetailPage({
   }
 
   const { id, moduleId } = await params;
-  const result = await getStudentModule(user, { moduleId });
+  const [moduleResult, progressResult] = await Promise.all([
+    getStudentModule(user, { moduleId }),
+    getStudentTrainingProgress(user, { trainingId: id }),
+  ]);
 
-  if (!result.success) {
-    if (result.error === "PRETEST_REQUIRED") {
+  if (!moduleResult.success) {
+    if (moduleResult.error === "PRETEST_REQUIRED") {
       redirect(`/student/trainings/${id}/pre-test`);
     }
     redirect("/unauthorized");
   }
 
+  const progress = progressResult.success ? progressResult.data : null;
+  const moduleProgress = progress?.modules.find((item) => item.id === moduleId);
+  const moduleNumber =
+    progress?.modules.findIndex((item) => item.id === moduleId) ?? -1;
+
   return (
     <>
       <StudentHeader
-        title={result.data.title}
+        title={moduleResult.data.title}
         breadcrumbs={[
           { label: "Training Saya", href: "/student/trainings" },
-          {
-            label: "Modul",
-            href: "/student/modules",
-          },
-          { label: result.data.title },
+          { label: "Modul", href: "/student/modules" },
+          { label: moduleResult.data.title },
         ]}
       />
       <main className="flex-1 overflow-auto">
-        <div className="container max-w-4xl space-y-6 p-6 md:p-8">
-          <AdminPageHeader
-            title={result.data.title}
-            description="Pelajari materi dan tandai modul selesai setelah selesai mempelajari."
-            actions={
-              <ButtonLink variant="outline" href="/student/modules">
-                Kembali ke Daftar Modul
-              </ButtonLink>
-            }
-          />
+        <div className="container max-w-7xl space-y-6 p-6 md:p-8">
+          <div className="flex justify-end">
+            <ButtonLink variant="outline" href="/student/modules">
+              Kembali ke Daftar Modul
+            </ButtonLink>
+          </div>
 
-          <Card>
-            <CardContent className="p-6">
-              <StudentModuleView module={result.data} trainingId={id} />
-            </CardContent>
-          </Card>
+          <StudentModuleView
+            module={moduleResult.data}
+            trainingId={id}
+            trainingTitle={progress?.trainingTitle}
+            progressItem={moduleProgress}
+            moduleNumber={moduleNumber >= 0 ? moduleNumber + 1 : undefined}
+            totalModules={progress?.modules.length}
+          />
         </div>
       </main>
     </>
