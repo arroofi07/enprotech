@@ -25,6 +25,7 @@ import { moduleAssessmentSchema } from "@/lib/validations/assessment-schemas";
 
 import { assertAssessmentStudent } from "./assert-access";
 import { canStudentAccessModule } from "../modules/check-module-access";
+import { assertStudentCanAccessModules } from "../training-flow/get-student-training-flow-state";
 import { buildAttemptQuestionSet } from "./attempt-questions";
 
 export type StudentAssessmentState = {
@@ -68,6 +69,14 @@ export async function getStudentAssessmentState(
   );
   if (!enrolled) {
     return assessmentFailure(AssessmentErrorCode.NOT_ENROLLED);
+  }
+
+  const pretestPassed = await assertStudentCanAccessModules(
+    actor!,
+    module.trainingId,
+  );
+  if (!pretestPassed) {
+    return assessmentFailure(AssessmentErrorCode.PRETEST_REQUIRED);
   }
 
   const canAccess = await canStudentAccessModule(

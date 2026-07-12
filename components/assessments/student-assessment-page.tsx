@@ -33,6 +33,10 @@ export async function StudentAssessmentPage({
     type: assessmentType,
   });
 
+  if (!result.success && result.error === "PRETEST_REQUIRED") {
+    redirect(`/student/trainings/${id}/pre-test`);
+  }
+
   if (
     !result.success &&
     result.error !== "ASSESSMENT_NOT_FOUND"

@@ -12,6 +12,7 @@ export const AssessmentErrorCode = {
   ATTEMPT_ALREADY_SUBMITTED: "ATTEMPT_ALREADY_SUBMITTED",
   IMPORT_ERROR: "IMPORT_ERROR",
   PRETEST_NOT_ACTIVE: "PRETEST_NOT_ACTIVE",
+  PRETEST_REQUIRED: "PRETEST_REQUIRED",
   PRETEST_ALREADY_ATTEMPTED: "PRETEST_ALREADY_ATTEMPTED",
   POSTTEST_LOCKED: "POSTTEST_LOCKED",
   MODULE_LOCKED: "MODULE_LOCKED",
@@ -41,6 +42,8 @@ const ASSESSMENT_ERROR_MESSAGES: Record<AssessmentErrorCode, string> = {
     "Gagal mengimpor soal dari Excel. Periksa format file.",
   [AssessmentErrorCode.PRETEST_NOT_ACTIVE]:
     "Pre-test belum diaktifkan oleh trainer.",
+  [AssessmentErrorCode.PRETEST_REQUIRED]:
+    "Kerjakan pre-test terlebih dahulu sebelum mengakses modul.",
   [AssessmentErrorCode.PRETEST_ALREADY_ATTEMPTED]:
     "Pre-test hanya dapat dikerjakan satu kali.",
   [AssessmentErrorCode.POSTTEST_LOCKED]:

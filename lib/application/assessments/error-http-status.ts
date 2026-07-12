@@ -8,6 +8,7 @@ export function assessmentErrorHttpStatus(error: AssessmentErrorCode): number {
     case "NOT_ENROLLED":
     case "ALREADY_PASSED":
     case "PRETEST_NOT_ACTIVE":
+    case "PRETEST_REQUIRED":
     case "PRETEST_ALREADY_ATTEMPTED":
     case "POSTTEST_LOCKED":
     case "MODULE_LOCKED":

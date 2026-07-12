@@ -21,6 +21,7 @@ export function ImportTemplateDownload({
   kind,
   columns,
   variant = "panel",
+  
 }: ImportTemplateDownloadProps) {
   const templateHref = `/api/import/templates/${kind}`;
 

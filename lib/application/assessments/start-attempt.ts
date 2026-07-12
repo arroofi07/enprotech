@@ -29,6 +29,7 @@ import { assessmentIdSchema } from "@/lib/validations/assessment-schemas";
 
 import { assertAssessmentStudent } from "./assert-access";
 import { canStudentAccessModule } from "../modules/check-module-access";
+import { assertStudentCanAccessModules } from "../training-flow/get-student-training-flow-state";
 import {
   buildAttemptQuestionSet,
   getAttemptQuestionIds,
@@ -112,6 +113,14 @@ export async function startAttempt(
   } else if (!assessment.moduleId) {
     return assessmentFailure(AssessmentErrorCode.ASSESSMENT_NOT_FOUND);
   } else {
+    const pretestPassed = await assertStudentCanAccessModules(
+      actor!,
+      assessment.trainingId,
+    );
+    if (!pretestPassed) {
+      return assessmentFailure(AssessmentErrorCode.PRETEST_REQUIRED);
+    }
+
     const canAccess = await canStudentAccessModule(
       actor!.id,
       assessment.trainingId,
