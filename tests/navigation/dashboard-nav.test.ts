@@ -69,14 +69,18 @@ describe("getDashboardNav", () => {
     ]);
   });
 
-  it("returns student learning flow navigation", () => {
+  it("returns student navigation with administration and learning flow", () => {
     const nav = getDashboardNav(student);
     const titles = nav.groups.flatMap((group) =>
       group.items.map((item) => item.title),
     );
 
-    expect(titles).toEqual([...LEARNING_FLOW_TITLES]);
-    expect(nav.homeHref).toBe("/student/modules");
+    expect(titles).toEqual([
+      "Dashboard",
+      "Training Saya",
+      ...LEARNING_FLOW_TITLES,
+    ]);
+    expect(nav.homeHref).toBe("/student/dashboard");
   });
 });
 
@@ -85,9 +89,35 @@ describe("isNavItemActive", () => {
     expect(
       isNavItemActive("/student/trainings/abc/modules/xyz", {
         href: "/student/modules",
-        activePrefixes: ["/student/modules", "/student/trainings"],
+        isActive: (pathname) =>
+          pathname === "/student/modules" ||
+          pathname.startsWith("/student/modules/") ||
+          /^\/student\/trainings\/[^/]+\/modules(?:\/|$)/.test(pathname),
       }),
     ).toBe(true);
+  });
+
+  it("highlights training overview on detail page", () => {
+    expect(
+      isNavItemActive("/student/trainings/abc", {
+        href: "/student/trainings",
+        isActive: (pathname) =>
+          pathname === "/student/trainings" ||
+          /^\/student\/trainings\/[^/]+$/.test(pathname),
+      }),
+    ).toBe(true);
+  });
+
+  it("does not highlight modul on training overview page", () => {
+    expect(
+      isNavItemActive("/student/trainings/abc", {
+        href: "/student/modules",
+        isActive: (pathname) =>
+          pathname === "/student/modules" ||
+          pathname.startsWith("/student/modules/") ||
+          /^\/student\/trainings\/[^/]+\/modules(?:\/|$)/.test(pathname),
+      }),
+    ).toBe(false);
   });
 
   it("matches nested trainer module routes", () => {

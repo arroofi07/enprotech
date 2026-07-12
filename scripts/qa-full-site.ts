@@ -268,13 +268,6 @@ async function main() {
       location: "/trainer/nilai",
     },
     {
-      id: "STUDENT-REDIRECT-trainings",
-      label: "Student /trainings redirects to modules",
-      path: "/student/trainings",
-      user: student,
-      location: "/student/modules",
-    },
-    {
       id: "STUDENT-REDIRECT-progress",
       label: "Student /progress redirects to nilai",
       path: "/student/progress",
@@ -315,6 +308,7 @@ async function main() {
 
   const staticStudentPages = [
     "/student/dashboard",
+    "/student/trainings",
     "/student/modules",
     "/student/pre-test",
     "/student/video-conference",

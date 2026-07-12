@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { StudentHeader } from "@/components/student/student-header";
 import { StudentTrainingCard } from "@/components/trainings/student-training-card";
+import { ButtonLink } from "@/components/ui/button-link";
 import { Card, CardContent } from "@/components/ui/card";
 import { ListPagination } from "@/components/ui/list-pagination";
 import { getCurrentUser } from "@/lib/application/auth/get-session";
@@ -44,6 +45,11 @@ export default async function StudentModulesPage({
           <AdminPageHeader
             title="Modul Pembelajaran"
             description="Pilih training untuk mengakses modul dan materi pembelajaran."
+            actions={
+              <ButtonLink variant="outline" href="/student/dashboard">
+                Kembali ke Dashboard
+              </ButtonLink>
+            }
           />
 
           <Card>

@@ -20,6 +20,7 @@ export type DashboardNavItem = {
   icon: TablerIcon;
   implemented: boolean;
   activePrefixes?: string[];
+  isActive?: (pathname: string) => boolean;
 };
 
 export type DashboardNavGroup = {
@@ -35,7 +36,96 @@ export type DashboardNavConfig = {
 
 type LearningFlowPrefix = "/student" | "/trainer";
 
+function isStudentTrainingOverviewPath(pathname: string): boolean {
+  return (
+    pathname === "/student/trainings" ||
+    /^\/student\/trainings\/[^/]+$/.test(pathname)
+  );
+}
+
+function buildStudentLearningFlowNav(): DashboardNavItem[] {
+  return [
+    {
+      title: "Pre Test",
+      href: "/student/pre-test",
+      icon: IconClipboardCheck,
+      implemented: true,
+      isActive: (pathname) =>
+        pathname === "/student/pre-test" ||
+        pathname.startsWith("/student/pre-test/") ||
+        /^\/student\/trainings\/[^/]+\/pre-test(?:\/|$)/.test(pathname),
+    },
+    {
+      title: "Modul",
+      href: "/student/modules",
+      icon: IconBook,
+      implemented: true,
+      isActive: (pathname) =>
+        pathname === "/student/modules" ||
+        pathname.startsWith("/student/modules/") ||
+        /^\/student\/trainings\/[^/]+\/modules(?:\/|$)/.test(pathname),
+    },
+    {
+      title: "Video Conference",
+      href: "/student/video-conference",
+      icon: IconVideo,
+      implemented: true,
+      activePrefixes: ["/student/video-conference"],
+    },
+    {
+      title: "Quiz",
+      href: "/student/quiz",
+      icon: IconListCheck,
+      implemented: true,
+      isActive: (pathname) =>
+        pathname === "/student/quiz" ||
+        pathname.startsWith("/student/quiz/") ||
+        /^\/student\/trainings\/[^/]+\/modules\/[^/]+\/quiz(?:\/|$)/.test(
+          pathname,
+        ),
+    },
+    {
+      title: "Latihan",
+      href: "/student/latihan",
+      icon: IconPencil,
+      implemented: true,
+      isActive: (pathname) =>
+        pathname === "/student/latihan" ||
+        pathname.startsWith("/student/latihan/") ||
+        /^\/student\/trainings\/[^/]+\/modules\/[^/]+\/latihan(?:\/|$)/.test(
+          pathname,
+        ),
+    },
+    {
+      title: "Post Test",
+      href: "/student/post-test",
+      icon: IconClipboardCheck,
+      implemented: true,
+      isActive: (pathname) =>
+        pathname === "/student/post-test" ||
+        pathname.startsWith("/student/post-test/") ||
+        /^\/student\/trainings\/[^/]+\/post-test(?:\/|$)/.test(pathname),
+    },
+    {
+      title: "Nilai",
+      href: "/student/nilai",
+      icon: IconChartBar,
+      implemented: true,
+    },
+    {
+      title: "Sertifikat",
+      href: "/student/certificates",
+      icon: IconCertificate,
+      implemented: true,
+    },
+  ];
+}
+
 function buildLearningFlowNav(prefix: LearningFlowPrefix): DashboardNavItem[] {
+  if (prefix === "/student") {
+    return buildStudentLearningFlowNav();
+  }
+
   return [
     {
       title: "Pre Test",
@@ -154,6 +244,24 @@ const TRAINER_NAV: DashboardNavGroup[] = [
 
 const STUDENT_NAV: DashboardNavGroup[] = [
   {
+    label: "Administrasi",
+    items: [
+      {
+        title: "Dashboard",
+        href: "/student/dashboard",
+        icon: IconLayoutDashboard,
+        implemented: true,
+      },
+      {
+        title: "Training Saya",
+        href: "/student/trainings",
+        icon: IconSchool,
+        implemented: true,
+        isActive: isStudentTrainingOverviewPath,
+      },
+    ],
+  },
+  {
     label: "Alur E-Training",
     items: buildLearningFlowNav("/student"),
   },
@@ -177,7 +285,7 @@ export function getDashboardNav(user: SessionUser): DashboardNavConfig {
   }
 
   return {
-    homeHref: "/student/modules",
+    homeHref: "/student/dashboard",
     shellLabel: "E-Training Student",
     groups: STUDENT_NAV,
   };
@@ -185,8 +293,12 @@ export function getDashboardNav(user: SessionUser): DashboardNavConfig {
 
 export function isNavItemActive(
   pathname: string,
-  item: Pick<DashboardNavItem, "href" | "activePrefixes">,
+  item: Pick<DashboardNavItem, "href" | "activePrefixes" | "isActive">,
 ): boolean {
+  if (item.isActive) {
+    return item.isActive(pathname);
+  }
+
   const prefixes = item.activePrefixes ?? [item.href];
 
   return prefixes.some(

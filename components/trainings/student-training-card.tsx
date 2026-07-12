@@ -1,10 +1,12 @@
-import Link from "next/link";
+import { IconChevronRight } from "@tabler/icons-react";
 
 import { TrainingStatusBadge } from "@/components/trainings/training-status-badge";
+import { ButtonLink } from "@/components/ui/button-link";
 import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -20,8 +22,7 @@ export function StudentTrainingCard({ training }: StudentTrainingCardProps) {
   const deadlineLabel = formatTrainingDeadline(training.deadline, "long");
 
   return (
-    <Link href={`/student/trainings/${training.id}`} className="block h-full">
-      <Card className="h-full overflow-hidden transition-colors hover:bg-muted/40">
+    <Card className="flex h-full flex-col overflow-hidden">
         {training.thumbnail ? (
           <div className="aspect-video w-full overflow-hidden bg-muted">
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -45,7 +46,7 @@ export function StudentTrainingCard({ training }: StudentTrainingCardProps) {
             <TrainingStatusBadge status={training.status} />
           </div>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="flex-1 space-y-4">
           {deadlineLabel ? (
             <p className="text-sm text-muted-foreground">
               Deadline: {deadlineLabel}
@@ -68,7 +69,15 @@ export function StudentTrainingCard({ training }: StudentTrainingCardProps) {
             </p>
           </div>
         </CardContent>
+        <CardFooter className="border-t bg-muted/20 pt-4">
+          <ButtonLink
+            className="w-full"
+            href={`/student/trainings/${training.id}`}
+          >
+            Lihat Detail
+            <IconChevronRight data-icon="inline-end" className="size-4" />
+          </ButtonLink>
+        </CardFooter>
       </Card>
-    </Link>
   );
 }

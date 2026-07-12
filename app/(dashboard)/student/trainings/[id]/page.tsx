@@ -42,7 +42,7 @@ export default async function StudentTrainingModulesPage({
       <StudentHeader
         title={progress.trainingTitle}
         breadcrumbs={[
-          { label: "Training Saya", href: "/student/modules" },
+          { label: "Training Saya", href: "/student/trainings" },
           { label: progress.trainingTitle },
         ]}
       />
@@ -52,7 +52,7 @@ export default async function StudentTrainingModulesPage({
             title={progress.trainingTitle}
             description="Pantau progress pembelajaran dan akses modul training."
             actions={
-              <ButtonLink variant="outline" href="/student/modules">
+              <ButtonLink variant="outline" href="/student/trainings">
                 Kembali
               </ButtonLink>
             }
