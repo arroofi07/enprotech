@@ -31,6 +31,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Spinner } from "@/components/ui/spinner";
 import { cn } from "@/lib/utils";
 import { getAssessmentTypeLabel } from "@/lib/domain/assessments/labels";
+import type { LatestAttemptReview } from "@/lib/application/assessments/build-latest-attempt-review";
 import type { WrongAnswerReview } from "@/lib/domain/assessments/review-wrong-answers";
 import type { AssessmentType } from "@/lib/domain/assessments/types";
 import type {
@@ -52,6 +53,7 @@ type AssessmentTakeViewProps = {
   hasCompleted?: boolean;
   inProgressAttempt: AssessmentAttemptRecord | null;
   attempts: AssessmentAttemptRecord[];
+  latestAttemptReview?: LatestAttemptReview | null;
 };
 
 type SubmitResult = {
@@ -81,6 +83,7 @@ export function AssessmentTakeView({
   hasCompleted = false,
   inProgressAttempt,
   attempts,
+  latestAttemptReview = null,
 }: AssessmentTakeViewProps) {
   const typeLabel = getAssessmentTypeLabel(type);
   const isSingleAttempt = type === "pre_test";
@@ -99,7 +102,7 @@ export function AssessmentTakeView({
       : null,
   );
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<SubmitResult | null>(null);
+  const [result, setResult] = useState<SubmitResult | null>(latestAttemptReview);
   const [attemptHistory, setAttemptHistory] = useState(attempts);
   const [currentIndex, setCurrentIndex] = useState(0);
 

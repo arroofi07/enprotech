@@ -3,18 +3,16 @@
 import {
   IconAlertTriangle,
   IconCheck,
+  IconChevronLeft,
+  IconChevronRight,
   IconCircleCheckFilled,
   IconX,
 } from "@tabler/icons-react";
+import { useEffect, useMemo, useState } from "react";
 
 import type { WrongAnswerReview } from "@/lib/domain/assessments/review-wrong-answers";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -125,6 +123,18 @@ type AssessmentReviewWrongProps = {
 export function AssessmentReviewWrong({
   wrongAnswers,
 }: AssessmentReviewWrongProps) {
+  const [currentPage, setCurrentPage] = useState(1);
+  const totalPages = wrongAnswers.length;
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [wrongAnswers]);
+
+  const currentItem = useMemo(() => {
+    const safePage = Math.min(Math.max(currentPage, 1), totalPages);
+    return wrongAnswers[safePage - 1] ?? null;
+  }, [currentPage, totalPages, wrongAnswers]);
+
   if (wrongAnswers.length === 0) {
     return (
       <Card>
@@ -143,6 +153,14 @@ export function AssessmentReviewWrong({
     );
   }
 
+  if (!currentItem) {
+    return null;
+  }
+
+  const safePage = Math.min(Math.max(currentPage, 1), totalPages);
+  const isFirstPage = safePage <= 1;
+  const isLastPage = safePage >= totalPages;
+
   return (
     <Card>
       <CardHeader>
@@ -156,49 +174,94 @@ export function AssessmentReviewWrong({
           <Badge variant="secondary">{wrongAnswers.length} soal</Badge>
         </div>
       </CardHeader>
-      <CardContent>
-        <Accordion defaultValue={[wrongAnswers[0].questionId]}>
-          {wrongAnswers.map((item, index) => (
-            <AccordionItem key={item.questionId} value={item.questionId}>
-              <AccordionTrigger className="px-4 py-3 hover:no-underline">
-                <span className="flex items-start gap-2.5">
-                  <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-destructive/10 text-[0.7rem] font-semibold text-destructive">
-                    {index + 1}
-                  </span>
-                  <span className="text-sm font-medium">
-                    {item.questionText}
-                  </span>
-                </span>
-              </AccordionTrigger>
-              <AccordionContent className="px-2">
-                <div className="space-y-2.5">
-                  <div className="flex items-start gap-2 rounded-md border border-destructive/20 bg-destructive/5 p-2.5">
-                    <IconX className="mt-0.5 size-4 shrink-0 text-destructive" />
-                    <div className="space-y-0.5">
-                      <p className="text-xs text-muted-foreground">
-                        Jawaban Kamu
-                      </p>
-                      <p className="text-sm text-destructive">
-                        {item.selectedOptionText ?? "Tidak dijawab"}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-2 rounded-md border border-emerald-500/20 bg-emerald-500/5 p-2.5">
-                    <IconCheck className="mt-0.5 size-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
-                    <div className="space-y-0.5">
-                      <p className="text-xs text-muted-foreground">
-                        Jawaban Benar
-                      </p>
-                      <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400">
-                        {item.correctOptionText}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-          ))}
-        </Accordion>
+      <CardContent className="space-y-5">
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-sm font-medium">
+            Soal {safePage} dari {totalPages}
+          </p>
+          <p className="text-xs text-muted-foreground">
+            {totalPages} jawaban perlu ditinjau
+          </p>
+        </div>
+
+        <div className="rounded-xl border bg-card p-5">
+          <div className="flex items-start gap-3">
+            <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-destructive/10 text-sm font-semibold text-destructive">
+              {safePage}
+            </span>
+            <p className="pt-1 font-medium leading-relaxed">
+              {currentItem.questionText}
+            </p>
+          </div>
+
+          <div className="mt-5 space-y-2.5">
+            <div className="flex items-start gap-2 rounded-md border border-destructive/20 bg-destructive/5 p-2.5">
+              <IconX className="mt-0.5 size-4 shrink-0 text-destructive" />
+              <div className="space-y-0.5">
+                <p className="text-xs text-muted-foreground">Jawaban Kamu</p>
+                <p className="text-sm text-destructive">
+                  {currentItem.selectedOptionText ?? "Tidak dijawab"}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-start gap-2 rounded-md border border-emerald-500/20 bg-emerald-500/5 p-2.5">
+              <IconCheck className="mt-0.5 size-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
+              <div className="space-y-0.5">
+                <p className="text-xs text-muted-foreground">Jawaban Benar</p>
+                <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400">
+                  {currentItem.correctOptionText}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {totalPages > 1 ? (
+          <>
+            <div className="grid grid-cols-6 gap-2 sm:grid-cols-8 lg:grid-cols-10">
+              {wrongAnswers.map((item, index) => {
+                const pageNumber = index + 1;
+                const isCurrent = pageNumber === safePage;
+
+                return (
+                  <button
+                    key={item.questionId}
+                    type="button"
+                    onClick={() => setCurrentPage(pageNumber)}
+                    aria-current={isCurrent ? "true" : undefined}
+                    aria-label={`Soal salah ${pageNumber}`}
+                    className={cn(
+                      "flex aspect-square items-center justify-center rounded-md border text-sm font-medium transition-colors",
+                      isCurrent
+                        ? "border-destructive bg-destructive text-destructive-foreground"
+                        : "border-input bg-background text-foreground hover:bg-muted",
+                    )}
+                  >
+                    {pageNumber}
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="flex items-center justify-between gap-3 border-t pt-4">
+              <Button
+                variant="outline"
+                onClick={() => setCurrentPage(safePage - 1)}
+                disabled={isFirstPage}
+              >
+                <IconChevronLeft className="size-4" />
+                Sebelumnya
+              </Button>
+              <Button
+                onClick={() => setCurrentPage(safePage + 1)}
+                disabled={isLastPage}
+              >
+                Berikutnya
+                <IconChevronRight className="size-4" />
+              </Button>
+            </div>
+          </>
+        ) : null}
       </CardContent>
     </Card>
   );

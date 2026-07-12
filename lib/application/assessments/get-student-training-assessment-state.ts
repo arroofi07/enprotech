@@ -34,6 +34,10 @@ import { trainingAssessmentSchema } from "@/lib/validations/assessment-schemas";
 
 import { assertAssessmentStudent } from "./assert-access";
 import { buildAttemptQuestionSet } from "./attempt-questions";
+import {
+  buildLatestAttemptReview,
+  type LatestAttemptReview,
+} from "./build-latest-attempt-review";
 
 export type StudentTrainingAssessmentState = {
   training: {
@@ -51,6 +55,7 @@ export type StudentTrainingAssessmentState = {
   inProgressAttempt: AssessmentAttemptRecord | null;
   attempts: AssessmentAttemptRecord[];
   allModulesCompleted: boolean;
+  latestAttemptReview: LatestAttemptReview | null;
 };
 
 export async function getStudentTrainingAssessmentState(
@@ -147,6 +152,16 @@ export async function getStudentTrainingAssessmentState(
       )
     : questions;
 
+  const latestAttemptReview = inProgressAttempt
+    ? null
+    : buildLatestAttemptReview(
+        questions,
+        assessment,
+        attempts[0] ?? null,
+        passingGrade,
+        bestScore,
+      );
+
   return assessmentSuccess({
     training: {
       id: training.id,
@@ -163,5 +178,6 @@ export async function getStudentTrainingAssessmentState(
     inProgressAttempt,
     attempts,
     allModulesCompleted,
+    latestAttemptReview,
   });
 }

@@ -32,6 +32,10 @@ import {
 } from "../modules/check-module-access";
 import { assertStudentCanAccessModules } from "../training-flow/get-student-training-flow-state";
 import { buildAttemptQuestionSet } from "./attempt-questions";
+import {
+  buildLatestAttemptReview,
+  type LatestAttemptReview,
+} from "./build-latest-attempt-review";
 
 export type StudentAssessmentState = {
   module: {
@@ -47,6 +51,7 @@ export type StudentAssessmentState = {
   canRetry: boolean;
   inProgressAttempt: AssessmentAttemptRecord | null;
   attempts: AssessmentAttemptRecord[];
+  latestAttemptReview: LatestAttemptReview | null;
 };
 
 export async function getStudentAssessmentState(
@@ -158,6 +163,16 @@ export async function getStudentAssessmentState(
       )
     : questions;
 
+  const latestAttemptReview = inProgressAttempt
+    ? null
+    : buildLatestAttemptReview(
+        questions,
+        assessment,
+        attempts[0] ?? null,
+        passingGrade,
+        bestScore,
+      );
+
   return assessmentSuccess({
     module: {
       id: module.id,
@@ -172,5 +187,6 @@ export async function getStudentAssessmentState(
     canRetry: retryAllowed,
     inProgressAttempt,
     attempts,
+    latestAttemptReview,
   });
 }

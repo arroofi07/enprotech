@@ -141,6 +141,7 @@ export async function StudentTrainingAssessmentPage({
                 hasCompleted={state.hasCompleted}
                 inProgressAttempt={state.inProgressAttempt}
                 attempts={state.attempts}
+                latestAttemptReview={state.latestAttemptReview}
               />
             </CardContent>
           </Card>

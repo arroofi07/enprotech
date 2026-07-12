@@ -162,6 +162,7 @@ export async function StudentAssessmentPage({
                 canRetry={state.canRetry}
                 inProgressAttempt={state.inProgressAttempt}
                 attempts={state.attempts}
+                latestAttemptReview={state.latestAttemptReview}
               />
             </CardContent>
           </Card>
