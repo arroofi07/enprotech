@@ -4,6 +4,7 @@ import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { TrainingProgressModules } from "@/components/progress/training-progress-modules";
 import { TrainingProgressOverview } from "@/components/progress/training-progress-overview";
 import { StudentModuleCard } from "@/components/modules/student-module-card";
+import { StudentModuleCardGrid } from "@/components/modules/student-module-card-grid";
 import { StudentHeader } from "@/components/student/student-header";
 import { ButtonLink } from "@/components/ui/button-link";
 import { Card, CardContent } from "@/components/ui/card";
@@ -46,8 +47,8 @@ export default async function StudentTrainingModulesPage({
           { label: progress.trainingTitle },
         ]}
       />
-      <main className="flex-1 overflow-auto">
-        <div className="container max-w-7xl space-y-6 p-6 md:p-8">
+      <main className="min-w-0 flex-1 overflow-auto">
+        <div className="container max-w-7xl min-w-0 space-y-6 p-4 sm:p-6 md:p-8">
           <AdminPageHeader
             title={progress.trainingTitle}
             description="Pantau progress pembelajaran dan akses modul training."
@@ -66,7 +67,7 @@ export default async function StudentTrainingModulesPage({
             preTestLocked={modulesLocked}
           />
 
-          <div className="space-y-4">
+          <div className="min-w-0 space-y-4">
             <div>
               <h3 className="text-sm font-semibold">Modul Pembelajaran</h3>
               <p className="mt-1 text-sm text-muted-foreground">
@@ -81,7 +82,7 @@ export default async function StudentTrainingModulesPage({
                 </CardContent>
               </Card>
             ) : (
-              <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+              <StudentModuleCardGrid>
                 {modulesResult.data.map((module) => (
                   <StudentModuleCard
                     key={module.id}
@@ -93,7 +94,7 @@ export default async function StudentTrainingModulesPage({
                     )}
                   />
                 ))}
-              </div>
+              </StudentModuleCardGrid>
             )}
           </div>
         </div>

@@ -9,7 +9,7 @@ import {
   type QuestionOption,
 } from "@/lib/db/schema/assessments";
 import { modules } from "@/lib/db/schema/modules";
-import { trainings } from "@/lib/db/schema/trainings";
+import { enrollments, trainings } from "@/lib/db/schema/trainings";
 import type {
   AssessmentType,
   ModuleAssessmentType,
@@ -660,6 +660,101 @@ export async function listModuleAssessmentHub(query: {
       moduleOrder: row.moduleOrder,
       trainingId: row.trainingId,
       trainingTitle: row.trainingTitle,
+      questionCount: Number(row.questionCount ?? 0),
+    })),
+    total: totalResult[0]?.value ?? 0,
+  };
+}
+
+export type StudentModuleAssessmentHubBaseRow = {
+  moduleId: string;
+  moduleTitle: string;
+  moduleOrder: number;
+  trainingId: string;
+  trainingTitle: string;
+  videoConferenceScheduledAt: Date | null;
+  questionCount: number;
+};
+
+function buildStudentModuleAssessmentHubSearch(
+  studentId: string,
+  search?: string,
+) {
+  const conditions = [eq(enrollments.studentId, studentId)];
+
+  if (search?.trim()) {
+    const term = `%${search.trim()}%`;
+    conditions.push(
+      or(ilike(trainings.title, term), ilike(modules.title, term))!,
+    );
+  }
+
+  return and(...conditions);
+}
+
+export async function listStudentModuleAssessmentHub(query: {
+  studentId: string;
+  type: ModuleAssessmentType;
+  search?: string;
+  page: number;
+  pageSize: number;
+}): Promise<{ items: StudentModuleAssessmentHubBaseRow[]; total: number }> {
+  const where = buildStudentModuleAssessmentHubSearch(
+    query.studentId,
+    query.search,
+  );
+  const offset = (query.page - 1) * query.pageSize;
+
+  const [rows, totalResult] = await Promise.all([
+    db
+      .select({
+        moduleId: modules.id,
+        moduleTitle: modules.title,
+        moduleOrder: modules.order,
+        trainingId: trainings.id,
+        trainingTitle: trainings.title,
+        videoConferenceScheduledAt: modules.videoConferenceScheduledAt,
+        questionCount: sql<number>`cast(count(${questions.id}) as int)`,
+      })
+      .from(enrollments)
+      .innerJoin(trainings, eq(enrollments.trainingId, trainings.id))
+      .innerJoin(modules, eq(modules.trainingId, trainings.id))
+      .leftJoin(
+        assessments,
+        and(
+          eq(assessments.moduleId, modules.id),
+          eq(assessments.type, query.type),
+        ),
+      )
+      .leftJoin(questions, eq(questions.assessmentId, assessments.id))
+      .where(where)
+      .groupBy(
+        modules.id,
+        modules.title,
+        modules.order,
+        modules.videoConferenceScheduledAt,
+        trainings.id,
+        trainings.title,
+      )
+      .orderBy(asc(trainings.title), asc(modules.order))
+      .limit(query.pageSize)
+      .offset(offset),
+    db
+      .select({ value: count() })
+      .from(enrollments)
+      .innerJoin(trainings, eq(enrollments.trainingId, trainings.id))
+      .innerJoin(modules, eq(modules.trainingId, trainings.id))
+      .where(where),
+  ]);
+
+  return {
+    items: rows.map((row) => ({
+      moduleId: row.moduleId,
+      moduleTitle: row.moduleTitle,
+      moduleOrder: row.moduleOrder,
+      trainingId: row.trainingId,
+      trainingTitle: row.trainingTitle,
+      videoConferenceScheduledAt: row.videoConferenceScheduledAt,
       questionCount: Number(row.questionCount ?? 0),
     })),
     total: totalResult[0]?.value ?? 0,

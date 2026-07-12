@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { StudentModuleCard } from "@/components/modules/student-module-card";
+import { StudentModuleCardGrid } from "@/components/modules/student-module-card-grid";
 import { StudentHeader } from "@/components/student/student-header";
 import { ButtonLink } from "@/components/ui/button-link";
 import { Card, CardContent } from "@/components/ui/card";
@@ -106,7 +107,7 @@ export default async function StudentModulesPage({
                             {modules.length} modul tersedia
                           </p>
                         </div>
-                        <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                        <StudentModuleCardGrid>
                           {modules.map((module) => (
                             <StudentModuleCard
                               key={module.id}
@@ -115,7 +116,7 @@ export default async function StudentModulesPage({
                               preTestLocked={preTestLocked}
                             />
                           ))}
-                        </div>
+                        </StudentModuleCardGrid>
                       </section>
                     ))}
                   </div>

@@ -1,5 +1,11 @@
 import { StudentAssessmentHubPage } from "@/components/assessments/student-assessment-hub-page";
 
-export default function StudentQuizHubPage() {
-  return <StudentAssessmentHubPage type="quiz" />;
+type PageProps = {
+  searchParams: Promise<{ page?: string; search?: string }>;
+};
+
+export default async function StudentQuizHubPage({ searchParams }: PageProps) {
+  const params = await searchParams;
+
+  return <StudentAssessmentHubPage type="quiz" searchParams={params} />;
 }
