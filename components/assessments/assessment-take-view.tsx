@@ -1,5 +1,18 @@
 "use client";
 
+import {
+  IconAlertTriangle,
+  IconChevronLeft,
+  IconChevronRight,
+  IconCircleCheck,
+  IconCircleCheckFilled,
+  IconClipboardList,
+  IconDeviceFloppy,
+  IconInfoCircle,
+  IconListNumbers,
+  IconLock,
+  IconTargetArrow,
+} from "@tabler/icons-react";
 import { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -11,11 +24,12 @@ import {
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Progress, ProgressLabel } from "@/components/ui/progress";
+import { Progress } from "@/components/ui/progress";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Spinner } from "@/components/ui/spinner";
+import { cn } from "@/lib/utils";
 import { getAssessmentTypeLabel } from "@/lib/domain/assessments/labels";
 import type { WrongAnswerReview } from "@/lib/domain/assessments/review-wrong-answers";
 import type { AssessmentType } from "@/lib/domain/assessments/types";
@@ -87,6 +101,7 @@ export function AssessmentTakeView({
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<SubmitResult | null>(null);
   const [attemptHistory, setAttemptHistory] = useState(attempts);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   const answeredCount = useMemo(() => {
     if (!session) {
@@ -99,6 +114,27 @@ export function AssessmentTakeView({
   const progressValue = session
     ? Math.round((answeredCount / session.questions.length) * 100)
     : 0;
+  const unansweredCount = session
+    ? session.questions.length - answeredCount
+    : 0;
+  const allAnswered = session ? unansweredCount === 0 : false;
+
+  const startTitle =
+    isSingleAttempt && hasCompleted
+      ? `${typeLabel} Selesai`
+      : hasPassed
+        ? "Kamu Sudah Lulus"
+        : inProgressAttempt
+          ? `Lanjutkan ${typeLabel}`
+          : `Siap Mengerjakan ${typeLabel}?`;
+  const startDescription =
+    isSingleAttempt && hasCompleted
+      ? `${typeLabel} sudah dikerjakan dan tidak dapat diulang.`
+      : hasPassed
+        ? `Kamu sudah mencapai passing grade untuk ${typeLabel.toLowerCase()} ini.`
+        : inProgressAttempt
+          ? "Kamu punya jawaban tersimpan. Lanjutkan dari tempat terakhir kamu berhenti."
+          : "Baca setiap soal dengan teliti, lalu pilih satu jawaban yang paling tepat.";
 
   const saveAnswers = useCallback(
     async (attemptId: string, answers: Record<string, string>) => {
@@ -147,6 +183,7 @@ export function AssessmentTakeView({
         questions: data.questions,
         answers,
       });
+      setCurrentIndex(0);
     } catch {
       toast.error("Gagal memulai attempt.");
     } finally {
@@ -224,23 +261,192 @@ export function AssessmentTakeView({
     );
   }
 
+  if (session) {
+    const total = session.questions.length;
+    const safeIndex = Math.min(currentIndex, total - 1);
+    const currentQuestion = session.questions[safeIndex];
+    const currentAnswer = session.answers[currentQuestion.id] ?? "";
+    const isFirstQuestion = safeIndex === 0;
+    const isLastQuestion = safeIndex === total - 1;
+
+    return (
+      <div className="flex flex-col gap-5 lg:flex-row">
+        <div className="flex-1 space-y-4">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <p className="text-sm font-semibold">{typeLabel}</p>
+              <p className="text-xs text-muted-foreground">
+                Soal {safeIndex + 1} dari {total}
+              </p>
+            </div>
+            <span className="text-sm font-semibold tabular-nums">
+              {progressValue}%
+            </span>
+          </div>
+          <Progress value={progressValue} />
+
+          <div className="rounded-xl border bg-card p-5 sm:p-6">
+            <div className="flex items-start gap-3">
+              <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-foreground">
+                {safeIndex + 1}
+              </span>
+              <p className="pt-1 font-medium leading-relaxed">
+                {currentQuestion.questionText}
+              </p>
+            </div>
+
+            <RadioGroup
+              value={currentAnswer}
+              onValueChange={(value) => {
+                if (value) {
+                  void handleAnswerChange(currentQuestion.id, value);
+                }
+              }}
+              className="mt-5"
+            >
+              {currentQuestion.options.map((option, optionIndex) => {
+                const optionLabel = String.fromCharCode(65 + optionIndex);
+                const selected = currentAnswer === option.id;
+
+                return (
+                  <Label
+                    key={option.id}
+                    htmlFor={option.id}
+                    className={cn(
+                      "flex cursor-pointer items-start gap-3 rounded-lg border p-3.5 text-sm font-normal leading-relaxed transition-colors",
+                      selected
+                        ? "border-primary bg-primary/5 ring-1 ring-primary/20"
+                        : "hover:border-input hover:bg-muted/50",
+                    )}
+                  >
+                    <RadioGroupItem
+                      value={option.id}
+                      id={option.id}
+                      className="mt-0.5"
+                    />
+                    <span>
+                      <span className="font-medium">{optionLabel}.</span>{" "}
+                      {option.text}
+                    </span>
+                  </Label>
+                );
+              })}
+            </RadioGroup>
+          </div>
+
+          <div className="flex items-center justify-between gap-3">
+            <Button
+              variant="outline"
+              onClick={() => setCurrentIndex(safeIndex - 1)}
+              disabled={isFirstQuestion}
+            >
+              <IconChevronLeft className="size-4" />
+              Sebelumnya
+            </Button>
+            <Button
+              onClick={() => setCurrentIndex(safeIndex + 1)}
+              disabled={isLastQuestion}
+            >
+              Berikutnya
+              <IconChevronRight className="size-4" />
+            </Button>
+          </div>
+        </div>
+
+        <aside className="lg:w-64 lg:shrink-0">
+          <div className="space-y-4 rounded-xl border bg-card p-4 lg:sticky lg:top-2">
+            <div>
+              <p className="text-sm font-semibold">Navigasi Soal</p>
+              <p className="mt-0.5 text-xs text-muted-foreground">
+                {answeredCount} dari {total} soal terjawab
+              </p>
+            </div>
+
+            <div className="grid grid-cols-6 gap-2 sm:grid-cols-8 lg:grid-cols-5">
+              {session.questions.map((question, index) => {
+                const isAnswered = Boolean(session.answers[question.id]);
+                const isCurrent = index === safeIndex;
+
+                return (
+                  <button
+                    key={question.id}
+                    type="button"
+                    onClick={() => setCurrentIndex(index)}
+                    aria-current={isCurrent ? "true" : undefined}
+                    aria-label={`Soal ${index + 1}${
+                      isAnswered ? " (sudah dijawab)" : ""
+                    }`}
+                    className={cn(
+                      "flex aspect-square items-center justify-center rounded-md border text-sm font-medium transition-colors",
+                      isAnswered
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : "border-input bg-background text-foreground hover:bg-muted",
+                      isCurrent &&
+                        "ring-2 ring-primary ring-offset-2 ring-offset-background",
+                    )}
+                  >
+                    {index + 1}
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="flex flex-col gap-1.5 text-xs text-muted-foreground">
+              <span className="flex items-center gap-2">
+                <span className="size-3 rounded-sm bg-primary" />
+                Sudah dijawab
+              </span>
+              <span className="flex items-center gap-2">
+                <span className="size-3 rounded-sm border border-input bg-background" />
+                Belum dijawab
+              </span>
+            </div>
+
+            <div className="space-y-2 border-t pt-4">
+              {allAnswered ? (
+                <p className="flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400">
+                  <IconCircleCheckFilled className="size-3.5 shrink-0" />
+                  Semua soal sudah dijawab
+                </p>
+              ) : (
+                <p className="flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400">
+                  <IconAlertTriangle className="size-3.5 shrink-0" />
+                  {unansweredCount} soal belum dijawab
+                </p>
+              )}
+              <Button
+                onClick={handleSubmit}
+                disabled={loading}
+                className="w-full"
+              >
+                {loading ? <Spinner className="size-4" /> : null}
+                Submit Jawaban
+              </Button>
+            </div>
+          </div>
+        </aside>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-xl font-semibold">{typeLabel}</h2>
           <p className="text-sm text-muted-foreground">
-            Passing grade {passingGrade}% · Nilai tertinggi {bestScore}%
+            Passing grade {passingGrade}% · Nilai tertinggi{" "}
+            {result ? result.bestScore : bestScore}%
             {isSingleAttempt ? " · Hanya 1 attempt" : null}
           </p>
         </div>
         {isSingleAttempt ? (
-          hasCompleted ? (
+          result || hasCompleted ? (
             <Badge>Selesai</Badge>
           ) : (
             <Badge variant="secondary">Belum Dikerjakan</Badge>
           )
-        ) : hasPassed ? (
+        ) : (result ? result.passed : hasPassed) ? (
           <Badge>Lulus</Badge>
         ) : (
           <Badge variant="secondary">Belum Lulus</Badge>
@@ -264,79 +470,83 @@ export function AssessmentTakeView({
             </Button>
           ) : null}
         </>
-      ) : session ? (
-        <div className="space-y-6">
-          <div className="space-y-2">
-            <div className="flex w-full items-center justify-between gap-3">
-              <ProgressLabel>Progress Jawaban</ProgressLabel>
-              <span className="text-xs text-muted-foreground tabular-nums">
-                {answeredCount}/{session.questions.length}
-              </span>
-            </div>
-            <Progress value={progressValue} />
-          </div>
-
-          {session.questions.map((question, index) => (
-            <Card key={question.id}>
-              <CardHeader>
-                <CardTitle className="text-base">
-                  {index + 1}. {question.questionText}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <RadioGroup
-                  value={session.answers[question.id] ?? ""}
-                  onValueChange={(value) => {
-                    if (value) {
-                      void handleAnswerChange(question.id, value);
-                    }
-                  }}
-                  className="space-y-3"
-                >
-                  {question.options.map((option, optionIndex) => {
-                    const label = String.fromCharCode(65 + optionIndex);
-
-                    return (
-                      <div
-                        key={option.id}
-                        className="flex items-start gap-3 rounded-lg border p-3"
-                      >
-                        <RadioGroupItem value={option.id} id={option.id} />
-                        <Label htmlFor={option.id} className="cursor-pointer">
-                          <span className="font-medium">{label}.</span>{" "}
-                          {option.text}
-                        </Label>
-                      </div>
-                    );
-                  })}
-                </RadioGroup>
-              </CardContent>
-            </Card>
-          ))}
-
-          <div className="flex justify-end">
-            <Button onClick={handleSubmit} disabled={loading}>
-              {loading ? <Spinner className="size-4" /> : null}
-              Submit Jawaban
-            </Button>
-          </div>
-        </div>
       ) : (
         <Card>
-          <CardContent className="space-y-4 p-6">
-            <p className="text-sm text-muted-foreground">
-              {isSingleAttempt && hasCompleted
-                ? `${typeLabel} sudah dikerjakan dan tidak dapat diulang.`
-                : hasPassed
-                  ? `Anda sudah mencapai passing grade untuk ${typeLabel.toLowerCase()} ini.`
-                  : `Mulai mengerjakan ${typeLabel.toLowerCase()}. Jawaban akan tersimpan otomatis saat Anda memilih opsi.`}
-            </p>
+          <CardContent className="space-y-6 p-6">
+            <div className="flex items-start gap-4">
+              <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <IconClipboardList className="size-6" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-lg font-semibold">{startTitle}</h3>
+                <p className="text-sm text-muted-foreground">
+                  {startDescription}
+                </p>
+              </div>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-3">
+              <div className="rounded-lg border p-4">
+                <div className="flex items-center gap-1.5 text-muted-foreground">
+                  <IconListNumbers className="size-4" />
+                  <span className="text-xs">Jumlah Soal</span>
+                </div>
+                <p className="mt-1 text-3xl font-semibold">
+                  {initialQuestions.length}
+                </p>
+              </div>
+              <div className="rounded-lg border p-4">
+                <div className="flex items-center gap-1.5 text-muted-foreground">
+                  <IconTargetArrow className="size-4" />
+                  <span className="text-xs">Passing Grade</span>
+                </div>
+                <p className="mt-1 text-3xl font-semibold">{passingGrade}%</p>
+              </div>
+              <div className="rounded-lg border p-4">
+                <div className="flex items-center gap-1.5 text-muted-foreground">
+                  <IconCircleCheck className="size-4" />
+                  <span className="text-xs">Nilai Tertinggi</span>
+                </div>
+                <p className="mt-1 text-3xl font-semibold">{bestScore}%</p>
+              </div>
+            </div>
+
+            {isSingleAttempt && !hasCompleted ? (
+              <div className="flex items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 text-xs text-amber-700 dark:text-amber-400">
+                <IconLock className="mt-0.5 size-4 shrink-0" />
+                <span>
+                  {typeLabel} hanya dapat dikerjakan satu kali. Pastikan semua
+                  jawaban sudah yakin sebelum submit.
+                </span>
+              </div>
+            ) : (
+              <div className="flex items-start gap-2 rounded-lg bg-muted/50 p-3 text-xs text-muted-foreground">
+                <IconDeviceFloppy className="mt-0.5 size-4 shrink-0" />
+                <span>
+                  Jawaban tersimpan otomatis setiap kali kamu memilih opsi.
+                </span>
+              </div>
+            )}
+
             {canRetry ? (
-              <Button onClick={handleStart} disabled={loading}>
+              <Button
+                size="lg"
+                onClick={handleStart}
+                disabled={loading}
+                className="w-full sm:w-auto"
+              >
                 {loading ? <Spinner className="size-4" /> : null}
                 {inProgressAttempt ? "Lanjutkan" : "Mulai"} {typeLabel}
               </Button>
-            ) : null}
+            ) : (
+              <div className="flex items-center gap-2 rounded-lg border border-dashed p-3 text-sm text-muted-foreground">
+                <IconInfoCircle className="size-4 shrink-0" />
+                <span>
+                  Kamu tidak dapat mengerjakan {typeLabel.toLowerCase()} saat
+                  ini.
+                </span>
+              </div>
+            )}
           </CardContent>
         </Card>
       )}
