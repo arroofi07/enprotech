@@ -5,3 +5,5 @@ export * from "./modules";
 export * from "./assessments";
 export * from "./certificates";
 export * from "./notifications";
+export * from "./student-projects";
+export * from "./training-feedback";

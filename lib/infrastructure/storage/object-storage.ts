@@ -9,6 +9,9 @@ export type UploadFileInput = {
   contentType: string;
   data: Buffer;
   purpose: UploadPurpose;
+  // Folder prefix opsional. Bila diisi, menggantikan prefix bawaan yang
+  // diturunkan dari `purpose` (mis. "projects" untuk file project peserta).
+  keyPrefix?: string;
 };
 
 export type UploadFileResult = {
@@ -35,7 +38,9 @@ function sanitizeFilename(filename: string): string {
 }
 
 function buildStoragePath(input: UploadFileInput): string {
-  const prefix = input.purpose === "thumbnail" ? "thumbnails" : "documents";
+  const prefix =
+    input.keyPrefix ??
+    (input.purpose === "thumbnail" ? "thumbnails" : "documents");
   return `${prefix}/${Date.now()}-${sanitizeFilename(input.filename)}`;
 }
 

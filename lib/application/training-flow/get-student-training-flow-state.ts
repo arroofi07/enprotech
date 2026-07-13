@@ -1,7 +1,7 @@
 import type { SessionUser } from "@/lib/domain/auth/types";
 import { getBestScore, hasPassed } from "@/lib/domain/assessments/best-score";
 import {
-  canAccessPostTest,
+  canAccessCertificate,
   hasPassedPostTest,
 } from "@/lib/domain/training-flow/gates";
 import {
@@ -9,6 +9,8 @@ import {
   getBestSubmittedScore,
   getTrainingPassingGrade,
 } from "@/lib/infrastructure/db/repositories/assessment-repository";
+import { findFeedbackByStudentAndTraining } from "@/lib/infrastructure/db/repositories/feedback-repository";
+import { findProjectByStudentAndTraining } from "@/lib/infrastructure/db/repositories/project-repository";
 import {
   areAllModulesCompleted,
   findTrainingById,
@@ -21,6 +23,8 @@ export type StudentTrainingFlowState = PretestGateState & {
   allModulesCompleted: boolean;
   postTestBestScore: number | null;
   hasPassedPostTest: boolean;
+  hasSubmittedProject: boolean;
+  hasSubmittedFeedback: boolean;
   canAccessCertificate: boolean;
 };
 
@@ -38,8 +42,12 @@ export async function getStudentTrainingFlowState(
     return null;
   }
 
-  const allModulesCompleted = await areAllModulesCompleted(studentId, trainingId);
-  const postTest = await findAssessmentByTrainingAndType(trainingId, "post_test");
+  const [allModulesCompleted, postTest, project, feedback] = await Promise.all([
+    areAllModulesCompleted(studentId, trainingId),
+    findAssessmentByTrainingAndType(trainingId, "post_test"),
+    findProjectByStudentAndTraining(studentId, trainingId),
+    findFeedbackByStudentAndTraining(studentId, trainingId),
+  ]);
 
   let postTestBestScore: number | null = null;
   let passedPostTest = false;
@@ -50,13 +58,23 @@ export async function getStudentTrainingFlowState(
     passedPostTest = hasPassedPostTest(postTestBestScore, passingGrade);
   }
 
+  const hasSubmittedProject = Boolean(project);
+  const hasSubmittedFeedback = Boolean(feedback);
+
   return {
     ...pretestGate,
     trainingTitle: training.title,
     allModulesCompleted,
     postTestBestScore: postTest ? postTestBestScore : null,
     hasPassedPostTest: passedPostTest,
-    canAccessCertificate: canAccessPostTest(allModulesCompleted) && passedPostTest,
+    hasSubmittedProject,
+    hasSubmittedFeedback,
+    canAccessCertificate: canAccessCertificate({
+      allModulesCompleted,
+      hasPassedPostTest: passedPostTest,
+      hasSubmittedProject,
+      hasSubmittedFeedback,
+    }),
   };
 }
 

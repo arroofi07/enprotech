@@ -1,0 +1,24 @@
+import type { ProjectErrorCode } from "@/lib/domain/projects/errors";
+
+export function projectErrorHttpStatus(error: ProjectErrorCode): number {
+  switch (error) {
+    case "UNAUTHORIZED":
+      return 401;
+    case "FORBIDDEN":
+    case "NOT_ENROLLED":
+      return 403;
+    case "TRAINING_NOT_FOUND":
+    case "PROJECT_NOT_FOUND":
+      return 404;
+    case "VALIDATION_ERROR":
+    case "INVALID_FILE_TYPE":
+    case "FILE_TOO_LARGE":
+      return 400;
+    case "UPLOAD_FAILED":
+      return 500;
+    default: {
+      const _exhaustive: never = error;
+      return _exhaustive;
+    }
+  }
+}

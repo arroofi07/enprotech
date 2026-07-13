@@ -11,8 +11,18 @@ export function canAccessPostTest(allModulesCompleted: boolean): boolean {
   return allModulesCompleted;
 }
 
-export function canAccessCertificate(hasPassedPostTest: boolean): boolean {
-  return hasPassedPostTest;
+export function canAccessCertificate(input: {
+  allModulesCompleted: boolean;
+  hasPassedPostTest: boolean;
+  hasSubmittedProject: boolean;
+  hasSubmittedFeedback: boolean;
+}): boolean {
+  return (
+    input.allModulesCompleted &&
+    input.hasPassedPostTest &&
+    input.hasSubmittedProject &&
+    input.hasSubmittedFeedback
+  );
 }
 
 export function hasCompletedPretest(submittedAttemptCount: number): boolean {

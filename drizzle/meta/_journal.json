@@ -43,6 +43,20 @@
       "when": 1783578000000,
       "tag": "0006_video_conference_ended_at",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1783921480083,
+      "tag": "0006_exotic_thunderbolt",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1783949698024,
+      "tag": "0007_clammy_penance",
+      "breakpoints": true
     }
   ]
 }

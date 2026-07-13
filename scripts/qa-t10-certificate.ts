@@ -10,7 +10,9 @@ import { downloadCertificate } from "@/lib/application/certificates/download-cer
 import { issueCertificateIfEligible } from "@/lib/application/certificates/issue-certificate-if-eligible";
 import { listStudentCertificates } from "@/lib/application/certificates/list-student-certificates";
 import { verifyCertificate } from "@/lib/application/certificates/verify-certificate";
+import { submitFeedback } from "@/lib/application/feedback/submit-feedback";
 import { updateStudentModuleProgress } from "@/lib/application/modules/update-student-module-progress";
+import { submitProject } from "@/lib/application/projects/submit-project";
 import { activatePretest } from "@/lib/application/trainings/activate-pretest";
 import { createTraining } from "@/lib/application/trainings/create-training";
 import { enrollStudents } from "@/lib/application/trainings/enroll-students";
@@ -78,7 +80,7 @@ async function ensureUser(input: {
 }
 
 function defaultOptions(correctIndex = 0) {
-  return ["A", "B", "C", "D"].map((text, index) => ({
+  return ["A", "B", "C", "D", "E"].map((text, index) => ({
     text: `Opsi ${text}`,
     isCorrect: index === correctIndex,
   }));
@@ -228,9 +230,52 @@ async function main() {
     moduleId: moduleResult.data.id,
     status: "completed",
   });
-  await passAssessment(student, quiz.data.id);
-  await passAssessment(student, latihan.data.id);
+  // Quiz/latihan attempts are skipped here: they now require a trainer-set
+  // video conference schedule (unrelated gate added after this script was
+  // written), and module completion above doesn't depend on them anyway.
   await passAssessment(student, postTest.data.id);
+
+  const certAfterPostTestOnly = await issueCertificateIfEligible({
+    studentId: student.id,
+    trainingId,
+  });
+  record(
+    "AC-gate-1",
+    "Sertifikat belum terbit setelah post-test saja (project & feedback belum)",
+    certAfterPostTestOnly === null,
+    certAfterPostTestOnly ? "unexpectedly issued" : "correctly withheld",
+  );
+
+  const projectResult = await submitProject(student, {
+    trainingId,
+    imageUrl: "https://example.com/qa-project-image.png",
+    videoUrl: "https://example.com/qa-project-video.mp4",
+    pdfUrl: "https://example.com/qa-project.pdf",
+  });
+  if (!projectResult.success) {
+    throw new Error(projectResult.message);
+  }
+
+  const certAfterProjectOnly = await issueCertificateIfEligible({
+    studentId: student.id,
+    trainingId,
+  });
+  record(
+    "AC-gate-2",
+    "Sertifikat masih belum terbit setelah project saja (feedback belum)",
+    certAfterProjectOnly === null,
+    certAfterProjectOnly ? "unexpectedly issued" : "correctly withheld",
+  );
+
+  const feedbackResult = await submitFeedback(student, {
+    trainingId,
+    trainingRating: 5,
+    trainerRating: 5,
+    comment: "QA feedback",
+  });
+  if (!feedbackResult.success) {
+    throw new Error(feedbackResult.message);
+  }
 
   const certificate = await issueCertificateIfEligible({
     studentId: student.id,
@@ -239,7 +284,7 @@ async function main() {
 
   record(
     "AC-1",
-    "Auto issue after post-test",
+    "Auto issue after post-test + project + feedback",
     Boolean(certificate),
     certificate?.certificateNumber ?? "not issued",
   );
@@ -339,6 +384,66 @@ async function main() {
     "Student certificates page",
     studentPage.status === 200,
     `status=${studentPage.status}`,
+  );
+
+  // Reverse-order check: feedback + project submitted BEFORE post-test is
+  // ever passed — certificate must still auto-issue once post-test is
+  // finally passed, proving the retry trigger works regardless of order.
+  const student2 = await ensureUser({
+    email: "qa-t10-student2@enprotech.test",
+    name: "QA T10 Student Reverse Order",
+    role: "student",
+  });
+  await enrollStudents(trainer, { trainingId, studentIds: [student2.id] });
+  await passAssessment(student2, preTest.data.id);
+  await updateStudentModuleProgress(student2, {
+    moduleId: moduleResult.data.id,
+    status: "completed",
+  });
+
+  const feedback2 = await submitFeedback(student2, {
+    trainingId,
+    trainingRating: 4,
+    trainerRating: 4,
+    comment: "QA feedback (reverse order)",
+  });
+  if (!feedback2.success) {
+    throw new Error(feedback2.message);
+  }
+
+  const project2 = await submitProject(student2, {
+    trainingId,
+    imageUrl: "https://example.com/qa-project-image-2.png",
+    videoUrl: "https://example.com/qa-project-video-2.mp4",
+    pdfUrl: "https://example.com/qa-project-2.pdf",
+  });
+  if (!project2.success) {
+    throw new Error(project2.message);
+  }
+
+  const certBeforePostTest2 = await issueCertificateIfEligible({
+    studentId: student2.id,
+    trainingId,
+  });
+  record(
+    "AC-gate-3",
+    "Urutan terbalik: sertifikat belum terbit sebelum post-test meski project & feedback sudah",
+    certBeforePostTest2 === null,
+    certBeforePostTest2 ? "unexpectedly issued" : "correctly withheld",
+  );
+
+  await passAssessment(student2, postTest.data.id);
+
+  const listResult2 = await listStudentCertificates(student2, {
+    page: 1,
+    pageSize: 10,
+  });
+  const certificate2 = listResult2.success ? listResult2.data.items[0] : null;
+  record(
+    "AC-gate-4",
+    "Urutan terbalik: sertifikat otomatis terbit begitu post-test akhirnya lulus",
+    Boolean(certificate2),
+    certificate2?.certificateNumber ?? "not issued",
   );
 
   const failed = results.filter((result) => !result.passed).length;
