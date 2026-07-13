@@ -23,7 +23,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { IconLayoutSidebar } from "@tabler/icons-react"
+import { IconChevronDown, IconLayoutSidebar } from "@tabler/icons-react"
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
@@ -368,17 +368,90 @@ function SidebarSeparator({
   )
 }
 
-function SidebarContent({ className, ...props }: React.ComponentProps<"div">) {
+function SidebarContent({
+  className,
+  children,
+  ...props
+}: React.ComponentProps<"div">) {
+  const scrollRef = React.useRef<HTMLDivElement>(null)
+  const [canScrollUp, setCanScrollUp] = React.useState(false)
+  const [canScrollDown, setCanScrollDown] = React.useState(false)
+
+  const updateScrollHints = React.useCallback(() => {
+    const el = scrollRef.current
+    if (!el) {
+      return
+    }
+
+    const { scrollTop, scrollHeight, clientHeight } = el
+    const threshold = 4
+    const hasOverflow = scrollHeight > clientHeight + threshold
+
+    setCanScrollUp(hasOverflow && scrollTop > threshold)
+    setCanScrollDown(
+      hasOverflow && scrollTop + clientHeight < scrollHeight - threshold
+    )
+  }, [])
+
+  React.useEffect(() => {
+    const el = scrollRef.current
+    if (!el) {
+      return
+    }
+
+    updateScrollHints()
+
+    const resizeObserver = new ResizeObserver(updateScrollHints)
+    resizeObserver.observe(el)
+
+    const mutationObserver = new MutationObserver(updateScrollHints)
+    mutationObserver.observe(el, { childList: true, subtree: true })
+
+    el.addEventListener("scroll", updateScrollHints, { passive: true })
+    window.addEventListener("resize", updateScrollHints)
+
+    return () => {
+      resizeObserver.disconnect()
+      mutationObserver.disconnect()
+      el.removeEventListener("scroll", updateScrollHints)
+      window.removeEventListener("resize", updateScrollHints)
+    }
+  }, [updateScrollHints])
+
   return (
     <div
-      data-slot="sidebar-content"
-      data-sidebar="content"
-      className={cn(
-        "no-scrollbar flex min-h-0 flex-1 flex-col gap-0 overflow-auto group-data-[collapsible=icon]:overflow-hidden",
-        className
-      )}
-      {...props}
-    />
+      data-slot="sidebar-content-wrapper"
+      className="relative flex min-h-0 flex-1 flex-col"
+    >
+      <div
+        aria-hidden="true"
+        className={cn(
+          "pointer-events-none absolute inset-x-0 top-0 z-10 h-6 bg-linear-to-b from-sidebar to-transparent transition-opacity duration-200 group-data-[collapsible=icon]:hidden",
+          canScrollUp ? "opacity-100" : "opacity-0"
+        )}
+      />
+      <div
+        ref={scrollRef}
+        data-slot="sidebar-content"
+        data-sidebar="content"
+        className={cn(
+          "no-scrollbar flex min-h-0 flex-1 flex-col gap-0 overflow-auto group-data-[collapsible=icon]:overflow-hidden",
+          className
+        )}
+        {...props}
+      >
+        {children}
+      </div>
+      <div
+        aria-hidden="true"
+        className={cn(
+          "pointer-events-none absolute inset-x-0 bottom-0 z-10 flex h-10 items-end justify-center bg-linear-to-t from-sidebar from-35% via-sidebar/80 to-transparent pb-1 transition-opacity duration-200 group-data-[collapsible=icon]:hidden",
+          canScrollDown ? "opacity-100" : "opacity-0"
+        )}
+      >
+        <IconChevronDown className="size-4 text-sidebar-foreground/50 motion-safe:animate-bounce" />
+      </div>
+    </div>
   )
 }
 
