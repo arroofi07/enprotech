@@ -1,5 +1,8 @@
+import { PutObjectCommand } from "@aws-sdk/client-s3";
+
 import type { UploadPurpose } from "@/lib/domain/modules/types";
-import { createAdminClient } from "@/utils/supabase/admin";
+
+import { createStorageClient } from "./s3-client";
 
 export type UploadFileInput = {
   filename: string;
@@ -16,7 +19,15 @@ export type UploadFileResult = {
 const DEFAULT_BUCKET = "uploads";
 
 function getStorageBucket(): string {
-  return process.env.SUPABASE_STORAGE_BUCKET ?? DEFAULT_BUCKET;
+  return process.env.S3_BUCKET ?? DEFAULT_BUCKET;
+}
+
+// Base URL yang menghadap browser untuk file publik. Berbeda dari S3_ENDPOINT
+// karena upload memakai hostname internal (mis. http://rustfs:9000) sedangkan
+// URL yang disimpan & disajikan harus reachable dari luar container.
+function getPublicBase(): string {
+  const base = process.env.S3_PUBLIC_URL ?? process.env.S3_ENDPOINT ?? "";
+  return base.replace(/\/$/, "");
 }
 
 function sanitizeFilename(filename: string): string {
@@ -31,23 +42,21 @@ function buildStoragePath(input: UploadFileInput): string {
 export async function uploadFileToStorage(
   input: UploadFileInput,
 ): Promise<UploadFileResult> {
-  const supabase = createAdminClient();
+  const s3 = createStorageClient();
   const bucket = getStorageBucket();
   const path = buildStoragePath(input);
 
-  const { error } = await supabase.storage.from(bucket).upload(path, input.data, {
-    contentType: input.contentType,
-    upsert: false,
-  });
-
-  if (error) {
-    throw error;
-  }
-
-  const { data } = supabase.storage.from(bucket).getPublicUrl(path);
+  await s3.send(
+    new PutObjectCommand({
+      Bucket: bucket,
+      Key: path,
+      Body: input.data,
+      ContentType: input.contentType,
+    }),
+  );
 
   return {
-    url: data.publicUrl,
+    url: `${getPublicBase()}/${bucket}/${path}`,
     size: input.data.byteLength,
   };
 }

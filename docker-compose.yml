@@ -1,0 +1,80 @@
+name: enprotech
+
+services:
+  app:
+    build:
+      context: .
+      target: runner
+    image: enprotech-app
+    env_file: .env
+    environment:
+      # Upload memakai hostname internal jaringan compose (override nilai .env).
+      S3_ENDPOINT: http://rustfs:9000
+    ports:
+      - "3000:3000"
+    depends_on:
+      rustfs-init:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+  rustfs:
+    image: rustfs/rustfs:latest
+    environment:
+      RUSTFS_ACCESS_KEY: ${S3_ACCESS_KEY_ID:-rustfsadmin}
+      RUSTFS_SECRET_KEY: ${S3_SECRET_ACCESS_KEY:-rustfsadmin}
+      RUSTFS_CONSOLE_ENABLE: "true"
+    ports:
+      - "9000:9000" # S3 API
+      - "9001:9001" # Console (login pakai access/secret key di atas)
+    volumes:
+      - rustfs-data:/data
+      - rustfs-logs:/logs
+    restart: unless-stopped
+
+  # Menunggu rustfs siap, membuat bucket, lalu set policy public-read. Jalan sekali & exit.
+  rustfs-init:
+    image: amazon/aws-cli:latest
+    depends_on:
+      rustfs:
+        condition: service_started
+    environment:
+      AWS_ACCESS_KEY_ID: ${S3_ACCESS_KEY_ID:-rustfsadmin}
+      AWS_SECRET_ACCESS_KEY: ${S3_SECRET_ACCESS_KEY:-rustfsadmin}
+      AWS_DEFAULT_REGION: ${S3_REGION:-us-east-1}
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        endpoint="http://rustfs:9000"; bucket="${S3_BUCKET:-uploads}"
+        for i in $$(seq 1 30); do
+          aws --endpoint-url "$$endpoint" s3 ls >/dev/null 2>&1 && break
+          echo "menunggu rustfs siap... ($$i)"; sleep 2
+        done
+        aws --endpoint-url "$$endpoint" s3 mb "s3://$$bucket" 2>/dev/null || true
+        aws --endpoint-url "$$endpoint" s3api put-bucket-policy --bucket "$$bucket" \
+          --policy "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":[\"s3:GetObject\"],\"Resource\":[\"arn:aws:s3:::$$bucket/*\"]}]}"
+        echo "rustfs siap: bucket '$$bucket' + policy public-read"
+    restart: "no"
+
+  # One-off (manual): docker compose run --rm migrate
+  migrate:
+    build:
+      context: .
+      target: tooling
+    image: enprotech-tooling
+    env_file: .env
+    profiles: ["tools"]
+    command: ["bun", "run", "db:migrate"]
+
+  # One-off (manual): docker compose run --rm seed
+  seed:
+    build:
+      context: .
+      target: tooling
+    image: enprotech-tooling
+    env_file: .env
+    profiles: ["tools"]
+    command: ["bun", "run", "db:seed"]
+
+volumes:
+  rustfs-data:
+  rustfs-logs:

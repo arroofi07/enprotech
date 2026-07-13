@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // Menghasilkan .next/standalone (server.js mandiri) untuk image Docker ramping.
+  output: "standalone",
 };
 
 export default nextConfig;

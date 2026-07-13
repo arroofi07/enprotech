@@ -7,8 +7,10 @@ import {
   type ModuleResult,
 } from "@/lib/domain/modules/errors";
 import type { UploadPurpose } from "@/lib/domain/modules/types";
-import { uploadFileToStorage } from "@/lib/infrastructure/storage/supabase-storage";
-import { SupabaseConfigError } from "@/utils/supabase/admin";
+import {
+  StorageConfigError,
+} from "@/lib/infrastructure/storage/s3-client";
+import { uploadFileToStorage } from "@/lib/infrastructure/storage/object-storage";
 import { uploadFileSchema } from "@/lib/validations/module-schemas";
 
 import { assertModuleTrainerOrAdmin } from "./assert-access";
@@ -63,7 +65,7 @@ export async function uploadModuleFile(
       purpose: parsed.data.purpose,
     });
   } catch (error) {
-    if (error instanceof SupabaseConfigError) {
+    if (error instanceof StorageConfigError) {
       console.error("[uploadModuleFile]", error.message);
       return {
         success: false,
