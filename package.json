@@ -43,7 +43,7 @@
     "jose": "^6.2.3",
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.8",
-    "next": "16.2.10",
+    "next": "16.3.0-canary.84",
     "next-themes": "^0.4.6",
     "postgres": "^3.4.9",
     "react": "19.2.4",
@@ -66,13 +66,29 @@
     "@types/node": "^20.19.43",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@typescript/typescript6": "^6.0.2",
     "dotenv": "^17.4.2",
     "drizzle-kit": "^0.31.10",
     "eslint": "^9",
-    "eslint-config-next": "16.2.10",
+    "eslint-config-next": "16.3.0-canary.84",
     "tailwindcss": "^4",
-    "typescript": "^5",
+    "typescript": "^7",
     "vitest": "^4.1.10"
+  },
+  "overrides": {
+    "eslint-config-next": {
+      "typescript-eslint": {
+        "@typescript-eslint/typescript-estree": {
+          "typescript": "$@typescript/typescript6"
+        },
+        "@typescript-eslint/parser": {
+          "typescript": "$@typescript/typescript6"
+        },
+        "@typescript-eslint/eslint-plugin": {
+          "typescript": "$@typescript/typescript6"
+        }
+      }
+    }
   },
   "ignoreScripts": [
     "sharp",
