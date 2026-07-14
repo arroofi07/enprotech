@@ -4,6 +4,7 @@ import {
   IconCertificate,
   IconChartBar,
   IconClipboardCheck,
+  IconClock,
   IconFolderOpen,
   IconLayoutDashboard,
   IconListCheck,
@@ -190,6 +191,18 @@ function buildLearningFlowNav(prefix: LearningFlowPrefix): DashboardNavItem[] {
         `${prefix}/post-test`,
         `${prefix}/trainings`,
       ],
+    },
+    {
+      title: "Batas Waktu",
+      href: `${prefix}/waktu-ujian`,
+      icon: IconClock,
+      implemented: true,
+      isActive: (pathname) =>
+        pathname === `${prefix}/waktu-ujian` ||
+        pathname.startsWith(`${prefix}/waktu-ujian/`) ||
+        new RegExp(`^${prefix}/trainings/[^/]+/waktu-ujian(?:/|$)`).test(
+          pathname,
+        ),
     },
     {
       title: "Project",

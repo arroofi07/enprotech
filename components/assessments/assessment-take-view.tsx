@@ -7,13 +7,14 @@ import {
   IconCircleCheck,
   IconCircleCheckFilled,
   IconClipboardList,
+  IconClock,
   IconDeviceFloppy,
   IconInfoCircle,
   IconListNumbers,
   IconLock,
   IconTargetArrow,
 } from "@tabler/icons-react";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { AssessmentAttemptHistory } from "@/components/assessments/assessment-attempt-history";
@@ -68,7 +69,15 @@ type AttemptSession = {
   attemptId: string;
   questions: QuestionRecord[];
   answers: Record<string, string>;
+  startedAt: Date;
 };
+
+function formatRemainingTime(ms: number): string {
+  const totalSeconds = Math.ceil(ms / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+}
 
 export function AssessmentTakeView({
   trainingId,
@@ -98,6 +107,7 @@ export function AssessmentTakeView({
               answer.selectedOptionId,
             ]),
           ),
+          startedAt: inProgressAttempt.startedAt,
         }
       : null,
   );
@@ -105,6 +115,12 @@ export function AssessmentTakeView({
   const [result, setResult] = useState<SubmitResult | null>(latestAttemptReview);
   const [attemptHistory, setAttemptHistory] = useState(attempts);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [remainingMs, setRemainingMs] = useState<number | null>(null);
+  const sessionRef = useRef(session);
+
+  useEffect(() => {
+    sessionRef.current = session;
+  }, [session]);
 
   const answeredCount = useMemo(() => {
     if (!session) {
@@ -185,6 +201,7 @@ export function AssessmentTakeView({
         attemptId: data.attempt.id,
         questions: data.questions,
         answers,
+        startedAt: new Date(data.attempt.startedAt),
       });
       setCurrentIndex(0);
     } catch {
@@ -204,52 +221,90 @@ export function AssessmentTakeView({
     await saveAnswers(session.attemptId, nextAnswers);
   }
 
+  const performSubmit = useCallback(
+    async (target: AttemptSession, options?: { auto?: boolean }) => {
+      setLoading(true);
+
+      try {
+        await saveAnswers(target.attemptId, target.answers);
+
+        const response = await fetch(
+          `/api/attempts/${target.attemptId}/submit`,
+          { method: "POST" },
+        );
+        const data = await response.json();
+
+        if (!response.ok) {
+          toast.error(data.message ?? "Gagal submit jawaban.");
+          return;
+        }
+
+        toast.success(
+          options?.auto
+            ? `Waktu habis, jawaban otomatis dikirim. Nilai Anda ${data.score}%.`
+            : data.passed
+              ? `Selamat! Anda lulus dengan nilai ${data.score}%.`
+              : `Jawaban terkirim. Nilai Anda ${data.score}%.`,
+        );
+        setResult(data);
+        setSession(null);
+        setAttemptHistory((current) => [
+          {
+            id: data.attemptId,
+            studentId: "",
+            assessmentId: assessment.id,
+            score: data.score,
+            answers: [],
+            questionIds: null,
+            startedAt: new Date(),
+            submittedAt: new Date(),
+          },
+          ...current,
+        ]);
+      } catch {
+        toast.error("Gagal submit jawaban.");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [assessment.id, saveAnswers],
+  );
+
   async function handleSubmit() {
     if (!session) {
       return;
     }
 
-    setLoading(true);
-
-    try {
-      await saveAnswers(session.attemptId, session.answers);
-
-      const response = await fetch(`/api/attempts/${session.attemptId}/submit`, {
-        method: "POST",
-      });
-      const data = await response.json();
-
-      if (!response.ok) {
-        toast.error(data.message ?? "Gagal submit jawaban.");
-        return;
-      }
-
-      toast.success(
-        data.passed
-          ? `Selamat! Anda lulus dengan nilai ${data.score}%.`
-          : `Jawaban terkirim. Nilai Anda ${data.score}%.`,
-      );
-      setResult(data);
-      setSession(null);
-      setAttemptHistory((current) => [
-        {
-          id: data.attemptId,
-          studentId: "",
-          assessmentId: assessment.id,
-          score: data.score,
-          answers: [],
-          questionIds: null,
-          startedAt: new Date(),
-          submittedAt: new Date(),
-        },
-        ...current,
-      ]);
-    } catch {
-      toast.error("Gagal submit jawaban.");
-    } finally {
-      setLoading(false);
-    }
+    await performSubmit(session);
   }
+
+  useEffect(() => {
+    if (!session || !assessment.timeLimit) {
+      setRemainingMs(null);
+      return;
+    }
+
+    const deadline =
+      session.startedAt.getTime() + assessment.timeLimit * 60_000;
+    let autoSubmitted = false;
+
+    function tick() {
+      const remaining = deadline - Date.now();
+      setRemainingMs(Math.max(remaining, 0));
+
+      if (remaining <= 0 && !autoSubmitted) {
+        autoSubmitted = true;
+        const current = sessionRef.current;
+        if (current) {
+          void performSubmit(current, { auto: true });
+        }
+      }
+    }
+
+    tick();
+    const interval = setInterval(tick, 1000);
+    return () => clearInterval(interval);
+  }, [session?.attemptId, assessment.timeLimit, performSubmit]);
 
   const contextLabel = moduleId ? "modul" : "training";
 
@@ -282,9 +337,24 @@ export function AssessmentTakeView({
                 Soal {safeIndex + 1} dari {total}
               </p>
             </div>
-            <span className="text-sm font-semibold tabular-nums">
-              {progressValue}%
-            </span>
+            <div className="flex items-center gap-3">
+              {remainingMs !== null ? (
+                <span
+                  className={cn(
+                    "flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm font-semibold tabular-nums",
+                    remainingMs <= 60_000
+                      ? "border-red-500/40 bg-red-500/10 text-red-600 dark:text-red-400"
+                      : "border-input bg-muted/50 text-foreground",
+                  )}
+                >
+                  <IconClock className="size-4" />
+                  {formatRemainingTime(remainingMs)}
+                </span>
+              ) : null}
+              <span className="text-sm font-semibold tabular-nums">
+                {progressValue}%
+              </span>
+            </div>
           </div>
           <Progress value={progressValue} />
 
@@ -488,7 +558,12 @@ export function AssessmentTakeView({
               </div>
             </div>
 
-            <div className="grid gap-3 sm:grid-cols-3">
+            <div
+              className={cn(
+                "grid gap-3 sm:grid-cols-3",
+                assessment.timeLimit ? "lg:grid-cols-4" : null,
+              )}
+            >
               <div className="rounded-lg border p-4">
                 <div className="flex items-center gap-1.5 text-muted-foreground">
                   <IconListNumbers className="size-4" />
@@ -505,6 +580,21 @@ export function AssessmentTakeView({
                 </div>
                 <p className="mt-1 text-3xl font-semibold">{passingGrade}%</p>
               </div>
+              {assessment.timeLimit ? (
+                <div className="rounded-lg border p-4">
+                  <div className="flex items-center gap-1.5 text-muted-foreground">
+                    <IconClock className="size-4" />
+                    <span className="text-xs">Batas Waktu</span>
+                  </div>
+                  <p className="mt-1 text-3xl font-semibold">
+                    {assessment.timeLimit}
+                    <span className="text-base font-normal text-muted-foreground">
+                      {" "}
+                      menit
+                    </span>
+                  </p>
+                </div>
+              ) : null}
               <div className="rounded-lg border p-4">
                 <div className="flex items-center gap-1.5 text-muted-foreground">
                   <IconCircleCheck className="size-4" />

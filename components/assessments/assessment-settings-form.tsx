@@ -59,7 +59,7 @@ export function AssessmentSettingsForm({
         </p>
       </div>
 
-      <FieldGroup className="gap-4 sm:grid-cols-2">
+      <FieldGroup className="gap-4 sm:grid-cols-3">
         <Field>
           <FieldLabel htmlFor="questionDisplayCount">
             Jumlah Soal Ditampilkan
@@ -81,6 +81,21 @@ export function AssessmentSettingsForm({
               {totalQuestions > 0 ? effectiveCount : 0}
             </span>{" "}
             soal.
+          </p>
+        </Field>
+
+        <Field>
+          <FieldLabel htmlFor="timeLimit">Batas Waktu (menit)</FieldLabel>
+          <Input
+            id="timeLimit"
+            name="timeLimit"
+            type="number"
+            min={1}
+            defaultValue={assessment.timeLimit ?? ""}
+            placeholder="Tanpa batas waktu"
+          />
+          <p className="text-xs text-muted-foreground">
+            Kosongkan jika student tidak dibatasi waktu pengerjaan.
           </p>
         </Field>
 

@@ -391,6 +391,7 @@ export async function updateAssessmentSettings(
   input: {
     questionDisplayCount?: number | null;
     shuffleQuestions?: boolean;
+    timeLimit?: number | null;
   },
 ): Promise<AssessmentRecord | null> {
   const [row] = await db
@@ -402,6 +403,7 @@ export async function updateAssessmentSettings(
       ...(input.shuffleQuestions !== undefined
         ? { shuffleQuestions: input.shuffleQuestions }
         : {}),
+      ...(input.timeLimit !== undefined ? { timeLimit: input.timeLimit } : {}),
     })
     .where(eq(assessments.id, assessmentId))
     .returning(assessmentColumns);

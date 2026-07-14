@@ -7,6 +7,7 @@ import { createQuestionUseCase } from "@/lib/application/assessments/create-ques
 import { deleteQuestionUseCase } from "@/lib/application/assessments/delete-question";
 import { importQuestionsUseCase } from "@/lib/application/assessments/import-questions";
 import { updateAssessmentSettingsUseCase } from "@/lib/application/assessments/update-assessment-settings";
+import { updateAssessmentTimeLimitUseCase } from "@/lib/application/assessments/update-assessment-time-limit";
 import { updateQuestionUseCase } from "@/lib/application/assessments/update-question";
 import type { AssessmentErrorCode } from "@/lib/domain/assessments/errors";
 import type { AssessmentType } from "@/lib/domain/assessments/types";
@@ -164,6 +165,7 @@ export async function updateAssessmentSettingsAction(
     assessmentId: String(formData.get("assessmentId") ?? ""),
     questionDisplayCount: formData.get("questionDisplayCount"),
     shuffleQuestions: formData.get("shuffleQuestions"),
+    timeLimit: formData.get("timeLimit"),
   });
 
   if (!result.success) {
@@ -176,4 +178,27 @@ export async function updateAssessmentSettingsAction(
 
   revalidateAssessmentPaths(trainingId, type, moduleId);
   return { success: true, message: "Pengaturan assessment berhasil disimpan." };
+}
+
+export async function updateAssessmentTimeLimitAction(
+  _prevState: AssessmentActionState,
+  formData: FormData,
+): Promise<AssessmentActionState> {
+  const actor = await getCurrentUser();
+  const result = await updateAssessmentTimeLimitUseCase(actor, {
+    assessmentId: String(formData.get("assessmentId") ?? ""),
+    timeLimit: formData.get("timeLimit"),
+  });
+
+  if (!result.success) {
+    return { error: result.error, message: result.message, success: false };
+  }
+
+  const trainingId = String(formData.get("trainingId") ?? "");
+  const moduleId = String(formData.get("moduleId") ?? "") || undefined;
+  const type = String(formData.get("type") ?? "quiz") as AssessmentType;
+
+  revalidateAssessmentPaths(trainingId, type, moduleId);
+  revalidatePath(`/trainer/trainings/${trainingId}/waktu-ujian`);
+  return { success: true, message: "Batas waktu berhasil disimpan." };
 }

@@ -111,6 +111,18 @@ export const saveAnswersSchema = z.object({
   ),
 });
 
+const timeLimitFieldSchema = z.preprocess(
+  (value) => {
+    if (value === "" || value === null || value === undefined) {
+      return null;
+    }
+
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : value;
+  },
+  z.number().int().min(1, "Batas waktu minimal 1 menit.").nullable(),
+);
+
 export const updateAssessmentSettingsSchema = z.object({
   assessmentId: z.uuid("ID assessment tidak valid."),
   questionDisplayCount: z.preprocess(
@@ -131,6 +143,12 @@ export const updateAssessmentSettingsSchema = z.object({
 
     return false;
   }, z.boolean()),
+  timeLimit: timeLimitFieldSchema,
+});
+
+export const updateAssessmentTimeLimitSchema = z.object({
+  assessmentId: z.uuid("ID assessment tidak valid."),
+  timeLimit: timeLimitFieldSchema,
 });
 
 export type ModuleAssessmentInput = z.infer<typeof moduleAssessmentSchema>;

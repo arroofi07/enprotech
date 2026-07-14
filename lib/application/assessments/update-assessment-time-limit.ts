@@ -6,16 +6,15 @@ import {
   type AssessmentResult,
 } from "@/lib/domain/assessments/errors";
 import {
-  countQuestionsByAssessment,
   findAssessmentById,
   updateAssessmentSettings,
   type AssessmentRecord,
 } from "@/lib/infrastructure/db/repositories/assessment-repository";
-import { updateAssessmentSettingsSchema } from "@/lib/validations/assessment-schemas";
+import { updateAssessmentTimeLimitSchema } from "@/lib/validations/assessment-schemas";
 
 import { assertAssessmentTrainerOrAdmin } from "./assert-access";
 
-export async function updateAssessmentSettingsUseCase(
+export async function updateAssessmentTimeLimitUseCase(
   actor: SessionUser | null,
   input: unknown,
 ): Promise<AssessmentResult<AssessmentRecord>> {
@@ -24,7 +23,7 @@ export async function updateAssessmentSettingsUseCase(
     return forbidden;
   }
 
-  const parsed = updateAssessmentSettingsSchema.safeParse(input);
+  const parsed = updateAssessmentTimeLimitSchema.safeParse(input);
   if (!parsed.success) {
     return assessmentFailure(AssessmentErrorCode.VALIDATION_ERROR);
   }
@@ -34,19 +33,7 @@ export async function updateAssessmentSettingsUseCase(
     return assessmentFailure(AssessmentErrorCode.ASSESSMENT_NOT_FOUND);
   }
 
-  const totalQuestions = await countQuestionsByAssessment(assessment.id);
-  const questionDisplayCount = parsed.data.questionDisplayCount ?? null;
-
-  if (
-    questionDisplayCount !== null &&
-    (questionDisplayCount < 1 || questionDisplayCount > totalQuestions)
-  ) {
-    return assessmentFailure(AssessmentErrorCode.VALIDATION_ERROR);
-  }
-
   const updated = await updateAssessmentSettings(assessment.id, {
-    questionDisplayCount,
-    shuffleQuestions: parsed.data.shuffleQuestions,
     timeLimit: parsed.data.timeLimit,
   });
 

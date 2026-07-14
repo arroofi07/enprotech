@@ -25,7 +25,7 @@ export type AssessmentWithQuestions = AssessmentRecord & {
   questions: QuestionRecord[];
 };
 
-async function getOrCreateAssessmentRecord(
+export async function getOrCreateAssessmentRecord(
   moduleId: string,
   type: ModuleAssessmentType,
 ): Promise<AssessmentResult<AssessmentRecord>> {
