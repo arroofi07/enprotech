@@ -2,9 +2,13 @@ import {
   IconBook,
   IconChevronRight,
   IconClipboardCheck,
+  IconDownload,
+  IconFileText,
   IconLock,
   IconPencil,
+  IconVideo,
 } from "@tabler/icons-react";
+import type { TablerIcon } from "@tabler/icons-react";
 
 import { AssessmentProgressBadge } from "@/components/progress/assessment-progress-badge";
 import { ButtonLink } from "@/components/ui/button-link";
@@ -18,7 +22,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import type { StudentModuleListItem } from "@/lib/application/modules/list-student-modules";
-import type { ModuleProgressStatus } from "@/lib/domain/modules/types";
+import type {
+  ModuleContentType,
+  ModuleProgressStatus,
+} from "@/lib/domain/modules/types";
 import type { ModuleProgressItem } from "@/lib/domain/trainings/progress-types";
 import { cn } from "@/lib/utils";
 
@@ -39,6 +46,29 @@ const STATUS_OVERLAY: Record<
     className: "bg-emerald-600 text-white ring-1 ring-black/10",
   },
 };
+
+const CONTENT_TYPE_META: Record<
+  ModuleContentType,
+  { label: string; icon: TablerIcon }
+> = {
+  video_link: { label: "Video", icon: IconVideo },
+  document: { label: "Dokumen", icon: IconFileText },
+  download_link: { label: "Berkas", icon: IconDownload },
+};
+
+const CONTENT_TYPE_ORDER: ModuleContentType[] = [
+  "video_link",
+  "document",
+  "download_link",
+];
+
+function getContentBreakdown(contents: StudentModuleListItem["contents"]) {
+  return CONTENT_TYPE_ORDER.map((type) => ({
+    type,
+    ...CONTENT_TYPE_META[type],
+    count: contents.filter((content) => content.type === type).length,
+  })).filter((entry) => entry.count > 0);
+}
 
 type StudentModuleCardProps = {
   module: StudentModuleListItem;
@@ -71,6 +101,7 @@ export function StudentModuleCard({
   const locked = preTestLocked || module.isLocked;
   const lockMessage = getLockMessage(preTestLocked, module.isLocked);
   const contentCount = module.contents.length;
+  const contentBreakdown = getContentBreakdown(module.contents);
   const href = `/student/trainings/${trainingId}/modules/${module.id}`;
 
   return (
@@ -82,7 +113,12 @@ export function StudentModuleCard({
           : "hover:-translate-y-0.5 hover:shadow-md hover:ring-primary/25",
       )}
     >
-      <div className="relative aspect-16/10 w-full overflow-hidden bg-muted">
+      <div
+        className={cn(
+          "relative aspect-16/10 w-full overflow-hidden bg-muted",
+          locked && "grayscale",
+        )}
+      >
         {module.thumbnail ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -95,7 +131,12 @@ export function StudentModuleCard({
             )}
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center bg-linear-to-br from-primary/15 via-muted to-accent/40">
+          <div
+            className={cn(
+              "flex h-full w-full items-center justify-center bg-linear-to-br from-primary/15 via-muted to-accent/40",
+              locked && "from-muted via-muted to-muted",
+            )}
+          >
             <div className="rounded-2xl bg-background/70 p-3 text-primary shadow-sm ring-1 ring-primary/10 backdrop-blur-sm">
               <IconBook className="size-7" />
             </div>
@@ -129,7 +170,7 @@ export function StudentModuleCard({
         </div>
 
         {locked ? (
-          <div className="absolute inset-0 z-5 flex items-center justify-center bg-background/35 backdrop-blur-[2px]">
+          <div className="absolute inset-0 z-5 flex items-center justify-center bg-background/55 backdrop-blur-[2px]">
             <div className="rounded-full bg-background/90 p-3 text-muted-foreground shadow-sm ring-1 ring-foreground/10">
               <IconLock className="size-5" />
             </div>
@@ -139,26 +180,42 @@ export function StudentModuleCard({
 
       <CardHeader className="gap-2 pt-4">
         {trainingTitle ? (
-          <p className="text-[0.65rem] font-semibold tracking-[0.08em] text-primary/80 uppercase">
+          <p
+            className={cn(
+              "text-[0.65rem] font-semibold tracking-[0.08em] uppercase",
+              locked ? "text-muted-foreground" : "text-primary/80",
+            )}
+          >
             {trainingTitle}
           </p>
         ) : null}
-        <CardTitle className="line-clamp-2 text-base leading-snug font-semibold">
+        <CardTitle
+          className={cn(
+            "line-clamp-2 text-base leading-snug font-semibold",
+            locked && "text-muted-foreground",
+          )}
+        >
           {module.title}
         </CardTitle>
         {module.description ? (
-          <CardDescription className="line-clamp-2 text-sm">
+          <CardDescription className="line-clamp-2">
             {module.description}
           </CardDescription>
         ) : null}
       </CardHeader>
 
       <CardContent className="flex flex-1 flex-col gap-3 pt-1">
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-sm text-muted-foreground">
-          <span className="inline-flex items-center gap-1.5">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs text-muted-foreground">
+          <span className="inline-flex items-center gap-1.5 font-medium text-foreground">
             <IconBook className="size-3.5 shrink-0 text-primary/70" />
             {contentCount} materi
           </span>
+          {contentBreakdown.map(({ type, label, icon: TypeIcon, count }) => (
+            <span key={type} className="inline-flex items-center gap-1">
+              <TypeIcon className="size-3.5 shrink-0 text-muted-foreground/70" />
+              {count} {label}
+            </span>
+          ))}
         </div>
 
         {lockMessage ? (
@@ -168,19 +225,25 @@ export function StudentModuleCard({
         ) : null}
 
         {progressItem && !locked ? (
-          <div className="grid grid-cols-1 gap-2 min-[420px]:grid-cols-2">
+          <div className="mt-auto grid grid-cols-1 gap-2 rounded-lg bg-muted/30 p-2.5 min-[420px]:grid-cols-2">
             <div className="flex min-w-0 items-center gap-1.5">
               <IconClipboardCheck className="size-3.5 shrink-0 text-muted-foreground" />
+              <span className="shrink-0 text-xs font-medium text-muted-foreground">
+                Kuis
+              </span>
               <AssessmentProgressBadge
                 status={progressItem.quiz.status}
-                className="max-w-full truncate"
+                className="min-w-0 max-w-full truncate"
               />
             </div>
             <div className="flex min-w-0 items-center gap-1.5">
               <IconPencil className="size-3.5 shrink-0 text-muted-foreground" />
+              <span className="shrink-0 text-xs font-medium text-muted-foreground">
+                Latihan
+              </span>
               <AssessmentProgressBadge
                 status={progressItem.latihan.status}
-                className="max-w-full truncate"
+                className="min-w-0 max-w-full truncate"
               />
             </div>
           </div>
