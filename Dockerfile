@@ -7,7 +7,13 @@ WORKDIR /app
 # ---- deps: install semua dependency (termasuk devDeps utk tooling) ----
 FROM base AS deps
 COPY package.json bun.lock ./
-RUN bun install --frozen-lockfile
+# Cache mount agar tarball persist antar build; retry karena extract binary besar
+# (@img/sharp-libvips-*) kadang gagal transient di build node. `bun pm cache rm`
+# saat retry supaya tarball corrupt di cache di-download ulang.
+RUN --mount=type=cache,target=/root/.bun/install/cache \
+    bun install --frozen-lockfile \
+    || (bun pm cache rm; bun install --frozen-lockfile) \
+    || (bun pm cache rm; bun install --frozen-lockfile)
 
 # ---- builder: bangun output standalone Next.js ----
 FROM base AS builder
