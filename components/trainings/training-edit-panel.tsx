@@ -140,13 +140,20 @@ export function TrainingEditPanel({
                   Thumbnail
                 </FieldLabel>
                 {thumbnailUrl ? (
-                  <div className="flex flex-wrap items-center gap-3">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={thumbnailUrl}
-                      alt={training.title}
-                      className="h-20 w-32 rounded-md object-cover"
-                    />
+                  <div className="space-y-3">
+                    <div className="overflow-hidden rounded-lg border bg-muted/40">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={thumbnailUrl}
+                        alt={`Thumbnail ${training.title}`}
+                        className="aspect-video w-full max-w-md object-cover"
+                      />
+                    </div>
+                    {thumbnailName ? (
+                      <p className="truncate text-sm text-muted-foreground">
+                        {thumbnailName}
+                      </p>
+                    ) : null}
                     <Button
                       type="button"
                       variant="outline"
