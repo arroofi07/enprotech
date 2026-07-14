@@ -7,10 +7,15 @@ export class StorageConfigError extends Error {
   }
 }
 
+function trimEnv(value: string | undefined): string | undefined {
+  const trimmed = value?.trim();
+  return trimmed ? trimmed : undefined;
+}
+
 export function createStorageClient(): S3Client {
-  const endpoint = process.env.S3_ENDPOINT;
-  const accessKeyId = process.env.S3_ACCESS_KEY_ID;
-  const secretAccessKey = process.env.S3_SECRET_ACCESS_KEY;
+  const endpoint = trimEnv(process.env.S3_ENDPOINT);
+  const accessKeyId = trimEnv(process.env.S3_ACCESS_KEY_ID);
+  const secretAccessKey = trimEnv(process.env.S3_SECRET_ACCESS_KEY);
 
   if (!endpoint) {
     throw new StorageConfigError("S3_ENDPOINT belum dikonfigurasi.");
@@ -24,8 +29,12 @@ export function createStorageClient(): S3Client {
 
   return new S3Client({
     endpoint,
-    region: process.env.S3_REGION ?? "us-east-1",
+    region: trimEnv(process.env.S3_REGION) ?? "us-east-1",
     credentials: { accessKeyId, secretAccessKey },
     forcePathStyle: true, // wajib untuk rustfs / MinIO (path-style URL)
+    // AWS SDK v3 default-nya WHEN_SUPPORTED (CRC32 header). Banyak S3-compatible
+    // (RustFS/MinIO/R2) salah-hitung signature → SignatureDoesNotMatch (403).
+    requestChecksumCalculation: "WHEN_REQUIRED",
+    responseChecksumValidation: "WHEN_REQUIRED",
   });
 }
