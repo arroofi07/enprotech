@@ -59,9 +59,11 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
               className="h-auto py-3"
               render={<Link href={homeHref} />}
             >
-              <BrandLogo mark priority className="size-10 shrink-0" />
+              <BrandLogo
+                priority
+                className="h-10 w-auto max-w-36 shrink-0 group-data-[collapsible=icon]:h-8 group-data-[collapsible=icon]:max-w-8"
+              />
               <div className="grid flex-1 text-left leading-tight group-data-[collapsible=icon]:hidden">
-                <span className="text-sm font-semibold">Enprotech</span>
                 <span className="text-xs text-sidebar-muted-foreground">
                   {shellLabel}
                 </span>

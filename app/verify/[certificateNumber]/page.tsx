@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { BrandLogo } from "@/components/brand/brand-logo";
 import { verifyCertificate } from "@/lib/application/certificates/verify-certificate";
 import { Badge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button-link";
@@ -33,11 +34,14 @@ export default async function VerifyResultPage({
   return (
     <div className="flex min-h-full flex-1 items-center justify-center bg-muted/30 p-6">
       <div className="flex w-full max-w-lg flex-col gap-6">
-        <div className="text-center">
-          <h1 className="text-lg font-semibold tracking-tight">
-            Hasil Verifikasi
-          </h1>
-          <p className="text-xs text-muted-foreground">{decodedNumber}</p>
+        <div className="flex flex-col items-center gap-3 text-center">
+          <BrandLogo priority className="h-12" />
+          <div>
+            <h1 className="text-lg font-semibold tracking-tight">
+              Hasil Verifikasi
+            </h1>
+            <p className="text-xs text-muted-foreground">{decodedNumber}</p>
+          </div>
         </div>
 
         <Card>
