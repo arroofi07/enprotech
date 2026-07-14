@@ -6,18 +6,19 @@ services:
       context: .
       target: runner
     image: enprotech-app
+    env_file: .env
     environment:
-      # Upload memakai hostname internal jaringan compose (override nilai .env).
+      # Database & auth (wajib — set di Dokploy UI atau .env lokal)
+      DATABASE_URL: ${DATABASE_URL}
+      SESSION_SECRET: ${SESSION_SECRET}
+      SESSION_MAX_AGE: ${SESSION_MAX_AGE:-604800}
+      # Storage — endpoint internal compose; kredensial dari env yang sama dengan rustfs
       S3_ENDPOINT: http://rustfs:9000
-      # Kredensial S3 di-set eksplisit dari sumber interpolasi yang SAMA dengan
-      # service `rustfs` di bawah → dijamin identik, tidak bergantung env_file.
       S3_ACCESS_KEY_ID: ${S3_ACCESS_KEY_ID:-rustfsadmin}
       S3_SECRET_ACCESS_KEY: ${S3_SECRET_ACCESS_KEY:-rustfsadmin}
       S3_REGION: ${S3_REGION:-us-east-1}
       S3_BUCKET: ${S3_BUCKET:-uploads}
       S3_PUBLIC_URL: ${S3_PUBLIC_URL:-}
-    # Tidak ada `ports:` — 3000 tidak di-publish ke host.
-    # Akses publik hanya lewat domain di Dokploy UI (Traefik → container port 3000).
     depends_on:
       rustfs:
         condition: service_started
