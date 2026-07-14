@@ -97,12 +97,12 @@ export function TrainingCreateForm() {
           </FieldLabel>
           {thumbnailUrl ? (
             <div className="space-y-3">
-              <div className="overflow-hidden rounded-lg border bg-muted/40">
+              <div className="aspect-video w-full max-w-md overflow-hidden rounded-lg border bg-muted/40">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={thumbnailUrl}
                   alt={thumbnailName || "Preview thumbnail"}
-                  className="aspect-video w-full max-w-md object-cover"
+                  className="size-full object-cover"
                 />
               </div>
               {thumbnailName ? (

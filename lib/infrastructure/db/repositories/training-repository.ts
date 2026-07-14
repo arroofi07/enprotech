@@ -14,6 +14,7 @@ import { moduleContents, moduleProgress, modules } from "@/lib/db/schema/modules
 import { enrollments, trainings } from "@/lib/db/schema/trainings";
 import { users } from "@/lib/db/schema/users";
 import type { EnrollmentStatus, TrainingStatus } from "@/lib/domain/trainings/types";
+import { toAbsoluteMediaUrl } from "@/lib/infrastructure/storage/absolute-media-url";
 
 export type TrainingRecord = {
   id: string;
@@ -105,7 +106,7 @@ function mapTraining(
     id: record.id,
     title: record.title,
     description: record.description,
-    thumbnail: record.thumbnail,
+    thumbnail: toAbsoluteMediaUrl(record.thumbnail),
     passingGrade: record.passingGrade,
     deadline: record.deadline,
     status: record.status,
@@ -162,7 +163,7 @@ export async function createTraining(
     .values({
       title: input.title,
       description: input.description,
-      thumbnail: input.thumbnail,
+      thumbnail: toAbsoluteMediaUrl(input.thumbnail),
       passingGrade: input.passingGrade ?? 70,
       deadline: formatDeadline(input.deadline),
       createdBy: input.createdBy,
@@ -195,7 +196,9 @@ export async function updateTraining(
       ...(input.description !== undefined
         ? { description: input.description }
         : {}),
-      ...(input.thumbnail !== undefined ? { thumbnail: input.thumbnail } : {}),
+      ...(input.thumbnail !== undefined
+        ? { thumbnail: toAbsoluteMediaUrl(input.thumbnail) }
+        : {}),
       ...(input.passingGrade !== undefined
         ? { passingGrade: input.passingGrade }
         : {}),

@@ -11,6 +11,7 @@ import type {
   ModuleContentType,
   ModuleProgressStatus,
 } from "@/lib/domain/modules/types";
+import { toAbsoluteMediaUrl } from "@/lib/infrastructure/storage/absolute-media-url";
 
 export type ModuleRecord = {
   id: string;
@@ -90,7 +91,7 @@ function mapModule(row: typeof modules.$inferSelect): ModuleRecord {
     trainingId: row.trainingId,
     title: row.title,
     description: row.description,
-    thumbnail: row.thumbnail,
+    thumbnail: toAbsoluteMediaUrl(row.thumbnail),
     videoConferenceLink: row.videoConferenceLink,
     videoConferenceScheduledAt: row.videoConferenceScheduledAt,
     videoConferenceEndedAt: row.videoConferenceEndedAt,
@@ -111,7 +112,7 @@ function mapContent(
     moduleId: row.moduleId,
     type: row.type,
     title: row.title,
-    url: row.url,
+    url: toAbsoluteMediaUrl(row.url) ?? row.url,
     fileSize: row.fileSize,
     order: row.order,
     createdAt: row.createdAt,
@@ -204,7 +205,7 @@ export async function createModule(input: {
         trainingId: input.trainingId,
         title: input.title,
         description: input.description ?? null,
-        thumbnail: input.thumbnail ?? null,
+        thumbnail: toAbsoluteMediaUrl(input.thumbnail) ?? null,
         videoConferenceLink: input.videoConferenceLink ?? null,
         minQuizScore: input.minQuizScore ?? 0,
         minLatihanScore: input.minLatihanScore ?? 0,
@@ -305,7 +306,12 @@ export async function updateModule(
 ): Promise<ModuleRecord | null> {
   const [module] = await db
     .update(modules)
-    .set(input)
+    .set({
+      ...input,
+      ...(input.thumbnail !== undefined
+        ? { thumbnail: toAbsoluteMediaUrl(input.thumbnail) }
+        : {}),
+    })
     .where(eq(modules.id, moduleId))
     .returning(moduleColumns);
 

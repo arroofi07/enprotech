@@ -28,9 +28,17 @@ function getStorageBucket(): string {
 // Base URL yang menghadap browser untuk file publik. Berbeda dari S3_ENDPOINT
 // karena upload memakai hostname internal (mis. http://rustfs:9000) sedangkan
 // URL yang disimpan & disajikan harus reachable dari luar container.
+// Wajib ada scheme (http/https); tanpa scheme browser menganggap URL relatif.
 function getPublicBase(): string {
-  const base = process.env.S3_PUBLIC_URL ?? process.env.S3_ENDPOINT ?? "";
-  return base.replace(/\/$/, "");
+  const raw = (process.env.S3_PUBLIC_URL ?? process.env.S3_ENDPOINT ?? "").trim();
+  const base = raw.replace(/\/$/, "");
+  if (!base) {
+    return "";
+  }
+  if (/^https?:\/\//i.test(base)) {
+    return base;
+  }
+  return `https://${base}`;
 }
 
 function sanitizeFilename(filename: string): string {
