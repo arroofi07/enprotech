@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useFormStatus } from "react-dom";
 import { IconCalendar, IconPhoto, IconPlus, IconSchool } from "@tabler/icons-react";
 
 import { createTrainingFormAction } from "@/app/actions/trainings";
@@ -14,7 +15,30 @@ import {
   FieldSeparator,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
+
+function CreateTrainingSubmit() {
+  const { pending } = useFormStatus();
+
+  return (
+    <div className="flex flex-col-reverse gap-3 border-t pt-6 sm:flex-row sm:items-center sm:justify-between">
+      <p className="text-xs text-muted-foreground">
+        {pending
+          ? "Sedang membuat training, mohon tunggu..."
+          : "Training baru akan dibuat berstatus draft dan dapat diatur lebih lanjut setelah dibuat."}
+      </p>
+      <Button type="submit" size="lg" className="shrink-0" disabled={pending}>
+        {pending ? (
+          <Spinner data-icon="inline-start" />
+        ) : (
+          <IconPlus data-icon="inline-start" />
+        )}
+        {pending ? "Membuat Training..." : "Buat Training"}
+      </Button>
+    </div>
+  );
+}
 
 export function TrainingCreateForm() {
   const [thumbnailUrl, setThumbnailUrl] = useState("");
@@ -161,16 +185,7 @@ export function TrainingCreateForm() {
         </div>
       </FieldGroup>
 
-      <div className="flex flex-col-reverse gap-3 border-t pt-6 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-xs text-muted-foreground">
-          Training baru akan dibuat berstatus draft dan dapat diatur lebih lanjut
-          setelah dibuat.
-        </p>
-        <Button type="submit" size="lg" className="shrink-0">
-          <IconPlus data-icon="inline-start" />
-          Buat Training
-        </Button>
-      </div>
+      <CreateTrainingSubmit />
     </form>
   );
 }
