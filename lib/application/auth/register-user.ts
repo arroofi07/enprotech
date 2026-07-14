@@ -13,6 +13,7 @@ import {
   registerSchema,
   type RegisterInput,
 } from "@/lib/validations/auth-schemas";
+import { notifyNewRegistration } from "@/lib/application/notifications/notify-new-registration";
 
 export type RegisterUserResult = {
   message: string;
@@ -41,6 +42,11 @@ export async function registerUser(
     passwordHash,
     role: "student",
     status: "pending",
+  });
+
+  await notifyNewRegistration({
+    userName: parsed.data.name,
+    email: parsed.data.email,
   });
 
   return authSuccess({

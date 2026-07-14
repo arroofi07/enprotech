@@ -42,6 +42,8 @@ import {
 } from "@/lib/infrastructure/db/repositories/user-repository";
 import { importQuestionsBodySchema } from "@/lib/validations/import-schemas";
 
+import { notifyEnrolled } from "@/lib/application/notifications/notify-enrolled";
+
 import { assertImportTrainerOrAdmin } from "./assert-trainer-or-admin";
 
 function readFileRows(buffer: ArrayBuffer) {
@@ -230,6 +232,10 @@ export async function commitEnrollmentsImport(
     }
 
     await enrollStudentsInRepo(row.data!.trainingId, [student.id]);
+    await notifyEnrolled({
+      studentIds: [student.id],
+      trainingId: row.data!.trainingId,
+    });
     successCount += 1;
   }
 

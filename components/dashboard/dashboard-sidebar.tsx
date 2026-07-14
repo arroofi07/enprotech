@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { IconLogout } from "@tabler/icons-react";
 
 import { logoutAction } from "@/app/actions/auth";
+import { BrandLogo } from "@/components/brand/brand-logo";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -58,9 +59,7 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
               className="h-auto py-3"
               render={<Link href={homeHref} />}
             >
-              <div className="flex aspect-square size-10 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
-                <span className="text-sm font-bold">EP</span>
-              </div>
+              <BrandLogo mark priority className="size-10 shrink-0" />
               <div className="grid flex-1 text-left leading-tight group-data-[collapsible=icon]:hidden">
                 <span className="text-sm font-semibold">Enprotech</span>
                 <span className="text-xs text-sidebar-muted-foreground">

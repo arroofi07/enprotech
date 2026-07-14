@@ -16,6 +16,8 @@ import {
   type ApproveUserInput,
 } from "@/lib/validations/user-schemas";
 
+import { notifyAccountApproved } from "@/lib/application/notifications/notify-account-approved";
+
 import { assertAdmin } from "./assert-admin";
 
 export async function approveUser(
@@ -54,6 +56,8 @@ export async function approveUser(
   if (!updated) {
     return userFailure(UserErrorCode.USER_NOT_FOUND);
   }
+
+  await notifyAccountApproved({ userId: parsed.data.userId });
 
   return userSuccess(updated);
 }

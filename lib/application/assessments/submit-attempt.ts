@@ -24,6 +24,7 @@ import {
 import { assertAssessmentStudent } from "./assert-access";
 import { issueCertificateIfEligible } from "../certificates/issue-certificate-if-eligible";
 import { tryAutoCompleteModuleAfterAssessmentSubmit } from "../modules/check-module-access";
+import { notifyPostTestResult } from "../notifications/notify-post-test-result";
 import { buildAttemptQuestionSet } from "./attempt-questions";
 
 export type SubmitAttemptResult = {
@@ -125,14 +126,22 @@ export async function submitAttemptUseCase(
     );
   }
 
-  if (
-    assessment.type === "post_test" &&
-    hasPassed(bestScore, passingGrade)
-  ) {
-    await issueCertificateIfEligible({
+  if (assessment.type === "post_test") {
+    await notifyPostTestResult({
       studentId: actor!.id,
+      attemptId: submitted.id,
       trainingId: assessment.trainingId,
+      score,
+      passingGrade,
+      passed: hasPassed(score, passingGrade),
     });
+
+    if (hasPassed(bestScore, passingGrade)) {
+      await issueCertificateIfEligible({
+        studentId: actor!.id,
+        trainingId: assessment.trainingId,
+      });
+    }
   }
 
   return assessmentSuccess({

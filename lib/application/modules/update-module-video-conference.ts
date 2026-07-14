@@ -12,6 +12,8 @@ import {
 } from "@/lib/infrastructure/db/repositories/module-repository";
 import { updateModuleVideoConferenceSchema } from "@/lib/validations/module-schemas";
 
+import { notifyVideoConferenceScheduled } from "@/lib/application/notifications/notify-video-conference-scheduled";
+
 import { assertModuleTrainerOrAdmin } from "./assert-access";
 
 export async function updateModuleVideoConference(
@@ -41,6 +43,15 @@ export async function updateModuleVideoConference(
 
   if (!updated) {
     return moduleFailure(ModuleErrorCode.MODULE_NOT_FOUND);
+  }
+
+  if (parsed.data.videoConferenceScheduledAt instanceof Date) {
+    await notifyVideoConferenceScheduled({
+      trainingId: updated.trainingId,
+      moduleId: updated.id,
+      moduleName: updated.title,
+      scheduledAt: parsed.data.videoConferenceScheduledAt,
+    });
   }
 
   return moduleSuccess(updated);

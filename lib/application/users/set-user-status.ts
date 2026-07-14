@@ -17,6 +17,8 @@ import {
   type SetUserStatusInput,
 } from "@/lib/validations/user-schemas";
 
+import { notifyAccountDeactivated } from "@/lib/application/notifications/notify-account-deactivated";
+
 import { assertAdmin } from "./assert-admin";
 
 export async function setUserStatus(
@@ -68,6 +70,10 @@ export async function setUserStatus(
 
   if (!updated) {
     return userFailure(UserErrorCode.USER_NOT_FOUND);
+  }
+
+  if (transition.nextStatus === "inactive") {
+    await notifyAccountDeactivated({ userId: parsed.data.userId });
   }
 
   return userSuccess(updated);

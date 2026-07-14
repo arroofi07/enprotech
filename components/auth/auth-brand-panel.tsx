@@ -5,8 +5,8 @@ import {
   IconChartBar,
 } from "@tabler/icons-react";
 
+import { BrandLogo } from "@/components/brand/brand-logo";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardContent,
@@ -54,9 +54,7 @@ export function AuthBrandPanel() {
       />
 
       <div className="relative z-10">
-        <Badge className="border-primary-foreground/30 bg-primary-foreground/15 text-primary-foreground hover:bg-primary-foreground/15">
-          E-Training Enprotech
-        </Badge>
+        <BrandLogo priority className="h-14 drop-shadow-md" />
       </div>
 
       <div className="relative z-10 space-y-8">

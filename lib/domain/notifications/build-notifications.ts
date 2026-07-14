@@ -83,6 +83,290 @@ export function buildDeadlineReminderNotification(
   };
 }
 
+// --- Tier 1 --------------------------------------------------------------
+
+export function buildEnrolledNotification(input: {
+  trainingId: string;
+  trainingName: string;
+}) {
+  const data: NotificationData = {
+    href: `/student/trainings/${input.trainingId}`,
+    trainingId: input.trainingId,
+    trainingName: input.trainingName,
+  };
+
+  return {
+    type: NotificationType.ENROLLED,
+    title: "Kamu terdaftar di training",
+    message: `Kamu telah didaftarkan pada training "${input.trainingName}". Segera mulai belajar.`,
+    data,
+  };
+}
+
+export function buildNewRegistrationNotification(input: {
+  userName: string;
+  email: string;
+}) {
+  const data: NotificationData = {
+    href: "/admin/users?status=pending",
+    userName: input.userName,
+    email: input.email,
+  };
+
+  return {
+    type: NotificationType.NEW_REGISTRATION,
+    title: "Registrasi baru",
+    message: `${input.userName} (${input.email}) mendaftar dan menunggu persetujuan.`,
+    data,
+  };
+}
+
+export function buildAccountApprovedNotification() {
+  const data: NotificationData = {
+    href: "/student",
+  };
+
+  return {
+    type: NotificationType.ACCOUNT_APPROVED,
+    title: "Akun disetujui",
+    message:
+      "Akun kamu telah disetujui. Sekarang kamu bisa mengakses training.",
+    data,
+  };
+}
+
+export function buildCertificateIssuedNotification(input: {
+  studentId: string;
+  trainingId: string;
+  trainingName: string;
+  certificateId: string;
+}) {
+  const data: NotificationData = {
+    href: `/student/trainings/${input.trainingId}`,
+    trainingId: input.trainingId,
+    trainingName: input.trainingName,
+    certificateId: input.certificateId,
+    dedupKey: `certificate_issued:${input.trainingId}:${input.studentId}`,
+  };
+
+  return {
+    type: NotificationType.CERTIFICATE_ISSUED,
+    title: "Sertifikat terbit",
+    message: `Selamat! Sertifikat untuk training "${input.trainingName}" telah terbit.`,
+    data,
+  };
+}
+
+export function buildStudentCertificateIssuedNotification(input: {
+  studentId: string;
+  studentName: string;
+  trainingId: string;
+  trainingName: string;
+}) {
+  const data: NotificationData = {
+    href: `/trainer/trainings/${input.trainingId}`,
+    trainingId: input.trainingId,
+    trainingName: input.trainingName,
+    studentId: input.studentId,
+    studentName: input.studentName,
+    dedupKey: `student_certificate_issued:${input.trainingId}:${input.studentId}`,
+  };
+
+  return {
+    type: NotificationType.STUDENT_CERTIFICATE_ISSUED,
+    title: "Peserta dapat sertifikat",
+    message: `${input.studentName} menyelesaikan training "${input.trainingName}" dan mendapatkan sertifikat.`,
+    data,
+  };
+}
+
+export function buildProjectSubmittedNotification(input: {
+  studentId: string;
+  studentName: string;
+  trainingId: string;
+  trainingName: string;
+}) {
+  const data: NotificationData = {
+    href: `/trainer/trainings/${input.trainingId}/projects`,
+    trainingId: input.trainingId,
+    trainingName: input.trainingName,
+    studentId: input.studentId,
+    studentName: input.studentName,
+  };
+
+  return {
+    type: NotificationType.PROJECT_SUBMITTED,
+    title: "Project dikumpulkan",
+    message: `${input.studentName} mengumpulkan project pada training "${input.trainingName}".`,
+    data,
+  };
+}
+
+export function buildFeedbackSubmittedNotification(input: {
+  studentId: string;
+  studentName: string;
+  trainingId: string;
+  trainingName: string;
+}) {
+  const data: NotificationData = {
+    href: `/trainer/trainings/${input.trainingId}/feedback`,
+    trainingId: input.trainingId,
+    trainingName: input.trainingName,
+    studentId: input.studentId,
+    studentName: input.studentName,
+  };
+
+  return {
+    type: NotificationType.FEEDBACK_SUBMITTED,
+    title: "Feedback masuk",
+    message: `${input.studentName} memberikan feedback pada training "${input.trainingName}".`,
+    data,
+  };
+}
+
+// --- Tier 2 --------------------------------------------------------------
+
+export function buildPostTestResultNotification(input: {
+  attemptId: string;
+  trainingId: string;
+  trainingName: string;
+  score: number;
+  passingGrade: number;
+  passed: boolean;
+}) {
+  const data: NotificationData = {
+    href: `/student/trainings/${input.trainingId}`,
+    trainingId: input.trainingId,
+    trainingName: input.trainingName,
+    score: input.score,
+    passingGrade: input.passingGrade,
+    passed: input.passed,
+    dedupKey: `post_test_result:${input.attemptId}`,
+  };
+
+  return {
+    type: NotificationType.POST_TEST_RESULT,
+    title: input.passed ? "Post-test lulus" : "Post-test belum lulus",
+    message: input.passed
+      ? `Kamu lulus post-test training "${input.trainingName}" dengan nilai ${input.score}.`
+      : `Nilai post-test kamu ${input.score}, passing grade ${input.passingGrade}. Kamu bisa mencoba lagi.`,
+    data,
+  };
+}
+
+export function buildPostTestResultStaffNotification(input: {
+  attemptId: string;
+  studentId: string;
+  studentName: string;
+  trainingId: string;
+  trainingName: string;
+  score: number;
+  passed: boolean;
+}) {
+  const data: NotificationData = {
+    href: `/trainer/trainings/${input.trainingId}`,
+    trainingId: input.trainingId,
+    trainingName: input.trainingName,
+    studentId: input.studentId,
+    studentName: input.studentName,
+    score: input.score,
+    passed: input.passed,
+    dedupKey: `post_test_result_staff:${input.attemptId}`,
+  };
+
+  return {
+    type: NotificationType.POST_TEST_RESULT_STAFF,
+    title: "Hasil post-test peserta",
+    message: `${input.studentName} ${input.passed ? "lulus" : "belum lulus"} post-test "${input.trainingName}" (nilai ${input.score}).`,
+    data,
+  };
+}
+
+export function buildTrainingPublishedNotification(input: {
+  trainingId: string;
+  trainingName: string;
+}) {
+  const data: NotificationData = {
+    href: `/student/trainings/${input.trainingId}`,
+    trainingId: input.trainingId,
+    trainingName: input.trainingName,
+    dedupKey: `training_published:${input.trainingId}`,
+  };
+
+  return {
+    type: NotificationType.TRAINING_PUBLISHED,
+    title: "Training dibuka",
+    message: `Training "${input.trainingName}" sudah dibuka. Kamu bisa mulai mengerjakan.`,
+    data,
+  };
+}
+
+export function buildVideoConferenceScheduledNotification(input: {
+  trainingId: string;
+  moduleId: string;
+  moduleName: string;
+  scheduledAt: string;
+  scheduledLabel: string;
+}) {
+  const data: NotificationData = {
+    href: `/student/trainings/${input.trainingId}`,
+    trainingId: input.trainingId,
+    moduleId: input.moduleId,
+    moduleName: input.moduleName,
+    scheduledAt: input.scheduledAt,
+    dedupKey: `vc_scheduled:${input.moduleId}:${input.scheduledAt}`,
+  };
+
+  return {
+    type: NotificationType.VIDEO_CONFERENCE_SCHEDULED,
+    title: "Jadwal video conference",
+    message: `Sesi video conference untuk modul "${input.moduleName}" dijadwalkan ${input.scheduledLabel}.`,
+    data,
+  };
+}
+
+// --- Tier 3 --------------------------------------------------------------
+
+const ROLE_LABEL: Record<string, string> = {
+  admin: "Admin",
+  trainer: "Trainer",
+  student: "Peserta",
+};
+
+const ROLE_HREF: Record<string, string> = {
+  admin: "/admin",
+  trainer: "/trainer",
+  student: "/student",
+};
+
+export function buildRoleChangedNotification(input: { role: string }) {
+  const data: NotificationData = {
+    href: ROLE_HREF[input.role] ?? "/",
+    role: input.role,
+  };
+
+  return {
+    type: NotificationType.ROLE_CHANGED,
+    title: "Peran akun diubah",
+    message: `Peran akun kamu diubah menjadi ${ROLE_LABEL[input.role] ?? input.role}.`,
+    data,
+  };
+}
+
+export function buildAccountDeactivatedNotification() {
+  const data: NotificationData = {
+    href: "/login",
+  };
+
+  return {
+    type: NotificationType.ACCOUNT_DEACTIVATED,
+    title: "Akun dinonaktifkan",
+    message:
+      "Akun kamu dinonaktifkan. Hubungi admin untuk informasi lebih lanjut.",
+    data,
+  };
+}
+
 export function getDeadlineReminderDays(
   deadline: string,
   today: Date = new Date(),

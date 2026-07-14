@@ -13,6 +13,7 @@ import {
   type CertificateRow,
 } from "@/lib/infrastructure/db/repositories/certificate-repository";
 import { findTrainingById } from "@/lib/infrastructure/db/repositories/training-repository";
+import { notifyCertificateIssued } from "@/lib/application/notifications/notify-certificate-issued";
 import { issueCertificateSchema } from "@/lib/validations/certificate-schemas";
 
 export async function issueCertificateIfEligible(
@@ -72,7 +73,7 @@ export async function issueCertificateIfEligible(
     sequence,
   });
 
-  return createCertificate({
+  const certificate = await createCertificate({
     certificateNumber,
     studentId,
     trainingId,
@@ -80,4 +81,12 @@ export async function issueCertificateIfEligible(
     postTestScore,
     finalGrade,
   });
+
+  await notifyCertificateIssued({
+    studentId,
+    trainingId,
+    certificateId: certificate.id,
+  });
+
+  return certificate;
 }

@@ -21,6 +21,8 @@ import {
   activatePretestSchema,
 } from "@/lib/validations/training-schemas";
 
+import { notifyTrainingPublished } from "@/lib/application/notifications/notify-training-published";
+
 import { assertTrainerOrAdmin } from "./assert-trainer-or-admin";
 
 export async function activatePretest(
@@ -77,6 +79,8 @@ export async function activatePretest(
   if (!updated) {
     return trainingFailure(TrainingErrorCode.TRAINING_NOT_FOUND);
   }
+
+  await notifyTrainingPublished({ trainingId: parsed.data.trainingId });
 
   return trainingSuccess(updated);
 }

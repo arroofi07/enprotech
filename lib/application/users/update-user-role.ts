@@ -16,6 +16,8 @@ import {
   type UpdateUserRoleInput,
 } from "@/lib/validations/user-schemas";
 
+import { notifyRoleChanged } from "@/lib/application/notifications/notify-role-changed";
+
 import { assertAdmin } from "./assert-admin";
 
 export async function updateUserRole(
@@ -58,6 +60,13 @@ export async function updateUserRole(
   );
   if (!updated) {
     return userFailure(UserErrorCode.USER_NOT_FOUND);
+  }
+
+  if (existing.role !== parsed.data.role) {
+    await notifyRoleChanged({
+      userId: parsed.data.userId,
+      role: parsed.data.role,
+    });
   }
 
   return userSuccess(updated);

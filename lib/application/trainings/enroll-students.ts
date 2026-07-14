@@ -16,6 +16,8 @@ import {
   enrollStudentsSchema,
 } from "@/lib/validations/training-schemas";
 
+import { notifyEnrolled } from "@/lib/application/notifications/notify-enrolled";
+
 import { assertTrainerOrAdmin } from "./assert-trainer-or-admin";
 
 export async function enrollStudents(
@@ -62,5 +64,8 @@ export async function enrollStudents(
   }
 
   const enrollments = await enrollStudentsInRepo(trainingId, newStudentIds);
+
+  await notifyEnrolled({ studentIds: newStudentIds, trainingId });
+
   return trainingSuccess(enrollments);
 }

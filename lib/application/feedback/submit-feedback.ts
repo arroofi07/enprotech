@@ -7,6 +7,7 @@ import {
 } from "@/lib/domain/feedback/errors";
 import type { TrainingFeedback } from "@/lib/db/schema/training-feedback";
 import { issueCertificateIfEligible } from "@/lib/application/certificates/issue-certificate-if-eligible";
+import { notifyFeedbackSubmitted } from "@/lib/application/notifications/notify-feedback-submitted";
 import { isStudentEnrolled } from "@/lib/infrastructure/db/repositories/report-repository";
 import { upsertFeedback } from "@/lib/infrastructure/db/repositories/feedback-repository";
 import { submitFeedbackSchema } from "@/lib/validations/feedback-schemas";
@@ -38,6 +39,11 @@ export async function submitFeedback(
     trainingRating: parsed.data.trainingRating,
     trainerRating: parsed.data.trainerRating,
     comment: parsed.data.comment,
+  });
+
+  await notifyFeedbackSubmitted({
+    studentId: actor!.id,
+    trainingId: parsed.data.trainingId,
   });
 
   await issueCertificateIfEligible({

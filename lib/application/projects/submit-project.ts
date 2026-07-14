@@ -7,6 +7,7 @@ import {
 } from "@/lib/domain/projects/errors";
 import type { StudentProject } from "@/lib/db/schema/student-projects";
 import { issueCertificateIfEligible } from "@/lib/application/certificates/issue-certificate-if-eligible";
+import { notifyProjectSubmitted } from "@/lib/application/notifications/notify-project-submitted";
 import { isStudentEnrolled } from "@/lib/infrastructure/db/repositories/report-repository";
 import { upsertProject } from "@/lib/infrastructure/db/repositories/project-repository";
 import { submitProjectSchema } from "@/lib/validations/project-schemas";
@@ -41,6 +42,11 @@ export async function submitProject(
     videoUrl: parsed.data.videoUrl,
     pdfUrl: parsed.data.pdfUrl,
     pdfFileSize: parsed.data.pdfFileSize,
+  });
+
+  await notifyProjectSubmitted({
+    studentId: actor!.id,
+    trainingId: parsed.data.trainingId,
   });
 
   await issueCertificateIfEligible({

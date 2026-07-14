@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { IconArrowRight, IconMenu2, IconSparkles } from "@tabler/icons-react";
+import { IconArrowRight, IconMenu2 } from "@tabler/icons-react";
 
-import { Badge } from "@/components/ui/badge";
+import { BrandLogo } from "@/components/brand/brand-logo";
 import { Button } from "@/components/ui/button";
 import { ButtonLink } from "@/components/ui/button-link";
 import { Separator } from "@/components/ui/separator";
@@ -32,13 +32,8 @@ export function LandingHeader({ dashboardHref }: LandingHeaderProps) {
   return (
     <header className="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-md">
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-4 sm:px-6">
-        <Link href="/" className="flex items-center gap-2">
-          <Badge className="size-8 rounded-lg p-0">
-            <IconSparkles className="size-4" />
-          </Badge>
-          <span className="font-heading text-base font-semibold tracking-tight">
-            Enprotech
-          </span>
+        <Link href="/" className="flex items-center" aria-label="Enprotech">
+          <BrandLogo priority className="h-9" />
         </Link>
 
         <nav className="hidden items-center gap-2 md:flex">

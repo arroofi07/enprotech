@@ -1,5 +1,5 @@
 import { AuthBrandPanel } from "@/components/auth/auth-brand-panel";
-import { Badge } from "@/components/ui/badge";
+import { BrandLogo } from "@/components/brand/brand-logo";
 import { Card, CardContent, CardDescription } from "@/components/ui/card";
 
 export default function AuthLayout({
@@ -12,10 +12,8 @@ export default function AuthLayout({
       <Card className="grid w-full max-w-5xl gap-0 overflow-hidden rounded-3xl py-0 shadow-2xl ring-0 lg:min-h-152 lg:grid-cols-2">
         <CardContent className="flex flex-col justify-center p-8 sm:p-10 lg:p-12">
           <div className="mx-auto w-full max-w-sm">
-            <div className="mb-8 space-y-2">
-              <Badge variant="outline" className="text-xs font-medium">
-                E-Training Enprotech
-              </Badge>
+            <div className="mb-8 space-y-3">
+              <BrandLogo priority className="h-12" />
               <CardDescription className="text-sm">
                 Platform pembelajaran dan pelatihan internal
               </CardDescription>

@@ -3,10 +3,11 @@ import { buildModuleCompletedNotification } from "@/lib/domain/notifications/bui
 import {
   createNotifications,
   hasNotificationWithDedupKey,
-  listActiveAdminIds,
 } from "@/lib/infrastructure/db/repositories/notification-repository";
 import { findTrainingById } from "@/lib/infrastructure/db/repositories/training-repository";
 import { findPublicUserById } from "@/lib/infrastructure/db/repositories/user-repository";
+
+import { resolveStaffRecipients } from "./resolve-staff-recipients";
 
 export async function notifyModuleCompleted(input: {
   studentId: string;
@@ -37,9 +38,9 @@ export async function notifyModuleCompleted(input: {
     return;
   }
 
-  const adminIds = await listActiveAdminIds();
-  const recipientIds = [...new Set([...adminIds, training.createdBy])].filter(
-    (userId) => userId !== input.studentId,
+  const recipientIds = await resolveStaffRecipients(
+    training.createdBy,
+    input.studentId,
   );
 
   const items = [];

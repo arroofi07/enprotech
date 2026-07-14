@@ -6,10 +6,9 @@ import {
   IconClock,
   IconMail,
   IconMapPin,
-  IconSparkles,
 } from "@tabler/icons-react";
 
-import { Badge } from "@/components/ui/badge";
+import { BrandLogo } from "@/components/brand/brand-logo";
 import { ButtonLink } from "@/components/ui/button-link";
 import { Separator } from "@/components/ui/separator";
 
@@ -52,13 +51,8 @@ export function LandingFooter() {
       <div className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6">
         <div className="grid gap-10 lg:grid-cols-[1.6fr_1fr_1fr_1.2fr]">
           <div className="flex flex-col gap-4">
-            <Link href="/" className="flex items-center gap-2">
-              <Badge className="size-8 rounded-lg p-0">
-                <IconSparkles className="size-4" />
-              </Badge>
-              <span className="font-heading text-base font-semibold tracking-tight">
-                enprotech
-              </span>
+            <Link href="/" className="flex items-center" aria-label="Enprotech">
+              <BrandLogo className="h-10" />
             </Link>
             <p className="max-w-xs text-sm leading-relaxed text-muted-foreground">
               Education on tech — platform pelatihan kewirausahaan digital
