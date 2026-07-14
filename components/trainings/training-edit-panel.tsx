@@ -1,18 +1,21 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
+import { IconPhoto } from "@tabler/icons-react";
 
 import {
   activatePretestAction,
   updateTrainingAction,
   type TrainingActionState,
 } from "@/app/actions/trainings";
+import { ModuleFileUpload } from "@/components/modules/module-file-upload";
 import { TrainingEnrollmentSection } from "@/components/trainings/training-enrollment-section";
 import { TrainingManagementActions } from "@/components/trainings/training-management-actions";
 import { TrainingStatusBadge } from "@/components/trainings/training-status-badge";
 import { Button } from "@/components/ui/button";
 import {
   Field,
+  FieldDescription,
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field";
@@ -40,10 +43,28 @@ function formatDeadlineForInput(deadline: string | null): string {
   return deadline ?? "";
 }
 
+function thumbnailFileNameFromUrl(url: string | null): string {
+  if (!url) {
+    return "";
+  }
+
+  try {
+    const pathname = new URL(url).pathname;
+    const segment = pathname.split("/").filter(Boolean).at(-1);
+    return segment ? decodeURIComponent(segment) : "thumbnail";
+  } catch {
+    return "thumbnail";
+  }
+}
+
 export function TrainingEditPanel({
   training,
   availableStudents,
 }: TrainingEditPanelProps) {
+  const [thumbnailUrl, setThumbnailUrl] = useState(training.thumbnail ?? "");
+  const [thumbnailName, setThumbnailName] = useState(
+    thumbnailFileNameFromUrl(training.thumbnail),
+  );
   const [updateState, updateAction, updatePending] = useActionState(
     updateTrainingAction,
     initialState,
@@ -89,6 +110,7 @@ export function TrainingEditPanel({
         <TabsContent value="detail" className="mt-6">
           <form action={updateAction} className="space-y-6">
             <input type="hidden" name="trainingId" value={training.id} />
+            <input type="hidden" name="thumbnail" value={thumbnailUrl} />
             <FieldGroup>
               <Field>
                 <FieldLabel htmlFor="title">Judul Training</FieldLabel>
@@ -113,13 +135,47 @@ export function TrainingEditPanel({
               </Field>
 
               <Field>
-                <FieldLabel htmlFor="thumbnail">URL Thumbnail</FieldLabel>
-                <Input
-                  id="thumbnail"
-                  name="thumbnail"
-                  type="url"
-                  defaultValue={training.thumbnail ?? ""}
-                />
+                <FieldLabel className="flex items-center gap-1.5">
+                  <IconPhoto className="size-3.5 text-muted-foreground" />
+                  Thumbnail
+                </FieldLabel>
+                {thumbnailUrl ? (
+                  <div className="flex flex-wrap items-center gap-3">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={thumbnailUrl}
+                      alt={training.title}
+                      className="h-20 w-32 rounded-md object-cover"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setThumbnailUrl("");
+                        setThumbnailName("");
+                      }}
+                    >
+                      Hapus / Ganti
+                    </Button>
+                  </div>
+                ) : (
+                  <ModuleFileUpload
+                    purpose="thumbnail"
+                    uploadedFileName={thumbnailName || undefined}
+                    onUploaded={({ url, fileName }) => {
+                      setThumbnailUrl(url);
+                      setThumbnailName(fileName);
+                    }}
+                    onClear={() => {
+                      setThumbnailUrl("");
+                      setThumbnailName("");
+                    }}
+                  />
+                )}
+                <FieldDescription>
+                  Opsional. JPG, JPEG, PNG, WEBP · maksimal 1 MB.
+                </FieldDescription>
               </Field>
 
               <div className="grid gap-4 sm:grid-cols-2">
