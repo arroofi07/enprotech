@@ -66,7 +66,7 @@ export function LandingHero() {
 
           <div className="flex flex-col gap-3 pt-2">
             <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-              Terbuka untuk mahasiswa &amp; dosen perguruan tinggi
+              Terbuka untuk peserta &amp; dosen perguruan tinggi
             </p>
             <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
               {AUDIENCE.map((name) => (

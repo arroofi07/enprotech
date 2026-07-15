@@ -56,7 +56,7 @@ export function LandingFooter() {
             </Link>
             <p className="max-w-xs text-sm leading-relaxed text-muted-foreground">
               Education on tech — platform pelatihan kewirausahaan digital
-              berbasis proyek untuk mahasiswa, dosen, dan praktisi.
+              berbasis proyek untuk peserta, dosen, dan praktisi.
             </p>
             <div className="flex items-center gap-2">
               {SOCIAL_LINKS.map((social) => (

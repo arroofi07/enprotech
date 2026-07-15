@@ -111,7 +111,7 @@ describe("Tier 1 notification builders", () => {
   it("builds account approved notification", () => {
     const n = buildAccountApprovedNotification();
     expect(n.type).toBe("account_approved");
-    expect(n.data.href).toBe("/student");
+    expect(n.data.href).toBe("/student/dashboard");
   });
 
   it("builds certificate issued notification with dedup key", () => {
@@ -136,7 +136,7 @@ describe("Tier 1 notification builders", () => {
     });
     expect(n.type).toBe("student_certificate_issued");
     expect(n.message).toContain("Budi");
-    expect(n.data.href).toBe("/trainer/trainings/t-1");
+    expect(n.data.href).toBe("/trainer/trainings/t-1/modules");
     expect(n.data.dedupKey).toBe("student_certificate_issued:t-1:s-1");
   });
 
@@ -149,7 +149,7 @@ describe("Tier 1 notification builders", () => {
     });
     expect(n.type).toBe("project_submitted");
     expect(n.message).toContain("Budi");
-    expect(n.data.href).toBe("/trainer/trainings/t-1/projects");
+    expect(n.data.href).toBe("/trainer/projects?trainingId=t-1");
     expect(n.data.dedupKey).toBeUndefined();
   });
 
@@ -162,7 +162,7 @@ describe("Tier 1 notification builders", () => {
     });
     expect(n.type).toBe("feedback_submitted");
     expect(n.message).toContain("Budi");
-    expect(n.data.href).toBe("/trainer/trainings/t-1/feedback");
+    expect(n.data.href).toBe("/trainer/feedback?trainingId=t-1");
     expect(n.data.dedupKey).toBeUndefined();
   });
 });
@@ -245,7 +245,7 @@ describe("Tier 3 notification builders", () => {
     const n = buildRoleChangedNotification({ role: "trainer" });
     expect(n.type).toBe("role_changed");
     expect(n.message).toContain("Trainer");
-    expect(n.data.href).toBe("/trainer");
+    expect(n.data.href).toBe("/trainer/dashboard");
     expect(n.data.dedupKey).toBeUndefined();
   });
 

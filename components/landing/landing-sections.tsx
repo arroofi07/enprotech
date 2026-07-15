@@ -67,7 +67,7 @@ const STEPS = [
   {
     title: "Buat akun & lengkapi profil",
     description:
-      "Daftar sebagai mahasiswa, dosen, atau praktisi dari perguruan tinggi mana saja, lalu lengkapi profil Anda.",
+      "Daftar sebagai peserta, dosen, atau praktisi dari perguruan tinggi mana saja, lalu lengkapi profil Anda.",
   },
   {
     title: "Ikuti pelatihan berbasis proyek",
@@ -90,7 +90,7 @@ const TESTIMONIALS = [
   },
   {
     quote:
-      "E-training enprotech yang digunakan sangat membantu dosen dalam membimbing mahasiswa ke arah praktis.",
+      "E-training enprotech yang digunakan sangat membantu dosen dalam membimbing peserta ke arah praktis.",
     name: "Rini Widyastuti, S.Kom., M.Kom",
     role: "Trainer",
   },
@@ -99,7 +99,7 @@ const TESTIMONIALS = [
 const FAQS = [
   {
     question: "Siapa yang boleh mendaftar?",
-    answer: "Mahasiswa dan dosen dari perguruan tinggi mana saja.",
+    answer: "Peserta dan dosen dari perguruan tinggi mana saja.",
   },
   {
     question: "Bagaimana cara mendaftar?",

@@ -25,11 +25,25 @@ function resolveNotificationHref(
     return null;
   }
 
-  if (notification.type === "module_completed") {
-    const legacyMatch = href.match(/^\/trainer\/trainings\/([^/]+)$/);
-    if (legacyMatch) {
-      return `/trainer/trainings/${legacyMatch[1]}/modules`;
-    }
+  // Rows written before the href fix point at routes that never existed.
+  // Repair them on read; new rows already arrive in the correct shape.
+  const trainingMatch = href.match(/^\/trainer\/trainings\/([^/]+)$/);
+  if (trainingMatch) {
+    return `/trainer/trainings/${trainingMatch[1]}/modules`;
+  }
+
+  const projectsMatch = href.match(/^\/trainer\/trainings\/([^/]+)\/projects$/);
+  if (projectsMatch) {
+    return `/trainer/projects?trainingId=${projectsMatch[1]}`;
+  }
+
+  const feedbackMatch = href.match(/^\/trainer\/trainings\/([^/]+)\/feedback$/);
+  if (feedbackMatch) {
+    return `/trainer/feedback?trainingId=${feedbackMatch[1]}`;
+  }
+
+  if (href === "/admin" || href === "/trainer" || href === "/student") {
+    return `${href}/dashboard`;
   }
 
   return href;

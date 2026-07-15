@@ -1,3 +1,5 @@
+import { getDashboardPath } from "@/lib/domain/auth/permissions";
+import type { UserRole } from "@/lib/domain/auth/types";
 import { formatTrainingDeadline } from "@/lib/domain/trainings/format-deadline";
 
 import {
@@ -123,7 +125,7 @@ export function buildNewRegistrationNotification(input: {
 
 export function buildAccountApprovedNotification() {
   const data: NotificationData = {
-    href: "/student",
+    href: getDashboardPath("student"),
   };
 
   return {
@@ -164,7 +166,7 @@ export function buildStudentCertificateIssuedNotification(input: {
   trainingName: string;
 }) {
   const data: NotificationData = {
-    href: `/trainer/trainings/${input.trainingId}`,
+    href: `/trainer/trainings/${input.trainingId}/modules`,
     trainingId: input.trainingId,
     trainingName: input.trainingName,
     studentId: input.studentId,
@@ -187,7 +189,7 @@ export function buildProjectSubmittedNotification(input: {
   trainingName: string;
 }) {
   const data: NotificationData = {
-    href: `/trainer/trainings/${input.trainingId}/projects`,
+    href: `/trainer/projects?trainingId=${input.trainingId}`,
     trainingId: input.trainingId,
     trainingName: input.trainingName,
     studentId: input.studentId,
@@ -209,7 +211,7 @@ export function buildFeedbackSubmittedNotification(input: {
   trainingName: string;
 }) {
   const data: NotificationData = {
-    href: `/trainer/trainings/${input.trainingId}/feedback`,
+    href: `/trainer/feedback?trainingId=${input.trainingId}`,
     trainingId: input.trainingId,
     trainingName: input.trainingName,
     studentId: input.studentId,
@@ -264,7 +266,7 @@ export function buildPostTestResultStaffNotification(input: {
   passed: boolean;
 }) {
   const data: NotificationData = {
-    href: `/trainer/trainings/${input.trainingId}`,
+    href: `/trainer/trainings/${input.trainingId}/modules`,
     trainingId: input.trainingId,
     trainingName: input.trainingName,
     studentId: input.studentId,
@@ -333,15 +335,13 @@ const ROLE_LABEL: Record<string, string> = {
   student: "Peserta",
 };
 
-const ROLE_HREF: Record<string, string> = {
-  admin: "/admin",
-  trainer: "/trainer",
-  student: "/student",
-};
+function isUserRole(role: string): role is UserRole {
+  return role === "admin" || role === "trainer" || role === "student";
+}
 
 export function buildRoleChangedNotification(input: { role: string }) {
   const data: NotificationData = {
-    href: ROLE_HREF[input.role] ?? "/",
+    href: isUserRole(input.role) ? getDashboardPath(input.role) : "/",
     role: input.role,
   };
 
