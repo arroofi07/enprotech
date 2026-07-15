@@ -29,6 +29,7 @@ export function isPublicPath(pathname: string): boolean {
 export function allowsLoggedInPublicAccess(pathname: string): boolean {
   return (
     pathname === "/" ||
+    pathname === "/unauthorized" ||
     pathname === "/verify" ||
     pathname.startsWith("/verify/")
   );

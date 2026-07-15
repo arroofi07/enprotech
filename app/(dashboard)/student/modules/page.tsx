@@ -65,7 +65,7 @@ export default async function StudentModulesPage({
     <>
       <StudentHeader title="Modul" breadcrumbs={[{ label: "Modul" }]} />
       <main className="flex-1 overflow-auto">
-        <div className="container max-w-7xl space-y-6 p-6 md:p-8">
+        <div className="container max-w-7xl min-w-0 space-y-6 p-4 sm:p-6 md:p-8">
           <AdminPageHeader
             title="Modul Pembelajaran"
             description="Pilih modul dari daftar untuk membuka materi pembelajaran."

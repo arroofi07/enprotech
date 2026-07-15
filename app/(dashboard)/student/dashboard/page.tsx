@@ -154,7 +154,7 @@ export default async function StudentDashboardPage() {
     <>
       <StudentHeader title="Dashboard" />
       <main className="flex-1 overflow-auto">
-        <div className="container max-w-7xl space-y-8 p-6 md:p-8">
+        <div className="container max-w-7xl min-w-0 space-y-8 p-4 sm:p-6 md:p-8">
           <AdminPageHeader
             title={`Selamat datang, ${user.name.split(" ")[0]}!`}
             description="Pantau progress training, akses modul, dan kerjakan evaluasi dari satu tempat."
@@ -180,7 +180,7 @@ export default async function StudentDashboardPage() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <p className="font-heading text-4xl font-bold tracking-tight">
+                  <p className="font-heading text-3xl font-bold tracking-tight sm:text-4xl">
                     {stat.value}
                   </p>
                   <p className="mt-1 text-sm text-muted-foreground">

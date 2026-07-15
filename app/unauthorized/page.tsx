@@ -1,30 +1,31 @@
-import Link from "next/link";
+import type { Metadata } from "next";
+import { IconArrowLeft, IconLock } from "@tabler/icons-react";
 
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { ErrorState } from "@/components/error/error-state";
+import { ButtonLink } from "@/components/ui/button-link";
+
+export const metadata: Metadata = {
+  title: "Akses Ditolak",
+};
 
 export default function UnauthorizedPage() {
   return (
-    <div className="flex min-h-full flex-1 items-center justify-center p-6">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Akses Ditolak</CardTitle>
-          <CardDescription>
-            Anda tidak memiliki izin untuk mengakses halaman ini.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Link href="/login">
-            <Button>Kembali ke Login</Button>
-          </Link>
-        </CardContent>
-      </Card>
-    </div>
+    <ErrorState
+      code="403"
+      icon={IconLock}
+      title="Akses ditolak"
+      description="Anda tidak memiliki izin untuk mengakses halaman ini. Masuk dengan akun yang sesuai untuk melanjutkan."
+      actions={
+        <>
+          <ButtonLink href="/login" size="lg">
+            <IconArrowLeft data-icon="inline-start" />
+            Kembali ke Login
+          </ButtonLink>
+          <ButtonLink href="/" variant="outline" size="lg">
+            Beranda
+          </ButtonLink>
+        </>
+      }
+    />
   );
 }

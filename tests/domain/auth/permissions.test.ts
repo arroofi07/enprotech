@@ -24,6 +24,10 @@ describe("permissions", () => {
     expect(allowsLoggedInPublicAccess("/register")).toBe(false);
   });
 
+  it("lets logged-in users see the unauthorized page they get redirected to", () => {
+    expect(allowsLoggedInPublicAccess("/unauthorized")).toBe(true);
+  });
+
   it("returns dashboard path by role", () => {
     expect(getDashboardPath("admin")).toBe("/admin/dashboard");
     expect(getDashboardPath("trainer")).toBe("/trainer/dashboard");

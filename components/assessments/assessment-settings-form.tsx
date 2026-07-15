@@ -59,7 +59,7 @@ export function AssessmentSettingsForm({
         </p>
       </div>
 
-      <FieldGroup className="gap-4 sm:grid-cols-3">
+      <FieldGroup className="gap-4 sm:grid sm:grid-cols-3 sm:items-start">
         <Field>
           <FieldLabel htmlFor="questionDisplayCount">
             Jumlah Soal Ditampilkan

@@ -147,7 +147,7 @@ export function StudentReportDetailDialog({
                         Belum ada attempt yang disubmit.
                       </p>
                     ) : (
-                      <div className="mt-3 overflow-hidden rounded-md border">
+                      <div className="mt-3 overflow-x-auto rounded-md border">
                         <table className="w-full text-sm">
                           <thead className="bg-muted/40">
                             <tr>

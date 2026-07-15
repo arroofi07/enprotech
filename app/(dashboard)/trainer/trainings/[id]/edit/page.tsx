@@ -44,7 +44,7 @@ export default async function TrainerTrainingEditPage({
         user={user}
       />
       <main className="flex-1 overflow-auto">
-        <div className="container max-w-5xl space-y-6 p-6 md:p-8">
+        <div className="container max-w-5xl min-w-0 space-y-6 p-4 sm:p-6 md:p-8">
           <AdminPageHeader
             title={trainingResult.data.title}
             description="Edit detail, kelola enrollment, dan pengaturan training."

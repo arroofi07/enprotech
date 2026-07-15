@@ -45,7 +45,7 @@ export default async function StudentCertificatesPage({
     <>
       <StudentHeader title="Sertifikat" breadcrumbs={[{ label: "Sertifikat" }]} />
       <main className="flex-1 overflow-auto">
-        <div className="container max-w-4xl space-y-6 p-6 md:p-8">
+        <div className="container max-w-4xl min-w-0 space-y-6 p-4 sm:p-6 md:p-8">
           <AdminPageHeader
             title="Sertifikat"
             description="Daftar sertifikat yang telah diterbitkan setelah menyelesaikan seluruh syarat kelulusan."

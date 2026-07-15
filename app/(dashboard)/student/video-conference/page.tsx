@@ -75,7 +75,7 @@ export default async function StudentVideoConferencePage({
         breadcrumbs={[{ label: "Video Conference" }]}
       />
       <main className="flex-1 overflow-auto">
-        <div className="container max-w-4xl space-y-6 p-6 md:p-8">
+        <div className="container max-w-4xl min-w-0 space-y-6 p-4 sm:p-6 md:p-8">
           <AdminPageHeader
             title="Video Conference"
             description="Jadwal video conference Google Meet atau Zoom per modul training."

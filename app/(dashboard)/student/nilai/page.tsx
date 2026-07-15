@@ -39,7 +39,7 @@ export default async function StudentNilaiPage({
     <>
       <StudentHeader title="Nilai" breadcrumbs={[{ label: "Nilai" }]} />
       <main className="flex-1 overflow-auto">
-        <div className="container max-w-7xl space-y-6 p-6 md:p-8">
+        <div className="container max-w-7xl min-w-0 space-y-6 p-4 sm:p-6 md:p-8">
           <AdminPageHeader
             title="Nilai Saya"
             description="Lihat nilai pre-test, quiz, latihan, dan post-test untuk setiap training yang Anda ikuti."

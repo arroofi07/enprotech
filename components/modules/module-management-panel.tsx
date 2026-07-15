@@ -89,7 +89,7 @@ export function ModuleManagementPanel({
               <IconArrowsSort className="size-4" />
               Atur Urutan
             </DialogTrigger>
-            <DialogContent className="max-w-2xl">
+            <DialogContent className="sm:max-w-2xl">
               <DialogHeader>
                 <DialogTitle>Atur Urutan Modul</DialogTitle>
                 <DialogDescription>
@@ -118,7 +118,7 @@ export function ModuleManagementPanel({
               <IconPlus className="size-4" />
               Buat Modul
             </DialogTrigger>
-            <DialogContent className="flex max-h-[90vh] max-w-4xl flex-col gap-0 overflow-hidden p-0 sm:max-w-4xl">
+            <DialogContent className="flex max-h-[90vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-4xl">
               <DialogHeader className="shrink-0 border-b px-6 py-4">
                 <DialogTitle className="text-base">Buat Modul Baru</DialogTitle>
                 <DialogDescription>

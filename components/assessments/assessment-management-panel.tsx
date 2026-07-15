@@ -109,7 +109,7 @@ export function AssessmentManagementPanel({
               <IconFileImport className="size-4" />
               Impor Excel
             </DialogTrigger>
-            <DialogContent className="max-w-lg">
+            <DialogContent className="sm:max-w-lg">
               <DialogHeader>
                 <DialogTitle>Impor Soal dari Excel</DialogTitle>
                 <DialogDescription>
@@ -132,7 +132,7 @@ export function AssessmentManagementPanel({
               <IconPlus className="size-4" />
               Tambah Soal
             </DialogTrigger>
-            <DialogContent className="flex max-h-[90vh] max-w-4xl flex-col gap-0 overflow-hidden p-0 sm:max-w-4xl">
+            <DialogContent className="flex max-h-[90vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-4xl">
               <DialogHeader className="shrink-0 border-b px-6 py-4">
                 <DialogTitle>Tambah Soal {typeLabel}</DialogTitle>
                 <DialogDescription>
@@ -208,7 +208,7 @@ export function AssessmentManagementPanel({
           }
         }}
       >
-        <DialogContent className="flex max-h-[90vh] max-w-4xl flex-col gap-0 overflow-hidden p-0 sm:max-w-4xl">
+        <DialogContent className="flex max-h-[90vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-4xl">
           <DialogHeader className="shrink-0 border-b px-6 py-4">
             <DialogTitle>Edit Soal</DialogTitle>
             <DialogDescription>

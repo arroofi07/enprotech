@@ -47,7 +47,7 @@ export default async function StudentFeedbackPage({
     <>
       <StudentHeader title="Feedback" breadcrumbs={[{ label: "Feedback" }]} />
       <main className="flex-1 overflow-auto">
-        <div className="container max-w-7xl space-y-6 p-6 md:p-8">
+        <div className="container max-w-7xl min-w-0 space-y-6 p-4 sm:p-6 md:p-8">
           <AdminPageHeader
             title="Feedback Saya"
             description="Berikan penilaian dan masukan untuk setiap training yang Anda ikuti."

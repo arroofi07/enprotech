@@ -61,7 +61,7 @@ export default async function StudentProjectFormPage({
         ]}
       />
       <main className="flex-1 overflow-auto">
-        <div className="container max-w-3xl space-y-6 p-6 md:p-8">
+        <div className="container max-w-3xl min-w-0 space-y-6 p-4 sm:p-6 md:p-8">
           <AdminPageHeader
             title={project ? "Edit Project" : "Upload Project"}
             description={enrollment.trainingTitle}
