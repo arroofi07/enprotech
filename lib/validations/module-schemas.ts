@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { parseWibDateTimeLocal } from "@/lib/domain/modules/format-video-conference-schedule";
+
 const moduleContentTypeSchema = z.enum([
   "document",
   "video_link",
@@ -17,6 +19,22 @@ function emptyToUndefined(value: unknown): unknown {
 function emptyToNull(value: unknown): unknown {
   if (value === "" || value === null || value === undefined) {
     return null;
+  }
+
+  return value;
+}
+
+function preprocessWibDateTime(value: unknown): unknown {
+  if (value === "" || value === null || value === undefined) {
+    return null;
+  }
+
+  if (value instanceof Date) {
+    return value;
+  }
+
+  if (typeof value === "string") {
+    return parseWibDateTimeLocal(value) ?? value;
   }
 
   return value;
@@ -180,8 +198,8 @@ export const updateModuleVideoConferenceSchema = z
       z.string().url("URL video conference tidak valid.").nullable(),
     ),
     videoConferenceScheduledAt: z.preprocess(
-      emptyToNull,
-      z.coerce.date({ message: "Jadwal tidak valid." }).nullable(),
+      preprocessWibDateTime,
+      z.date({ message: "Jadwal tidak valid." }).nullable(),
     ),
   })
   .superRefine((value, context) => {

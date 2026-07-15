@@ -15,6 +15,7 @@ import { endModuleVideoConference } from "@/lib/application/modules/end-module-v
 import { updateModuleContent } from "@/lib/application/modules/update-module-content";
 import { updateStudentModuleProgress } from "@/lib/application/modules/update-student-module-progress";
 import { ModuleErrorCode } from "@/lib/domain/modules/errors";
+import { parseWibDateTimeLocal } from "@/lib/domain/modules/format-video-conference-schedule";
 
 export type ModuleActionState = {
   error?: ModuleErrorCode;
@@ -252,8 +253,8 @@ function parseOptionalDateTime(
     return null;
   }
 
-  const parsed = new Date(text);
-  return Number.isNaN(parsed.getTime()) ? undefined : parsed;
+  const parsed = parseWibDateTimeLocal(text);
+  return parsed ?? undefined;
 }
 
 export async function updateModuleVideoConferenceAction(

@@ -139,7 +139,7 @@ export function VideoConferenceModuleForm({
 
       <Field>
         <FieldLabel htmlFor={`vc-schedule-${module.id}`}>
-          Jadwal Video Conference
+          Jadwal Video Conference (WIB)
         </FieldLabel>
         <Input
           id={`vc-schedule-${module.id}`}
@@ -148,6 +148,9 @@ export function VideoConferenceModuleForm({
           value={scheduledAt}
           onChange={(event) => setScheduledAt(event.target.value)}
         />
+        <p className="text-xs text-muted-foreground">
+          Waktu menggunakan zona Indonesia Barat (WIB, UTC+7).
+        </p>
       </Field>
 
       <div className="flex flex-wrap gap-2">
