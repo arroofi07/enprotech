@@ -38,6 +38,7 @@ export const listProjectsSchema = z.object({
 });
 
 export const uploadProjectFileSchema = z.object({
+  trainingId: z.uuid("ID training tidak valid."),
   kind: z.enum(["image", "pdf"]),
 });
 

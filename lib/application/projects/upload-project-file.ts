@@ -11,7 +11,10 @@ import { uploadFileToStorage } from "@/lib/infrastructure/storage/object-storage
 import { StorageConfigError } from "@/lib/infrastructure/storage/s3-client";
 import { uploadProjectFileSchema } from "@/lib/validations/project-schemas";
 
-import { assertProjectStudent } from "./assert-access";
+import {
+  assertProjectStudent,
+  assertProjectSubmissionAccess,
+} from "./assert-access";
 
 export type UploadProjectFileResult = {
   url: string;
@@ -32,6 +35,14 @@ export async function uploadProjectFile(
   const parsed = uploadProjectFileSchema.safeParse(input);
   if (!parsed.success || !file) {
     return projectFailure(ProjectErrorCode.VALIDATION_ERROR);
+  }
+
+  const inaccessible = await assertProjectSubmissionAccess(
+    actor,
+    parsed.data.trainingId,
+  );
+  if (inaccessible) {
+    return inaccessible;
   }
 
   const { kind } = parsed.data;

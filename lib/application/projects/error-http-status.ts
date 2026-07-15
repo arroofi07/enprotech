@@ -6,6 +6,7 @@ export function projectErrorHttpStatus(error: ProjectErrorCode): number {
       return 401;
     case "FORBIDDEN":
     case "NOT_ENROLLED":
+    case "PROJECT_LOCKED":
       return 403;
     case "TRAINING_NOT_FOUND":
     case "PROJECT_NOT_FOUND":

@@ -129,6 +129,7 @@ export function ProjectSubmitForm({
             Gambar Project
           </FieldLabel>
           <ProjectFileUpload
+            trainingId={trainingId}
             kind="image"
             uploadedFileName={imageName || undefined}
             onUploaded={({ url, fileName }) => {
@@ -168,6 +169,7 @@ export function ProjectSubmitForm({
             File PDF
           </FieldLabel>
           <ProjectFileUpload
+            trainingId={trainingId}
             kind="pdf"
             uploadedFileName={pdfName || undefined}
             onUploaded={({ url, fileName, size }) => {

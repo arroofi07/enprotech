@@ -1,15 +1,18 @@
 import { redirect } from "next/navigation";
-import { IconFolderOpen } from "@tabler/icons-react";
+import { IconFolderOpen, IconLock } from "@tabler/icons-react";
 
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { StudentHeader } from "@/components/student/student-header";
 import { ButtonLink } from "@/components/ui/button-link";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ListPagination } from "@/components/ui/list-pagination";
 import { getCurrentUser } from "@/lib/application/auth/get-session";
 import { listStudentProjects } from "@/lib/application/projects/get-student-project";
+import { getStudentTrainingFlowState } from "@/lib/application/training-flow/get-student-training-flow-state";
 import { listEnrolledTrainings } from "@/lib/application/trainings/list-enrolled-trainings";
+import { canAccessProject } from "@/lib/domain/training-flow/gates";
 
 const PAGE_SIZE = 10;
 
@@ -41,6 +44,21 @@ export default async function StudentProjectsPage({
   const { items: trainings, total, totalPages } = trainingsResult.data;
   const projectByTraining = new Map(
     projectsResult.data.map((project) => [project.trainingId, project]),
+  );
+  const projectAccessByTraining = new Map(
+    await Promise.all(
+      trainings.map(async (training) => {
+        const flow = await getStudentTrainingFlowState(user.id, training.id);
+        const canUpload = flow
+          ? canAccessProject({
+              allModulesCompleted: flow.allModulesCompleted,
+              hasPassedPostTest: flow.hasPassedPostTest,
+            })
+          : false;
+
+        return [training.id, canUpload] as const;
+      }),
+    ),
   );
 
   return (
@@ -79,6 +97,8 @@ export default async function StudentProjectsPage({
                   <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                     {trainings.map((training) => {
                       const project = projectByTraining.get(training.id);
+                      const canUpload =
+                        projectAccessByTraining.get(training.id) ?? false;
                       return (
                         <div
                           key={training.id}
@@ -89,7 +109,12 @@ export default async function StudentProjectsPage({
                               <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
                                 <IconFolderOpen className="size-5" />
                               </span>
-                              {project ? (
+                              {!canUpload ? (
+                                <Badge variant="secondary">
+                                  <IconLock data-icon="inline-start" />
+                                  Terkunci
+                                </Badge>
+                              ) : project ? (
                                 <Badge>Sudah dikumpulkan</Badge>
                               ) : (
                                 <Badge variant="secondary">Belum ada</Badge>
@@ -99,13 +124,25 @@ export default async function StudentProjectsPage({
                               {training.title}
                             </p>
                           </div>
-                          <ButtonLink
-                            variant={project ? "outline" : "default"}
-                            size="sm"
-                            href={`/student/projects/${training.id}`}
-                          >
-                            {project ? "Edit Project" : "Upload Project"}
-                          </ButtonLink>
+                          {canUpload ? (
+                            <ButtonLink
+                              variant={project ? "outline" : "default"}
+                              size="sm"
+                              href={`/student/projects/${training.id}`}
+                            >
+                              {project ? "Edit Project" : "Upload Project"}
+                            </ButtonLink>
+                          ) : (
+                            <div className="space-y-2">
+                              <Button size="sm" disabled className="w-full">
+                                <IconLock data-icon="inline-start" />
+                                Upload Project
+                              </Button>
+                              <p className="text-xs text-muted-foreground">
+                                Selesaikan semua modul dan lulus post-test.
+                              </p>
+                            </div>
+                          )}
                         </div>
                       );
                     })}

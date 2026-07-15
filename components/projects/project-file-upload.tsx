@@ -15,6 +15,7 @@ import type { ProjectFileKind } from "@/lib/domain/projects/types";
 import { cn } from "@/lib/utils";
 
 type ProjectFileUploadProps = {
+  trainingId: string;
   kind: ProjectFileKind;
   onUploaded: (result: { url: string; size: number; fileName: string }) => void;
   onClear?: () => void;
@@ -28,6 +29,7 @@ const HINTS: Record<ProjectFileKind, string> = {
 };
 
 export function ProjectFileUpload({
+  trainingId,
   kind,
   onUploaded,
   onClear,
@@ -48,6 +50,7 @@ export function ProjectFileUpload({
 
       try {
         const formData = new FormData();
+        formData.append("trainingId", trainingId);
         formData.append("kind", kind);
         formData.append("file", file);
 
@@ -76,7 +79,7 @@ export function ProjectFileUpload({
         setUploading(false);
       }
     },
-    [kind, onUploaded],
+    [kind, onUploaded, trainingId],
   );
 
   const allowedTypes = [...getProjectAllowedMimeTypes(kind)];

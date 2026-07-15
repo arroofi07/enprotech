@@ -8,11 +8,13 @@ import {
 import type { StudentProject } from "@/lib/db/schema/student-projects";
 import { issueCertificateIfEligible } from "@/lib/application/certificates/issue-certificate-if-eligible";
 import { notifyProjectSubmitted } from "@/lib/application/notifications/notify-project-submitted";
-import { isStudentEnrolled } from "@/lib/infrastructure/db/repositories/report-repository";
 import { upsertProject } from "@/lib/infrastructure/db/repositories/project-repository";
 import { submitProjectSchema } from "@/lib/validations/project-schemas";
 
-import { assertProjectStudent } from "./assert-access";
+import {
+  assertProjectStudent,
+  assertProjectSubmissionAccess,
+} from "./assert-access";
 
 export async function submitProject(
   actor: SessionUser | null,
@@ -28,9 +30,12 @@ export async function submitProject(
     return projectFailure(ProjectErrorCode.VALIDATION_ERROR);
   }
 
-  const enrolled = await isStudentEnrolled(actor!.id, parsed.data.trainingId);
-  if (!enrolled) {
-    return projectFailure(ProjectErrorCode.NOT_ENROLLED);
+  const inaccessible = await assertProjectSubmissionAccess(
+    actor,
+    parsed.data.trainingId,
+  );
+  if (inaccessible) {
+    return inaccessible;
   }
 
   const project = await upsertProject({

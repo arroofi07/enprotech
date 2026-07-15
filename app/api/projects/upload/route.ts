@@ -19,12 +19,13 @@ export async function POST(request: Request) {
     );
   }
 
+  const trainingId = String(formData.get("trainingId") ?? "");
   const kind = String(formData.get("kind") ?? "");
   const file = formData.get("file");
 
   const result = await uploadProjectFile(
     actor,
-    { kind },
+    { trainingId, kind },
     file instanceof File ? file : null,
   );
 

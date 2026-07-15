@@ -7,6 +7,8 @@ import { ButtonLink } from "@/components/ui/button-link";
 import { Card, CardContent } from "@/components/ui/card";
 import { getCurrentUser } from "@/lib/application/auth/get-session";
 import { getStudentProject } from "@/lib/application/projects/get-student-project";
+import { getStudentTrainingFlowState } from "@/lib/application/training-flow/get-student-training-flow-state";
+import { canAccessProject } from "@/lib/domain/training-flow/gates";
 import { findEnrollmentSummary } from "@/lib/infrastructure/db/repositories/report-repository";
 
 type StudentProjectFormPageProps = {
@@ -29,9 +31,22 @@ export default async function StudentProjectFormPage({
     redirect("/student/projects");
   }
 
-  const projectResult = await getStudentProject(user, trainingId);
+  const [projectResult, flow] = await Promise.all([
+    getStudentProject(user, trainingId),
+    getStudentTrainingFlowState(user.id, trainingId),
+  ]);
   if (!projectResult.success) {
     redirect("/unauthorized");
+  }
+
+  if (
+    !flow ||
+    !canAccessProject({
+      allModulesCompleted: flow.allModulesCompleted,
+      hasPassedPostTest: flow.hasPassedPostTest,
+    })
+  ) {
+    redirect("/student/projects");
   }
 
   const project = projectResult.data;

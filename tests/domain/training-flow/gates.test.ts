@@ -4,6 +4,7 @@ import {
   canAccessCertificate,
   canAccessModules,
   canAccessPostTest,
+  canAccessProject,
   hasCompletedPretest,
   hasPassedPostTest,
 } from "@/lib/domain/training-flow/gates";
@@ -47,6 +48,35 @@ describe("canAccessPostTest", () => {
   });
 });
 
+describe("canAccessProject", () => {
+  it("blocks until all modules are completed", () => {
+    expect(
+      canAccessProject({
+        allModulesCompleted: false,
+        hasPassedPostTest: true,
+      }),
+    ).toBe(false);
+  });
+
+  it("blocks until the post-test is passed", () => {
+    expect(
+      canAccessProject({
+        allModulesCompleted: true,
+        hasPassedPostTest: false,
+      }),
+    ).toBe(false);
+  });
+
+  it("allows access after modules and post-test are completed", () => {
+    expect(
+      canAccessProject({
+        allModulesCompleted: true,
+        hasPassedPostTest: true,
+      }),
+    ).toBe(true);
+  });
+});
+
 describe("hasCompletedPretest", () => {
   it("returns false with zero attempts", () => {
     expect(hasCompletedPretest(0)).toBe(false);
@@ -68,8 +98,22 @@ describe("hasPassedPostTest", () => {
 });
 
 describe("canAccessCertificate", () => {
-  it("requires passed post-test", () => {
-    expect(canAccessCertificate(false)).toBe(false);
-    expect(canAccessCertificate(true)).toBe(true);
+  it("requires every completion step", () => {
+    expect(
+      canAccessCertificate({
+        allModulesCompleted: true,
+        hasPassedPostTest: false,
+        hasSubmittedProject: true,
+        hasSubmittedFeedback: true,
+      }),
+    ).toBe(false);
+    expect(
+      canAccessCertificate({
+        allModulesCompleted: true,
+        hasPassedPostTest: true,
+        hasSubmittedProject: true,
+        hasSubmittedFeedback: true,
+      }),
+    ).toBe(true);
   });
 });

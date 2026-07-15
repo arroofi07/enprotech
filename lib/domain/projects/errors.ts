@@ -3,6 +3,7 @@ export const ProjectErrorCode = {
   FORBIDDEN: "FORBIDDEN",
   TRAINING_NOT_FOUND: "TRAINING_NOT_FOUND",
   NOT_ENROLLED: "NOT_ENROLLED",
+  PROJECT_LOCKED: "PROJECT_LOCKED",
   PROJECT_NOT_FOUND: "PROJECT_NOT_FOUND",
   VALIDATION_ERROR: "VALIDATION_ERROR",
   INVALID_FILE_TYPE: "INVALID_FILE_TYPE",
@@ -18,6 +19,8 @@ const PROJECT_ERROR_MESSAGES: Record<ProjectErrorCode, string> = {
   [ProjectErrorCode.FORBIDDEN]: "Anda tidak memiliki akses untuk tindakan ini.",
   [ProjectErrorCode.TRAINING_NOT_FOUND]: "Training tidak ditemukan.",
   [ProjectErrorCode.NOT_ENROLLED]: "Anda belum terdaftar di training ini.",
+  [ProjectErrorCode.PROJECT_LOCKED]:
+    "Selesaikan seluruh modul dan lulus post-test sebelum mengunggah project.",
   [ProjectErrorCode.PROJECT_NOT_FOUND]: "Project tidak ditemukan.",
   [ProjectErrorCode.VALIDATION_ERROR]: "Data yang dimasukkan tidak valid.",
   [ProjectErrorCode.INVALID_FILE_TYPE]: "Format file tidak didukung.",
