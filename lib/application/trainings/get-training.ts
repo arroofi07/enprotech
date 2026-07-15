@@ -6,6 +6,10 @@ import {
   type TrainingResult,
 } from "@/lib/domain/trainings/errors";
 import {
+  getTrainingPublicationSummaries,
+  type TrainingPublicationSummary,
+} from "@/lib/infrastructure/db/repositories/assessment-repository";
+import {
   findTrainingById,
   listEnrollmentsByTraining,
   type EnrollmentRecord,
@@ -17,6 +21,7 @@ import { assertTrainerOrAdmin } from "./assert-trainer-or-admin";
 
 export type TrainingDetail = TrainingRecord & {
   enrollments: EnrollmentRecord[];
+  publicationSummary: TrainingPublicationSummary;
 };
 
 export async function getTraining(
@@ -38,10 +43,19 @@ export async function getTraining(
     return trainingFailure(TrainingErrorCode.TRAINING_NOT_FOUND);
   }
 
-  const enrollments = await listEnrollmentsByTraining(parsed.data.trainingId);
+  const [enrollments, summaries] = await Promise.all([
+    listEnrollmentsByTraining(parsed.data.trainingId),
+    getTrainingPublicationSummaries([parsed.data.trainingId]),
+  ]);
+  const publicationSummary = summaries[parsed.data.trainingId];
+
+  if (!publicationSummary) {
+    return trainingFailure(TrainingErrorCode.TRAINING_NOT_FOUND);
+  }
 
   return trainingSuccess({
     ...training,
     enrollments,
+    publicationSummary,
   });
 }

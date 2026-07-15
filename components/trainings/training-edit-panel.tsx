@@ -229,6 +229,7 @@ export function TrainingEditPanel({
           <TrainingManagementActions
             trainingId={training.id}
             status={training.status}
+            publicationSummary={training.publicationSummary}
           />
         </TabsContent>
       </Tabs>

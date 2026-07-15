@@ -7,6 +7,7 @@ import {
   publishTrainingAction,
   type TrainingActionState,
 } from "@/app/actions/trainings";
+import { TrainingPublicationSummary } from "@/components/trainings/training-publication-summary";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -21,17 +22,20 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { useActionToast } from "@/hooks/use-action-toast";
 import type { TrainingStatus } from "@/lib/domain/trainings/types";
+import type { TrainingPublicationSummary as TrainingPublicationSummaryData } from "@/lib/infrastructure/db/repositories/assessment-repository";
 
 const initialState: TrainingActionState = {};
 
 type TrainingManagementActionsProps = {
   trainingId: string;
   status: TrainingStatus;
+  publicationSummary: TrainingPublicationSummaryData;
 };
 
 export function TrainingManagementActions({
   trainingId,
   status,
+  publicationSummary,
 }: TrainingManagementActionsProps) {
   const [publishState, publishAction, publishPending] = useActionState(
     publishTrainingAction,
@@ -47,13 +51,26 @@ export function TrainingManagementActions({
 
   return (
     <div className="space-y-4">
+      <TrainingPublicationSummary summary={publicationSummary} />
+      {!publicationSummary.isReadyToPublish &&
+      (status === "draft" || status === "archived") ? (
+        <p className="text-sm text-muted-foreground">
+          Isi materi, quiz, dan latihan pada setiap modul serta soal pre-test
+          dan post-test agar training dapat dipublikasikan.
+        </p>
+      ) : null}
       <div className="flex flex-wrap gap-2">
-        {status === "draft" ? (
+        {status === "draft" || status === "archived" ? (
           <form action={publishAction}>
             <input type="hidden" name="trainingId" value={trainingId} />
-            <Button type="submit" disabled={publishPending}>
+            <Button
+              type="submit"
+              disabled={publishPending || !publicationSummary.isReadyToPublish}
+            >
               {publishPending ? <Spinner data-icon="inline-start" /> : null}
-              Publikasikan
+              {status === "archived"
+                ? "Publikasikan Kembali"
+                : "Publikasikan"}
             </Button>
           </form>
         ) : null}

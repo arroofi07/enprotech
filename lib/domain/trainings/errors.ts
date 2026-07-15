@@ -7,6 +7,7 @@ export const TrainingErrorCode = {
   INVALID_STATUS_TRANSITION: "INVALID_STATUS_TRANSITION",
   ALREADY_ENROLLED: "ALREADY_ENROLLED",
   MODULES_NOT_READY: "MODULES_NOT_READY",
+  TRAINING_NOT_READY: "TRAINING_NOT_READY",
   PRETEST_ALREADY_ACTIVE: "PRETEST_ALREADY_ACTIVE",
   VALIDATION_ERROR: "VALIDATION_ERROR",
   PRETEST_NO_QUESTIONS: "PRETEST_NO_QUESTIONS",
@@ -28,6 +29,8 @@ const TRAINING_ERROR_MESSAGES: Record<TrainingErrorCode, string> = {
     "Student sudah terdaftar di training ini.",
   [TrainingErrorCode.MODULES_NOT_READY]:
     "Semua modul harus memiliki materi sebelum pre-test diaktifkan.",
+  [TrainingErrorCode.TRAINING_NOT_READY]:
+    "Lengkapi materi, soal quiz dan latihan di setiap modul, serta soal pre-test dan post-test sebelum training dipublikasikan.",
   [TrainingErrorCode.PRETEST_ALREADY_ACTIVE]: "Pre-test sudah aktif.",
   [TrainingErrorCode.VALIDATION_ERROR]: "Data yang dimasukkan tidak valid.",
   [TrainingErrorCode.PRETEST_NO_QUESTIONS]:

@@ -112,15 +112,16 @@ export async function archiveTrainingAction(
   formData: FormData,
 ): Promise<TrainingActionState> {
   const actor = await getCurrentUser();
+  const trainingId = String(formData.get("trainingId") ?? "");
   const result = await archiveTraining(actor, {
-    trainingId: String(formData.get("trainingId") ?? ""),
+    trainingId,
   });
 
   if (!result.success) {
     return { error: result.error, message: result.message, success: false };
   }
 
-  revalidateTrainingPaths();
+  revalidateTrainingPaths(trainingId);
   return { success: true, message: "Training berhasil diarsipkan." };
 }
 

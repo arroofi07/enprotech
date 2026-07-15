@@ -8,7 +8,7 @@ import {
   type AssessmentAnswer,
   type QuestionOption,
 } from "@/lib/db/schema/assessments";
-import { modules } from "@/lib/db/schema/modules";
+import { moduleContents, modules } from "@/lib/db/schema/modules";
 import { enrollments, trainings } from "@/lib/db/schema/trainings";
 import type {
   AssessmentType,
@@ -48,6 +48,18 @@ export type AssessmentAttemptRecord = {
   questionIds: string[] | null;
   startedAt: Date;
   submittedAt: Date | null;
+};
+
+export type TrainingPublicationSummary = {
+  moduleCount: number;
+  modulesWithContentCount: number;
+  quizQuestionCount: number;
+  modulesWithQuizQuestionsCount: number;
+  latihanQuestionCount: number;
+  modulesWithLatihanQuestionsCount: number;
+  preTestQuestionCount: number;
+  postTestQuestionCount: number;
+  isReadyToPublish: boolean;
 };
 
 export type ModuleContext = {
@@ -833,4 +845,115 @@ export async function countModuleQuestionsByTrainingIds(
   }
 
   return counts;
+}
+
+export async function getTrainingPublicationSummaries(
+  trainingIds: string[],
+): Promise<Record<string, TrainingPublicationSummary>> {
+  const summaries: Record<string, TrainingPublicationSummary> =
+    Object.fromEntries(
+      trainingIds.map((trainingId) => [
+        trainingId,
+        {
+          moduleCount: 0,
+          modulesWithContentCount: 0,
+          quizQuestionCount: 0,
+          modulesWithQuizQuestionsCount: 0,
+          latihanQuestionCount: 0,
+          modulesWithLatihanQuestionsCount: 0,
+          preTestQuestionCount: 0,
+          postTestQuestionCount: 0,
+          isReadyToPublish: false,
+        },
+      ]),
+    );
+
+  if (trainingIds.length === 0) {
+    return summaries;
+  }
+
+  const [moduleRows, assessmentRows] = await Promise.all([
+    db
+      .select({
+        trainingId: modules.trainingId,
+        moduleId: modules.id,
+        contentCount: sql<number>`cast(count(${moduleContents.id}) as int)`,
+      })
+      .from(modules)
+      .leftJoin(moduleContents, eq(moduleContents.moduleId, modules.id))
+      .where(inArray(modules.trainingId, trainingIds))
+      .groupBy(modules.trainingId, modules.id),
+    db
+      .select({
+        trainingId: assessments.trainingId,
+        moduleId: assessments.moduleId,
+        type: assessments.type,
+        questionCount: sql<number>`cast(count(${questions.id}) as int)`,
+      })
+      .from(assessments)
+      .leftJoin(questions, eq(questions.assessmentId, assessments.id))
+      .where(inArray(assessments.trainingId, trainingIds))
+      .groupBy(
+        assessments.trainingId,
+        assessments.moduleId,
+        assessments.type,
+      ),
+  ]);
+
+  for (const row of moduleRows) {
+    const summary = summaries[row.trainingId];
+    if (!summary) {
+      continue;
+    }
+
+    summary.moduleCount += 1;
+    if (Number(row.contentCount) > 0) {
+      summary.modulesWithContentCount += 1;
+    }
+  }
+
+  for (const row of assessmentRows) {
+    const summary = summaries[row.trainingId];
+    if (!summary) {
+      continue;
+    }
+
+    const questionCount = Number(row.questionCount);
+    switch (row.type) {
+      case "pre_test":
+        summary.preTestQuestionCount += questionCount;
+        break;
+      case "post_test":
+        summary.postTestQuestionCount += questionCount;
+        break;
+      case "quiz":
+        summary.quizQuestionCount += questionCount;
+        if (row.moduleId && questionCount > 0) {
+          summary.modulesWithQuizQuestionsCount += 1;
+        }
+        break;
+      case "latihan":
+        summary.latihanQuestionCount += questionCount;
+        if (row.moduleId && questionCount > 0) {
+          summary.modulesWithLatihanQuestionsCount += 1;
+        }
+        break;
+      default: {
+        const _exhaustive: never = row.type;
+        throw new Error(`Unsupported assessment type: ${_exhaustive}`);
+      }
+    }
+  }
+
+  for (const summary of Object.values(summaries)) {
+    summary.isReadyToPublish =
+      summary.moduleCount > 0 &&
+      summary.modulesWithContentCount === summary.moduleCount &&
+      summary.modulesWithQuizQuestionsCount === summary.moduleCount &&
+      summary.modulesWithLatihanQuestionsCount === summary.moduleCount &&
+      summary.preTestQuestionCount > 0 &&
+      summary.postTestQuestionCount > 0;
+  }
+
+  return summaries;
 }

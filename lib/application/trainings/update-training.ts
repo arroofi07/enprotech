@@ -7,13 +7,14 @@ import {
 } from "@/lib/domain/trainings/errors";
 import { resolveDirectStatusChange } from "@/lib/domain/trainings/status-transitions";
 import {
+  getTrainingPublicationSummaries,
+} from "@/lib/infrastructure/db/repositories/assessment-repository";
+import {
   findTrainingById,
   updateTraining as updateTrainingInRepo,
   type TrainingRecord,
 } from "@/lib/infrastructure/db/repositories/training-repository";
-import {
-  updateTrainingSchema,
-} from "@/lib/validations/training-schemas";
+import { updateTrainingSchema } from "@/lib/validations/training-schemas";
 
 import { assertTrainerOrAdmin } from "./assert-trainer-or-admin";
 
@@ -58,6 +59,13 @@ export async function updateTraining(
       return trainingFailure(transition.error);
     }
     nextStatus = transition.nextStatus;
+
+    if (nextStatus === "active" && existing.status !== "active") {
+      const summaries = await getTrainingPublicationSummaries([trainingId]);
+      if (!summaries[trainingId]?.isReadyToPublish) {
+        return trainingFailure(TrainingErrorCode.TRAINING_NOT_READY);
+      }
+    }
   }
 
   const updated = await updateTrainingInRepo(trainingId, {

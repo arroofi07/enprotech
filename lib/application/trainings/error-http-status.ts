@@ -15,6 +15,7 @@ export function trainingErrorHttpStatus(error: TrainingErrorCode): number {
     case "INVALID_STATUS_TRANSITION":
     case "ALREADY_ENROLLED":
     case "MODULES_NOT_READY":
+    case "TRAINING_NOT_READY":
     case "PRETEST_ALREADY_ACTIVE":
     case "PRETEST_NO_QUESTIONS":
       return 409;

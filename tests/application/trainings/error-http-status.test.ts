@@ -28,5 +28,8 @@ describe("trainingErrorHttpStatus", () => {
     expect(trainingErrorHttpStatus(TrainingErrorCode.MODULES_NOT_READY)).toBe(
       409,
     );
+    expect(trainingErrorHttpStatus(TrainingErrorCode.TRAINING_NOT_READY)).toBe(
+      409,
+    );
   });
 });

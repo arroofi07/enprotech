@@ -11,6 +11,7 @@ import {
 
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { TrainerHeader } from "@/components/trainer/trainer-header";
+import { TrainingPublicationSummary } from "@/components/trainings/training-publication-summary";
 import { TrainingStatusBadge } from "@/components/trainings/training-status-badge";
 import { ButtonLink } from "@/components/ui/button-link";
 import {
@@ -23,6 +24,7 @@ import {
 import { getCurrentUser } from "@/lib/application/auth/get-session";
 import { listTrainings } from "@/lib/application/trainings/list-trainings";
 import { formatTrainingDeadline } from "@/lib/domain/trainings/format-deadline";
+import { getTrainingPublicationSummaries } from "@/lib/infrastructure/db/repositories/assessment-repository";
 import { countTrainingsByStatus } from "@/lib/infrastructure/db/repositories/training-repository";
 
 export default async function TrainerDashboardPage() {
@@ -52,6 +54,9 @@ export default async function TrainerDashboardPage() {
   const completedTrainings = completedCount;
 
   const recentItems = recentTrainings.success ? recentTrainings.data.items : [];
+  const publicationSummaries = await getTrainingPublicationSummaries(
+    recentItems.map((training) => training.id),
+  );
 
   const stats = [
     {
@@ -163,18 +168,28 @@ export default async function TrainerDashboardPage() {
                       <Link
                         key={training.id}
                         href={`/trainer/trainings/${training.id}/edit`}
-                        className="flex items-center justify-between gap-4 rounded-lg border bg-card p-4 transition-colors hover:bg-muted/50"
+                        className="block space-y-3 rounded-lg border bg-card p-4 transition-colors hover:bg-muted/50"
                       >
-                        <div className="min-w-0">
-                          <p className="truncate font-medium">{training.title}</p>
-                          <p className="text-sm text-muted-foreground">
-                            Passing grade {training.passingGrade}%
-                            {formatTrainingDeadline(training.deadline)
-                              ? ` · Deadline ${formatTrainingDeadline(training.deadline)}`
-                              : ""}
-                          </p>
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="min-w-0">
+                            <p className="truncate font-medium">
+                              {training.title}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              Passing grade {training.passingGrade}%
+                              {formatTrainingDeadline(training.deadline)
+                                ? ` · Deadline ${formatTrainingDeadline(training.deadline)}`
+                                : ""}
+                            </p>
+                          </div>
+                          <TrainingStatusBadge status={training.status} />
                         </div>
-                        <TrainingStatusBadge status={training.status} />
+                        {publicationSummaries[training.id] ? (
+                          <TrainingPublicationSummary
+                            summary={publicationSummaries[training.id]}
+                            compact
+                          />
+                        ) : null}
                       </Link>
                     ))}
                   </div>

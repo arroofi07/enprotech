@@ -11,6 +11,8 @@ import {
 
 import { AdminHeader } from "@/components/admin/admin-header";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
+import { TrainingPublicationSummary } from "@/components/trainings/training-publication-summary";
+import { TrainingStatusBadge } from "@/components/trainings/training-status-badge";
 import { Badge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button-link";
 import {
@@ -21,8 +23,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { getCurrentUser } from "@/lib/application/auth/get-session";
+import { listTrainings } from "@/lib/application/trainings/list-trainings";
 import { listUsers } from "@/lib/application/users/list-users";
 import { formatUserDisplayName } from "@/lib/domain/users/format-display-name";
+import { getTrainingPublicationSummaries } from "@/lib/infrastructure/db/repositories/assessment-repository";
 
 export default async function AdminDashboardPage() {
   const user = await getCurrentUser();
@@ -31,12 +35,13 @@ export default async function AdminDashboardPage() {
     redirect("/login");
   }
 
-  const [allUsers, pendingUsers, activeUsers, inactiveUsers] =
+  const [allUsers, pendingUsers, activeUsers, inactiveUsers, recentTrainings] =
     await Promise.all([
       listUsers(user, { page: 1, pageSize: 1 }),
       listUsers(user, { status: "pending", page: 1, pageSize: 5 }),
       listUsers(user, { status: "active", page: 1, pageSize: 1 }),
       listUsers(user, { status: "inactive", page: 1, pageSize: 1 }),
+      listTrainings(user, { page: 1, pageSize: 5 }),
     ]);
 
   const total = allUsers.success ? allUsers.data.total : 0;
@@ -44,6 +49,12 @@ export default async function AdminDashboardPage() {
   const activeTotal = activeUsers.success ? activeUsers.data.total : 0;
   const inactiveTotal = inactiveUsers.success ? inactiveUsers.data.total : 0;
   const pendingItems = pendingUsers.success ? pendingUsers.data.items : [];
+  const recentTrainingItems = recentTrainings.success
+    ? recentTrainings.data.items
+    : [];
+  const publicationSummaries = await getTrainingPublicationSummaries(
+    recentTrainingItems.map((training) => training.id),
+  );
 
   const stats = [
     {
@@ -262,6 +273,51 @@ export default async function AdminDashboardPage() {
               </CardContent>
             </Card>
           </div>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle className="text-lg">
+                  Kelengkapan Training Terbaru
+                </CardTitle>
+                <CardDescription>
+                  Ringkasan modul dan soal sebelum training dipublikasikan
+                </CardDescription>
+              </div>
+              <ButtonLink variant="outline" href="/trainer/modules">
+                Lihat Semua
+                <IconChevronRight data-icon="inline-end" className="size-4" />
+              </ButtonLink>
+            </CardHeader>
+            <CardContent>
+              {recentTrainingItems.length === 0 ? (
+                <p className="py-8 text-center text-sm text-muted-foreground">
+                  Belum ada training.
+                </p>
+              ) : (
+                <div className="space-y-3">
+                  {recentTrainingItems.map((training) => (
+                    <Link
+                      key={training.id}
+                      href={`/trainer/trainings/${training.id}/edit`}
+                      className="block space-y-3 rounded-lg border bg-card p-4 transition-colors hover:bg-muted/50"
+                    >
+                      <div className="flex items-center justify-between gap-4">
+                        <p className="truncate font-medium">{training.title}</p>
+                        <TrainingStatusBadge status={training.status} />
+                      </div>
+                      {publicationSummaries[training.id] ? (
+                        <TrainingPublicationSummary
+                          summary={publicationSummaries[training.id]}
+                          compact
+                        />
+                      ) : null}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </div>
       </main>
     </>

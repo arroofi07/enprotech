@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getTraining } from "@/lib/application/trainings/get-training";
 import type { SessionUser } from "@/lib/domain/auth/types";
 import { TrainingErrorCode } from "@/lib/domain/trainings/errors";
+import * as assessmentRepository from "@/lib/infrastructure/db/repositories/assessment-repository";
 import * as trainingRepository from "@/lib/infrastructure/db/repositories/training-repository";
 
 const trainer: SessionUser = {
@@ -35,6 +36,22 @@ describe("getTraining", () => {
   });
 
   it("returns training detail with enrollments", async () => {
+    vi.spyOn(
+      assessmentRepository,
+      "getTrainingPublicationSummaries",
+    ).mockResolvedValue({
+      [trainingId]: {
+        moduleCount: 1,
+        modulesWithContentCount: 1,
+        quizQuestionCount: 5,
+        modulesWithQuizQuestionsCount: 1,
+        latihanQuestionCount: 5,
+        modulesWithLatihanQuestionsCount: 1,
+        preTestQuestionCount: 5,
+        postTestQuestionCount: 5,
+        isReadyToPublish: true,
+      },
+    });
     vi.spyOn(trainingRepository, "findTrainingById").mockResolvedValue(
       trainingRecord,
     );
@@ -57,6 +74,7 @@ describe("getTraining", () => {
     if (result.success) {
       expect(result.data.title).toBe("Safety Training");
       expect(result.data.enrollments).toHaveLength(1);
+      expect(result.data.publicationSummary.isReadyToPublish).toBe(true);
     }
   });
 
