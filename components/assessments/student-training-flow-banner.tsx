@@ -39,7 +39,7 @@ export function StudentTrainingFlowBanner({
           </div>
           <p className="text-sm text-muted-foreground">
             Kerjakan pre-test terlebih dahulu sebelum mengakses modul pembelajaran.
-            Pre-test hanya dapat dikerjakan satu kali.
+            Jika belum lulus, pre-test dapat dikerjakan kembali.
           </p>
           <ButtonLink href={`/student/trainings/${trainingId}/pre-test`}>
             Kerjakan Pre-Test

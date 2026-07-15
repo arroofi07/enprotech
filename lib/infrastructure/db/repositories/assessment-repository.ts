@@ -267,7 +267,7 @@ export async function createTrainingAssessment(input: {
       moduleId: null,
       type: input.type,
       title: input.title,
-      maxRetry: input.type === "pre_test" ? 1 : null,
+      maxRetry: null,
     })
     .returning(assessmentColumns);
 

@@ -137,8 +137,6 @@ export async function getStudentTrainingAssessmentState(
       : passed;
 
   const retryAllowed = canRetry({
-    submittedAttemptCount,
-    maxRetry: assessment.maxRetry,
     bestScore,
     passingGrade,
   });

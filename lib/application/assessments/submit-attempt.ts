@@ -1,4 +1,5 @@
 import type { SessionUser } from "@/lib/domain/auth/types";
+import { areAllQuestionsAnswered } from "@/lib/domain/assessments/are-all-questions-answered";
 import { calculateScore } from "@/lib/domain/assessments/calculate-score";
 import { getBestScore, hasPassed } from "@/lib/domain/assessments/best-score";
 import {
@@ -7,6 +8,7 @@ import {
   assessmentSuccess,
   type AssessmentResult,
 } from "@/lib/domain/assessments/errors";
+import { isAttemptTimedOut } from "@/lib/domain/assessments/is-attempt-timed-out";
 import { getWrongAnswerReviews } from "@/lib/domain/assessments/review-wrong-answers";
 import { resolvePassingGrade } from "@/lib/domain/assessments/resolve-passing-grade";
 import { isTrainingAssessmentType } from "@/lib/domain/assessments/types";
@@ -93,6 +95,14 @@ export async function submitAttemptUseCase(
 
   if (questions.length === 0) {
     return assessmentFailure(AssessmentErrorCode.NO_QUESTIONS);
+  }
+
+  // Manual submit must be complete. Timed-out attempts can be scored with blanks as wrong.
+  if (
+    !isAttemptTimedOut(attempt, assessment) &&
+    !areAllQuestionsAnswered(questions, attempt.answers)
+  ) {
+    return assessmentFailure(AssessmentErrorCode.INCOMPLETE_ANSWERS);
   }
 
   const score = calculateScore(questions, attempt.answers);

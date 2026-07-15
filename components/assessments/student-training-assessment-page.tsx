@@ -138,7 +138,6 @@ export async function StudentTrainingAssessmentPage({
                 bestScore={state.bestScore}
                 hasPassed={state.hasPassed}
                 canRetry={state.canRetry}
-                hasCompleted={state.hasCompleted}
                 inProgressAttempt={state.inProgressAttempt}
                 attempts={state.attempts}
                 latestAttemptReview={state.latestAttemptReview}

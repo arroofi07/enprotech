@@ -10,7 +10,6 @@ import { resolvePassingGrade } from "@/lib/domain/assessments/resolve-passing-gr
 import { isTrainingAssessmentType } from "@/lib/domain/assessments/types";
 import { canAccessPostTest } from "@/lib/domain/training-flow/gates";
 import {
-  countSubmittedAttempts,
   createAttempt,
   findAssessmentById,
   findInProgressAttempt,
@@ -165,26 +164,13 @@ export async function startAttempt(
 
   const passingGrade = await resolvePassingGradeForAssessment(assessment);
   const bestScore = await getBestSubmittedScore(actor!.id, assessment.id);
-  const submittedAttemptCount = await countSubmittedAttempts(
-    actor!.id,
-    assessment.id,
-  );
 
   if (
     !canRetry({
-      submittedAttemptCount,
-      maxRetry: assessment.maxRetry,
       bestScore,
       passingGrade,
     })
   ) {
-    if (
-      assessment.type === "pre_test" &&
-      submittedAttemptCount >= (assessment.maxRetry ?? 1)
-    ) {
-      return assessmentFailure(AssessmentErrorCode.PRETEST_ALREADY_ATTEMPTED);
-    }
-
     return assessmentFailure(AssessmentErrorCode.ALREADY_PASSED);
   }
 

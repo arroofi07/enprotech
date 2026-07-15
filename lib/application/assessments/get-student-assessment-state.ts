@@ -148,8 +148,6 @@ export async function getStudentAssessmentState(
 
   const passed = hasPassed(bestScore, passingGrade);
   const retryAllowed = canRetry({
-    submittedAttemptCount: attempts.length,
-    maxRetry: assessment.maxRetry,
     bestScore,
     passingGrade,
   });

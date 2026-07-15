@@ -11,7 +11,6 @@ import {
   IconDeviceFloppy,
   IconInfoCircle,
   IconListNumbers,
-  IconLock,
   IconTargetArrow,
 } from "@tabler/icons-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -30,8 +29,9 @@ import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Spinner } from "@/components/ui/spinner";
-import { cn } from "@/lib/utils";
+import { areAllQuestionsAnswered } from "@/lib/domain/assessments/are-all-questions-answered";
 import { getAssessmentTypeLabel } from "@/lib/domain/assessments/labels";
+import { cn } from "@/lib/utils";
 import type { LatestAttemptReview } from "@/lib/application/assessments/build-latest-attempt-review";
 import type { WrongAnswerReview } from "@/lib/domain/assessments/review-wrong-answers";
 import type { AssessmentType } from "@/lib/domain/assessments/types";
@@ -51,7 +51,6 @@ type AssessmentTakeViewProps = {
   bestScore: number;
   hasPassed: boolean;
   canRetry: boolean;
-  hasCompleted?: boolean;
   inProgressAttempt: AssessmentAttemptRecord | null;
   attempts: AssessmentAttemptRecord[];
   latestAttemptReview?: LatestAttemptReview | null;
@@ -89,13 +88,11 @@ export function AssessmentTakeView({
   bestScore,
   hasPassed,
   canRetry,
-  hasCompleted = false,
   inProgressAttempt,
   attempts,
   latestAttemptReview = null,
 }: AssessmentTakeViewProps) {
   const typeLabel = getAssessmentTypeLabel(type);
-  const isSingleAttempt = type === "pre_test";
   const [session, setSession] = useState<AttemptSession | null>(
     inProgressAttempt
       ? {
@@ -127,7 +124,10 @@ export function AssessmentTakeView({
       return 0;
     }
 
-    return Object.keys(session.answers).length;
+    return session.questions.filter((question) => {
+      const selectedOptionId = session.answers[question.id];
+      return question.options.some((option) => option.id === selectedOptionId);
+    }).length;
   }, [session]);
 
   const progressValue = session
@@ -136,24 +136,29 @@ export function AssessmentTakeView({
   const unansweredCount = session
     ? session.questions.length - answeredCount
     : 0;
-  const allAnswered = session ? unansweredCount === 0 : false;
+  const allAnswered = session
+    ? areAllQuestionsAnswered(
+        session.questions,
+        Object.entries(session.answers).map(
+          ([questionId, selectedOptionId]) => ({
+            questionId,
+            selectedOptionId,
+          }),
+        ),
+      )
+    : false;
 
-  const startTitle =
-    isSingleAttempt && hasCompleted
-      ? `${typeLabel} Selesai`
-      : hasPassed
-        ? "Kamu Sudah Lulus"
-        : inProgressAttempt
-          ? `Lanjutkan ${typeLabel}`
-          : `Siap Mengerjakan ${typeLabel}?`;
+  const startTitle = hasPassed
+    ? "Kamu Sudah Lulus"
+    : inProgressAttempt
+      ? `Lanjutkan ${typeLabel}`
+      : `Siap Mengerjakan ${typeLabel}?`;
   const startDescription =
-    isSingleAttempt && hasCompleted
-      ? `${typeLabel} sudah dikerjakan dan tidak dapat diulang.`
-      : hasPassed
-        ? `Kamu sudah mencapai passing grade untuk ${typeLabel.toLowerCase()} ini.`
-        : inProgressAttempt
-          ? "Kamu punya jawaban tersimpan. Lanjutkan dari tempat terakhir kamu berhenti."
-          : "Baca setiap soal dengan teliti, lalu pilih satu jawaban yang paling tepat.";
+    hasPassed
+      ? `Kamu sudah mencapai passing grade untuk ${typeLabel.toLowerCase()} ini.`
+      : inProgressAttempt
+        ? "Kamu punya jawaban tersimpan. Lanjutkan dari tempat terakhir kamu berhenti."
+        : "Baca setiap soal dengan teliti, lalu pilih satu jawaban yang paling tepat.";
 
   const saveAnswers = useCallback(
     async (attemptId: string, answers: Record<string, string>) => {
@@ -272,6 +277,19 @@ export function AssessmentTakeView({
 
   async function handleSubmit() {
     if (!session) {
+      return;
+    }
+
+    if (!allAnswered) {
+      const firstUnansweredIndex = session.questions.findIndex(
+        (question) => !session.answers[question.id],
+      );
+      if (firstUnansweredIndex >= 0) {
+        setCurrentIndex(firstUnansweredIndex);
+      }
+      toast.error(
+        `Lengkapi ${unansweredCount} soal yang belum dijawab sebelum submit.`,
+      );
       return;
     }
 
@@ -489,7 +507,7 @@ export function AssessmentTakeView({
               )}
               <Button
                 onClick={handleSubmit}
-                disabled={loading}
+                disabled={loading || !allAnswered}
                 className="w-full"
               >
                 {loading ? <Spinner className="size-4" /> : null}
@@ -510,16 +528,9 @@ export function AssessmentTakeView({
           <p className="text-sm text-muted-foreground">
             Passing grade {passingGrade}% · Nilai tertinggi{" "}
             {result ? result.bestScore : bestScore}%
-            {isSingleAttempt ? " · Hanya 1 attempt" : null}
           </p>
         </div>
-        {isSingleAttempt ? (
-          result || hasCompleted ? (
-            <Badge>Selesai</Badge>
-          ) : (
-            <Badge variant="secondary">Belum Dikerjakan</Badge>
-          )
-        ) : (result ? result.passed : hasPassed) ? (
+        {(result ? result.passed : hasPassed) ? (
           <Badge>Lulus</Badge>
         ) : (
           <Badge variant="secondary">Belum Lulus</Badge>
@@ -536,7 +547,7 @@ export function AssessmentTakeView({
             typeLabel={typeLabel}
           />
           <AssessmentReviewWrong wrongAnswers={result.wrongAnswers} />
-          {!isSingleAttempt && !result.passed && canRetry ? (
+          {!result.passed && canRetry ? (
             <Button onClick={handleStart} disabled={loading}>
               {loading ? <Spinner className="size-4" /> : null}
               Coba Lagi
@@ -604,22 +615,15 @@ export function AssessmentTakeView({
               </div>
             </div>
 
-            {isSingleAttempt && !hasCompleted ? (
-              <div className="flex items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 text-xs text-amber-700 dark:text-amber-400">
-                <IconLock className="mt-0.5 size-4 shrink-0" />
-                <span>
-                  {typeLabel} hanya dapat dikerjakan satu kali. Pastikan semua
-                  jawaban sudah yakin sebelum submit.
-                </span>
-              </div>
-            ) : (
-              <div className="flex items-start gap-2 rounded-lg bg-muted/50 p-3 text-xs text-muted-foreground">
-                <IconDeviceFloppy className="mt-0.5 size-4 shrink-0" />
-                <span>
-                  Jawaban tersimpan otomatis setiap kali kamu memilih opsi.
-                </span>
-              </div>
-            )}
+            <div className="flex items-start gap-2 rounded-lg bg-muted/50 p-3 text-xs text-muted-foreground">
+              <IconDeviceFloppy className="mt-0.5 size-4 shrink-0" />
+              <span>
+                Jawaban tersimpan otomatis. Semua soal wajib dijawab sebelum
+                submit manual. Jika waktu habis, jawaban yang sudah dipilih
+                akan dikirim otomatis dan soal kosong dihitung salah. Kamu
+                dapat mencoba lagi selama belum lulus.
+              </span>
+            </div>
 
             {canRetry ? (
               <Button

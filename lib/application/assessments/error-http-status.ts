@@ -9,7 +9,6 @@ export function assessmentErrorHttpStatus(error: AssessmentErrorCode): number {
     case "ALREADY_PASSED":
     case "PRETEST_NOT_ACTIVE":
     case "PRETEST_REQUIRED":
-    case "PRETEST_ALREADY_ATTEMPTED":
     case "POSTTEST_LOCKED":
     case "MODULE_LOCKED":
     case "QUIZ_NOT_SCHEDULED":
@@ -24,6 +23,7 @@ export function assessmentErrorHttpStatus(error: AssessmentErrorCode): number {
       return 404;
     case "VALIDATION_ERROR":
     case "NO_QUESTIONS":
+    case "INCOMPLETE_ANSWERS":
     case "ATTEMPT_ALREADY_SUBMITTED":
     case "IMPORT_ERROR":
       return 400;

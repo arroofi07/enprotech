@@ -20,7 +20,7 @@ export function getAssessmentTypeDescription(type: AssessmentType): string {
     case "latihan":
       return "Dikerjakan di akhir sesi sebagai latihan mandiri dengan kesempatan retry.";
     case "pre_test":
-      return "Assessment awal sebelum memulai modul. Hanya dapat dikerjakan satu kali.";
+      return "Assessment awal sebelum memulai modul. Dapat diulang selama belum lulus.";
     case "post_test":
       return "Assessment akhir setelah menyelesaikan semua modul. Retry unlimited jika belum lulus.";
   }

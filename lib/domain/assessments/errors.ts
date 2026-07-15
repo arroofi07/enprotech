@@ -8,12 +8,12 @@ export const AssessmentErrorCode = {
   NOT_ENROLLED: "NOT_ENROLLED",
   VALIDATION_ERROR: "VALIDATION_ERROR",
   NO_QUESTIONS: "NO_QUESTIONS",
+  INCOMPLETE_ANSWERS: "INCOMPLETE_ANSWERS",
   ALREADY_PASSED: "ALREADY_PASSED",
   ATTEMPT_ALREADY_SUBMITTED: "ATTEMPT_ALREADY_SUBMITTED",
   IMPORT_ERROR: "IMPORT_ERROR",
   PRETEST_NOT_ACTIVE: "PRETEST_NOT_ACTIVE",
   PRETEST_REQUIRED: "PRETEST_REQUIRED",
-  PRETEST_ALREADY_ATTEMPTED: "PRETEST_ALREADY_ATTEMPTED",
   POSTTEST_LOCKED: "POSTTEST_LOCKED",
   MODULE_LOCKED: "MODULE_LOCKED",
   QUIZ_NOT_SCHEDULED: "QUIZ_NOT_SCHEDULED",
@@ -37,6 +37,8 @@ const ASSESSMENT_ERROR_MESSAGES: Record<AssessmentErrorCode, string> = {
   [AssessmentErrorCode.VALIDATION_ERROR]: "Data yang dimasukkan tidak valid.",
   [AssessmentErrorCode.NO_QUESTIONS]:
     "Belum ada soal. Trainer harus menambahkan soal terlebih dahulu.",
+  [AssessmentErrorCode.INCOMPLETE_ANSWERS]:
+    "Semua soal harus dijawab sebelum jawaban dapat disubmit.",
   [AssessmentErrorCode.ALREADY_PASSED]:
     "Anda sudah mencapai passing grade. Tidak dapat mencoba lagi.",
   [AssessmentErrorCode.ATTEMPT_ALREADY_SUBMITTED]:
@@ -47,8 +49,6 @@ const ASSESSMENT_ERROR_MESSAGES: Record<AssessmentErrorCode, string> = {
     "Pre-test belum diaktifkan oleh trainer.",
   [AssessmentErrorCode.PRETEST_REQUIRED]:
     "Kerjakan pre-test terlebih dahulu sebelum mengakses modul.",
-  [AssessmentErrorCode.PRETEST_ALREADY_ATTEMPTED]:
-    "Pre-test hanya dapat dikerjakan satu kali.",
   [AssessmentErrorCode.POSTTEST_LOCKED]:
     "Selesaikan semua modul terlebih dahulu sebelum mengerjakan post-test.",
   [AssessmentErrorCode.MODULE_LOCKED]:

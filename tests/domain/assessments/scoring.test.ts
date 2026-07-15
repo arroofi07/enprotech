@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
 
+import { areAllQuestionsAnswered } from "@/lib/domain/assessments/are-all-questions-answered";
 import { getBestScore, hasPassed } from "@/lib/domain/assessments/best-score";
 import { calculateScore } from "@/lib/domain/assessments/calculate-score";
 import { canRetry } from "@/lib/domain/assessments/can-retry";
+import { isAttemptTimedOut } from "@/lib/domain/assessments/is-attempt-timed-out";
 import { resolvePassingGrade } from "@/lib/domain/assessments/resolve-passing-grade";
 
 const questions = [
@@ -35,6 +37,37 @@ const questions = [
     ],
   },
 ];
+
+describe("areAllQuestionsAnswered", () => {
+  it("requires one valid answer for every displayed question", () => {
+    expect(
+      areAllQuestionsAnswered(questions, [
+        { questionId: "q1", selectedOptionId: "a" },
+        { questionId: "q2", selectedOptionId: "d" },
+        { questionId: "q3", selectedOptionId: "f" },
+        { questionId: "q4", selectedOptionId: "g" },
+      ]),
+    ).toBe(true);
+
+    expect(
+      areAllQuestionsAnswered(questions, [
+        { questionId: "q1", selectedOptionId: "a" },
+        { questionId: "q2", selectedOptionId: "d" },
+      ]),
+    ).toBe(false);
+  });
+
+  it("rejects an option that does not belong to its question", () => {
+    expect(
+      areAllQuestionsAnswered(questions, [
+        { questionId: "q1", selectedOptionId: "d" },
+        { questionId: "q2", selectedOptionId: "d" },
+        { questionId: "q3", selectedOptionId: "f" },
+        { questionId: "q4", selectedOptionId: "g" },
+      ]),
+    ).toBe(false);
+  });
+});
 
 describe("calculateScore", () => {
   it("returns 0 when there are no questions", () => {
@@ -83,12 +116,32 @@ describe("hasPassed", () => {
   });
 });
 
+describe("isAttemptTimedOut", () => {
+  it("returns false when there is no time limit", () => {
+    expect(
+      isAttemptTimedOut(
+        { startedAt: new Date("2026-01-01T00:00:00.000Z") },
+        { timeLimit: null },
+        new Date("2026-01-01T01:00:00.000Z"),
+      ),
+    ).toBe(false);
+  });
+
+  it("returns true once the time limit has elapsed", () => {
+    expect(
+      isAttemptTimedOut(
+        { startedAt: new Date("2026-01-01T00:00:00.000Z") },
+        { timeLimit: 10 },
+        new Date("2026-01-01T00:10:00.000Z"),
+      ),
+    ).toBe(true);
+  });
+});
+
 describe("canRetry", () => {
   it("allows retry when best score is below passing grade", () => {
     expect(
       canRetry({
-        submittedAttemptCount: 0,
-        maxRetry: null,
         bestScore: 60,
         passingGrade: 70,
       }),
@@ -98,8 +151,6 @@ describe("canRetry", () => {
   it("blocks retry after passing when enabled", () => {
     expect(
       canRetry({
-        submittedAttemptCount: 1,
-        maxRetry: null,
         bestScore: 80,
         passingGrade: 70,
       }),
@@ -109,8 +160,6 @@ describe("canRetry", () => {
   it("allows retry after passing when disabled", () => {
     expect(
       canRetry({
-        submittedAttemptCount: 1,
-        maxRetry: null,
         bestScore: 80,
         passingGrade: 70,
         blockRetryAfterPassing: false,
@@ -118,22 +167,18 @@ describe("canRetry", () => {
     ).toBe(true);
   });
 
-  it("blocks pre-test after one submitted attempt", () => {
+  it("allows a failed pre-test to be retried", () => {
     expect(
       canRetry({
-        submittedAttemptCount: 1,
-        maxRetry: 1,
         bestScore: 40,
         passingGrade: 70,
       }),
-    ).toBe(false);
+    ).toBe(true);
   });
 
   it("allows post-test retry when not passed", () => {
     expect(
       canRetry({
-        submittedAttemptCount: 3,
-        maxRetry: null,
         bestScore: 60,
         passingGrade: 70,
       }),
