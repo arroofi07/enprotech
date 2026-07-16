@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, type ReactNode } from "react";
+import { useActionState, useEffect, useState, type ReactNode } from "react";
 
 import {
   createQuestionAction,
@@ -10,10 +10,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { DialogClose, DialogFooter } from "@/components/ui/dialog";
 import { Field, FieldLabel } from "@/components/ui/field";
+import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import { useActionToast } from "@/hooks/use-action-toast";
+import { cn } from "@/lib/utils";
 import type { AssessmentType } from "@/lib/domain/assessments/types";
 import type { QuestionRecord } from "@/lib/infrastructure/db/repositories/assessment-repository";
 
@@ -69,10 +71,19 @@ export function AssessmentQuestionForm({
 
   const defaultCorrectLabel =
     question?.options.findIndex((option) => option.isCorrect) ?? -1;
-  const correctAnswer =
+  const initialCorrectAnswer =
     defaultCorrectLabel >= 0
       ? OPTION_LABELS[defaultCorrectLabel]
       : "A";
+  const [correctAnswer, setCorrectAnswer] = useState(initialCorrectAnswer);
+
+  const handleCorrectAnswerChange = (value: string | null) => {
+    const nextAnswer = OPTION_LABELS.find((label) => label === value);
+
+    if (nextAnswer) {
+      setCorrectAnswer(nextAnswer);
+    }
+  };
 
   useEffect(() => {
     if (state.success) {
@@ -92,7 +103,7 @@ export function AssessmentQuestionForm({
         <input type="hidden" name="questionId" value={question.id} />
       ) : null}
 
-      <div className="flex-1 space-y-4 overflow-y-auto px-6 py-4">
+      <div className="flex-1 space-y-4 overflow-y-auto overscroll-contain px-6 py-4">
         <QuestionFormSection title="Pertanyaan">
           <Field>
             <FieldLabel htmlFor="questionText">Teks Soal</FieldLabel>
@@ -134,18 +145,26 @@ export function AssessmentQuestionForm({
         >
           <RadioGroup
             name="correctAnswer"
-            defaultValue={correctAnswer}
+            value={correctAnswer}
+            onValueChange={handleCorrectAnswerChange}
             className="grid grid-cols-2 gap-3 sm:grid-cols-5"
           >
-            {OPTION_LABELS.map((label) => (
-              <label
-                key={label}
-                className="flex items-center gap-2 rounded-lg border bg-background p-3 text-sm"
-              >
-                <RadioGroupItem value={label} />
-                Opsi {label}
-              </label>
-            ))}
+            {OPTION_LABELS.map((label) => {
+              const selected = correctAnswer === label;
+
+              return (
+                <Label
+                  key={label}
+                  className={cn(
+                    "flex cursor-pointer items-center gap-2 rounded-lg border bg-background p-3 text-sm font-normal",
+                    selected && "border-primary bg-primary/5 ring-1 ring-primary/20",
+                  )}
+                >
+                  <RadioGroupItem value={label} />
+                  Opsi {label}
+                </Label>
+              );
+            })}
           </RadioGroup>
         </QuestionFormSection>
       </div>

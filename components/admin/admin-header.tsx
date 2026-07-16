@@ -1,3 +1,5 @@
+import { Fragment } from "react";
+
 import { NotificationBell } from "@/components/notifications/notification-bell";
 import {
   Breadcrumb,
@@ -25,8 +27,8 @@ export function AdminHeader({ title, breadcrumbs = [] }: AdminHeaderProps) {
           <BreadcrumbItem>
             <BreadcrumbLink href="/admin/dashboard">Admin</BreadcrumbLink>
           </BreadcrumbItem>
-          {breadcrumbs.map((crumb) => (
-            <span key={crumb.label} className="contents">
+          {breadcrumbs.map((crumb, index) => (
+            <Fragment key={index}>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
                 {crumb.href ? (
@@ -35,7 +37,7 @@ export function AdminHeader({ title, breadcrumbs = [] }: AdminHeaderProps) {
                   <BreadcrumbPage>{crumb.label}</BreadcrumbPage>
                 )}
               </BreadcrumbItem>
-            </span>
+            </Fragment>
           ))}
           {breadcrumbs.length === 0 ? (
             <>

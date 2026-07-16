@@ -42,7 +42,10 @@ export const createTrainingSchema = z.object({
   passingGrade: z.coerce
     .number()
     .int("Passing grade harus bilangan bulat.")
-    .min(0, "Passing grade minimal 0.")
+    .min(
+      1,
+      "Passing grade minimal 1%. Nilai 0 membuat peserta otomatis dianggap lulus tanpa mengerjakan soal.",
+    )
     .max(100, "Passing grade maksimal 100.")
     .default(70),
   deadline: z.preprocess(

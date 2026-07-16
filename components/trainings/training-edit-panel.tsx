@@ -65,6 +65,11 @@ export function TrainingEditPanel({
   const [thumbnailName, setThumbnailName] = useState(
     thumbnailFileNameFromUrl(training.thumbnail),
   );
+  // Controlled so Base UI's FieldControl doesn't warn when `training.passingGrade`
+  // changes after a save + revalidation swaps in a fresh training prop.
+  const [passingGrade, setPassingGrade] = useState(
+    String(training.passingGrade),
+  );
   const [updateState, updateAction, updatePending] = useActionState(
     updateTrainingAction,
     initialState,
@@ -192,11 +197,18 @@ export function TrainingEditPanel({
                     id="passingGrade"
                     name="passingGrade"
                     type="number"
-                    min={0}
+                    min={1}
                     max={100}
-                    defaultValue={training.passingGrade}
+                    value={passingGrade}
+                    onChange={(event) => setPassingGrade(event.target.value)}
                     required
                   />
+                  <FieldDescription>
+                    Nilai minimum (1–100%) agar peserta dinyatakan lulus. Tidak
+                    boleh 0: passing grade 0% membuat peserta otomatis dianggap
+                    lulus dengan nilai 0 dan justru terkunci sehingga tidak bisa
+                    mengerjakan soal.
+                  </FieldDescription>
                 </Field>
 
                 <Field>

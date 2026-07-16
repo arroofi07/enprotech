@@ -9,7 +9,12 @@ function RadioGroup({ className, ...props }: RadioGroupPrimitive.Props) {
   return (
     <RadioGroupPrimitive
       data-slot="radio-group"
-      className={cn("grid w-full gap-3", className)}
+      // `relative` anchors each Radio's visually-hidden input, which Base UI
+      // renders as a sibling of the item (not a child), so the item's own
+      // `relative` can't contain it. Without a positioned ancestor here it
+      // resolves against the dialog popup and stops scrolling with the form,
+      // and focusing it on select scrolls the popup itself.
+      className={cn("relative grid w-full gap-3", className)}
       {...props}
     />
   )
