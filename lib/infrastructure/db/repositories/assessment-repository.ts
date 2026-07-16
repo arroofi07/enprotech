@@ -23,6 +23,7 @@ export type AssessmentRecord = {
   type: AssessmentType;
   title: string;
   passingGrade: number | null;
+  questionWeight: number | null;
   timeLimit: number | null;
   maxRetry: number | null;
   questionDisplayCount: number | null;
@@ -78,6 +79,7 @@ const assessmentColumns = {
   type: assessments.type,
   title: assessments.title,
   passingGrade: assessments.passingGrade,
+  questionWeight: assessments.questionWeight,
   timeLimit: assessments.timeLimit,
   maxRetry: assessments.maxRetry,
   questionDisplayCount: assessments.questionDisplayCount,
@@ -115,6 +117,7 @@ function mapAssessment(
     type: row.type,
     title: row.title,
     passingGrade: row.passingGrade,
+    questionWeight: row.questionWeight,
     timeLimit: row.timeLimit,
     maxRetry: row.maxRetry,
     questionDisplayCount: row.questionDisplayCount,
@@ -404,6 +407,7 @@ export async function updateAssessmentSettings(
     questionDisplayCount?: number | null;
     shuffleQuestions?: boolean;
     timeLimit?: number | null;
+    questionWeight?: number | null;
   },
 ): Promise<AssessmentRecord | null> {
   const [row] = await db
@@ -416,6 +420,9 @@ export async function updateAssessmentSettings(
         ? { shuffleQuestions: input.shuffleQuestions }
         : {}),
       ...(input.timeLimit !== undefined ? { timeLimit: input.timeLimit } : {}),
+      ...(input.questionWeight !== undefined
+        ? { questionWeight: input.questionWeight }
+        : {}),
     })
     .where(eq(assessments.id, assessmentId))
     .returning(assessmentColumns);

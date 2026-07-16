@@ -10,6 +10,7 @@ import {
   IconListCheck,
   IconMessage2,
   IconPencil,
+  IconScale,
   IconSchool,
   IconUsers,
   IconVideo,
@@ -203,6 +204,16 @@ function buildLearningFlowNav(prefix: LearningFlowPrefix): DashboardNavItem[] {
         new RegExp(`^${prefix}/trainings/[^/]+/waktu-ujian(?:/|$)`).test(
           pathname,
         ),
+    },
+    {
+      title: "Bobot Soal",
+      href: `${prefix}/bobot-soal`,
+      icon: IconScale,
+      implemented: true,
+      isActive: (pathname) =>
+        pathname === `${prefix}/bobot-soal` ||
+        pathname.startsWith(`${prefix}/bobot-soal/`) ||
+        new RegExp(`^${prefix}/trainings/[^/]+/bobot-soal(?:/|$)`).test(pathname),
     },
     {
       title: "Project",

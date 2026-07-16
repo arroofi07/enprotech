@@ -64,6 +64,13 @@
       "when": 1784172284145,
       "tag": "0008_notification_indexes",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1784198400000,
+      "tag": "0009_assessment_question_weight",
+      "breakpoints": true
     }
   ]
 }

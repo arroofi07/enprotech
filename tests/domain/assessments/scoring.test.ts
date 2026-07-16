@@ -93,6 +93,46 @@ describe("calculateScore", () => {
 
     expect(score).toBe(50);
   });
+
+  it("scores each correct answer at the configured weight", () => {
+    const answers = [
+      { questionId: "q1", selectedOptionId: "a" },
+      { questionId: "q2", selectedOptionId: "d" },
+      { questionId: "q3", selectedOptionId: "e" },
+      { questionId: "q4", selectedOptionId: "h" },
+    ];
+
+    // 2 benar x 25 = 50 — sama dengan penilaian rata karena 4 x 25 = 100.
+    expect(calculateScore(questions, answers, 25)).toBe(50);
+    // Bobot yang totalnya di bawah 100 memang menghasilkan nilai lebih kecil.
+    expect(calculateScore(questions, answers, 10)).toBe(20);
+  });
+
+  it("caps the score at 100 when the weights total more than 100", () => {
+    const allCorrect = [
+      { questionId: "q1", selectedOptionId: "a" },
+      { questionId: "q2", selectedOptionId: "d" },
+      { questionId: "q3", selectedOptionId: "f" },
+      { questionId: "q4", selectedOptionId: "g" },
+    ];
+
+    // 4 x 40 = 160, tapi nilai peserta tidak boleh lewat 100.
+    expect(calculateScore(questions, allCorrect, 40)).toBe(100);
+  });
+
+  it("rounds fractional weighted scores to a whole number", () => {
+    // 1 benar x 2.5 = 2.5 -> 3, karena kolom score bertipe integer.
+    expect(
+      calculateScore(questions, [{ questionId: "q1", selectedOptionId: "a" }], 2.5),
+    ).toBe(3);
+  });
+
+  it("falls back to even scoring when no weight is set", () => {
+    const answers = [{ questionId: "q1", selectedOptionId: "a" }];
+
+    expect(calculateScore(questions, answers, null)).toBe(25);
+    expect(calculateScore(questions, answers)).toBe(25);
+  });
 });
 
 describe("getBestScore", () => {

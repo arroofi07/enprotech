@@ -1,5 +1,10 @@
 import { z } from "zod";
 
+import {
+  MAX_QUESTION_WEIGHT,
+  MIN_QUESTION_WEIGHT,
+  roundWeight,
+} from "@/lib/domain/assessments/question-weight";
 import type {
   AssessmentType,
   ModuleAssessmentType,
@@ -149,6 +154,41 @@ export const updateAssessmentSettingsSchema = z.object({
 export const updateAssessmentTimeLimitSchema = z.object({
   assessmentId: z.uuid("ID assessment tidak valid."),
   timeLimit: timeLimitFieldSchema,
+});
+
+// Bobot boleh dikosongkan (kembali ke penilaian rata) dan boleh bertotal != 100 —
+// UI hanya memperingatkan. Yang ditolak cuma nilai yang tak masuk akal: <= 0,
+// > 100, atau lebih dari 2 desimal (numeric(5,2) tidak bisa menyimpannya utuh).
+const questionWeightFieldSchema = z.preprocess(
+  (value) => {
+    if (value === "" || value === null || value === undefined) {
+      return null;
+    }
+
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : value;
+  },
+  z
+    .number()
+    .min(MIN_QUESTION_WEIGHT, "Bobot harus lebih dari 0.")
+    .max(MAX_QUESTION_WEIGHT, "Bobot maksimal 100 per soal.")
+    .refine(
+      (value) => roundWeight(value) === value,
+      "Bobot maksimal 2 angka di belakang koma.",
+    )
+    .nullable(),
+);
+
+export const updateTrainingQuestionWeightsSchema = z.object({
+  trainingId: z.uuid("ID training tidak valid."),
+  weights: z
+    .array(
+      z.object({
+        assessmentId: z.uuid("ID assessment tidak valid."),
+        questionWeight: questionWeightFieldSchema,
+      }),
+    )
+    .min(1, "Tidak ada bobot yang dikirim."),
 });
 
 export type ModuleAssessmentInput = z.infer<typeof moduleAssessmentSchema>;

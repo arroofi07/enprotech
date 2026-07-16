@@ -105,7 +105,11 @@ export async function submitAttemptUseCase(
     return assessmentFailure(AssessmentErrorCode.INCOMPLETE_ANSWERS);
   }
 
-  const score = calculateScore(questions, attempt.answers);
+  const score = calculateScore(
+    questions,
+    attempt.answers,
+    assessment.questionWeight,
+  );
   const submitted = await submitAttempt(attemptId, {
     score,
     answers: attempt.answers,

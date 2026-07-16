@@ -9,6 +9,7 @@ import { importQuestionsUseCase } from "@/lib/application/assessments/import-que
 import { updateAssessmentSettingsUseCase } from "@/lib/application/assessments/update-assessment-settings";
 import { updateAssessmentTimeLimitUseCase } from "@/lib/application/assessments/update-assessment-time-limit";
 import { updateQuestionUseCase } from "@/lib/application/assessments/update-question";
+import { updateTrainingQuestionWeightsUseCase } from "@/lib/application/assessments/update-training-question-weights";
 import type { AssessmentErrorCode } from "@/lib/domain/assessments/errors";
 import type { AssessmentType } from "@/lib/domain/assessments/types";
 
@@ -201,4 +202,38 @@ export async function updateAssessmentTimeLimitAction(
   revalidateAssessmentPaths(trainingId, type, moduleId);
   revalidatePath(`/trainer/trainings/${trainingId}/waktu-ujian`);
   return { success: true, message: "Batas waktu berhasil disimpan." };
+}
+
+export async function updateTrainingQuestionWeightsAction(
+  _prevState: AssessmentActionState,
+  formData: FormData,
+): Promise<AssessmentActionState> {
+  const actor = await getCurrentUser();
+  const trainingId = String(formData.get("trainingId") ?? "");
+
+  const weights = formData.getAll("assessmentId").map((value) => {
+    const assessmentId = String(value);
+
+    return {
+      assessmentId,
+      questionWeight: formData.get(`weight_${assessmentId}`),
+    };
+  });
+
+  const result = await updateTrainingQuestionWeightsUseCase(actor, {
+    trainingId,
+    weights,
+  });
+
+  if (!result.success) {
+    return { error: result.error, message: result.message, success: false };
+  }
+
+  revalidatePath(`/trainer/trainings/${trainingId}/bobot-soal`);
+  revalidatePath("/trainer/bobot-soal");
+
+  return {
+    success: true,
+    message: `Bobot untuk ${result.data.updatedCount} assessment berhasil disimpan.`,
+  };
 }

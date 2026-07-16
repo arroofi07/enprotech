@@ -2,6 +2,7 @@ import {
   boolean,
   integer,
   jsonb,
+  numeric,
   pgTable,
   text,
   timestamp,
@@ -34,6 +35,13 @@ export const assessments = pgTable("assessments", {
   type: assessmentTypeEnum("type").notNull(),
   title: text("title").notNull(),
   passingGrade: integer("passing_grade"),
+  // Null means every question is worth an equal share of 100. A value here makes
+  // each correct answer worth exactly that many points instead.
+  questionWeight: numeric("question_weight", {
+    precision: 5,
+    scale: 2,
+    mode: "number",
+  }),
   timeLimit: integer("time_limit"),
   maxRetry: integer("max_retry"),
   questionDisplayCount: integer("question_display_count"),

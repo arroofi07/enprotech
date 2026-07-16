@@ -46,6 +46,7 @@ describe("activatePretest", () => {
       type: "pre_test",
       title: "Pre-Test — Safety Training",
       passingGrade: null,
+      questionWeight: null,
       timeLimit: null,
       maxRetry: 1,
       questionDisplayCount: null,

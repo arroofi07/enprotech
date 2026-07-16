@@ -80,10 +80,11 @@ export function assessmentSuccess<T>(data: T): AssessmentSuccess<T> {
 
 export function assessmentFailure(
   error: AssessmentErrorCode,
+  message?: string,
 ): AssessmentFailure {
   return {
     success: false,
     error,
-    message: getAssessmentErrorMessage(error),
+    message: message ?? getAssessmentErrorMessage(error),
   };
 }
