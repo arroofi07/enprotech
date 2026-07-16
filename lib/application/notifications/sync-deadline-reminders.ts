@@ -3,10 +3,7 @@ import {
   buildDeadlineReminderNotification,
   getDeadlineReminderDays,
 } from "@/lib/domain/notifications/build-notifications";
-import {
-  createNotification,
-  hasNotificationWithDedupKey,
-} from "@/lib/infrastructure/db/repositories/notification-repository";
+import { createNotificationIfAbsent } from "@/lib/infrastructure/db/repositories/notification-repository";
 import { listEnrolledTrainingsByStudent } from "@/lib/infrastructure/db/repositories/training-repository";
 
 export async function syncDeadlineRemindersForStudent(
@@ -37,19 +34,17 @@ export async function syncDeadlineRemindersForStudent(
         continue;
       }
 
-      const exists = await hasNotificationWithDedupKey(studentId, dedupKey);
-      if (exists) {
-        continue;
-      }
-
-      await createNotification({
+      const notification = await createNotificationIfAbsent({
         userId: studentId,
         type: payload.type,
         title: payload.title,
         message: payload.message,
         data: payload.data,
       });
-      created += 1;
+
+      if (notification) {
+        created += 1;
+      }
     }
   }
 

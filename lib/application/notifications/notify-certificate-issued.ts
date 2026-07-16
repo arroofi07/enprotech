@@ -3,7 +3,7 @@ import {
   buildStudentCertificateIssuedNotification,
 } from "@/lib/domain/notifications/build-notifications";
 import {
-  createNotification,
+  createNotificationIfAbsent,
   createNotifications,
   hasNotificationWithDedupKey,
 } from "@/lib/infrastructure/db/repositories/notification-repository";
@@ -36,11 +36,8 @@ export async function notifyCertificateIssued(input: {
     });
 
     const studentDedup = studentPayload.data.dedupKey;
-    if (
-      studentDedup &&
-      !(await hasNotificationWithDedupKey(input.studentId, studentDedup))
-    ) {
-      await createNotification({
+    if (studentDedup) {
+      await createNotificationIfAbsent({
         userId: input.studentId,
         type: studentPayload.type,
         title: studentPayload.title,

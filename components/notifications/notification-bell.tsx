@@ -2,10 +2,11 @@
 
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import { IconBell } from "@tabler/icons-react";
+import { IconBell, IconVolume, IconVolumeOff } from "@tabler/icons-react";
 import { formatDistanceToNow } from "date-fns";
 import { id as localeId } from "date-fns/locale";
 
+import { useNotificationSound } from "@/hooks/use-notification-sound";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,7 +18,19 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 
-const POLL_INTERVAL_MS = 30_000;
+/**
+ * While the stream is up it delivers within milliseconds, so this poll is only
+ * a safety net — it still runs because every GET also drives the
+ * deadline-reminder sync inside listNotifications.
+ */
+const STREAM_UP_POLL_MS = 120_000;
+
+/**
+ * With no stream — a buffering proxy, a blocked EventSource — polling is the
+ * only delivery mechanism, so it stays at the interval used before SSE existed
+ * rather than silently degrading to a two-minute wait.
+ */
+const STREAM_DOWN_POLL_MS = 30_000;
 
 type NotificationItem = {
   id: string;
@@ -40,6 +53,8 @@ export function NotificationBell() {
   const [items, setItems] = useState<NotificationItem[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [streamUp, setStreamUp] = useState(false);
+  const { muted, toggleMuted, announce } = useNotificationSound();
 
   const fetchNotifications = useCallback(async () => {
     try {
@@ -54,18 +69,45 @@ export function NotificationBell() {
       const data = (await response.json()) as NotificationResponse;
       setItems(data.items);
       setUnreadCount(data.unreadCount);
+      // Items arrive newest-first, so the first unread one is the newest.
+      announce(data.items.find((item) => !item.isRead)?.createdAt);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [announce]);
 
   useEffect(() => {
     void fetchNotifications();
-    const interval = window.setInterval(() => {
-      void fetchNotifications();
-    }, POLL_INTERVAL_MS);
+  }, [fetchNotifications]);
+
+  useEffect(() => {
+    const interval = window.setInterval(
+      () => {
+        void fetchNotifications();
+      },
+      streamUp ? STREAM_UP_POLL_MS : STREAM_DOWN_POLL_MS,
+    );
 
     return () => window.clearInterval(interval);
+  }, [fetchNotifications, streamUp]);
+
+  useEffect(() => {
+    const source = new EventSource("/api/notifications/stream");
+
+    source.addEventListener("open", () => setStreamUp(true));
+    // EventSource reconnects on its own; until it does, the poll speeds back up.
+    source.addEventListener("error", () => setStreamUp(false));
+
+    // The server sends a bare signal, not the notification itself, so the
+    // authorized GET stays the only way notification data reaches the client.
+    source.addEventListener("notification", () => {
+      void fetchNotifications();
+    });
+
+    return () => {
+      source.close();
+      setStreamUp(false);
+    };
   }, [fetchNotifications]);
 
   async function markAsRead(notificationId: string) {
@@ -148,16 +190,34 @@ export function NotificationBell() {
       >
         <PopoverHeader className="flex shrink-0 flex-row items-center justify-between border-b px-4 py-3">
           <PopoverTitle>Notifikasi</PopoverTitle>
-          {unreadCount > 0 ? (
+          <div className="flex items-center gap-1">
+            {unreadCount > 0 ? (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-auto px-2 py-1 text-xs"
+                onClick={() => void markAllAsRead()}
+              >
+                Tandai semua dibaca
+              </Button>
+            ) : null}
             <Button
               variant="ghost"
               size="sm"
-              className="h-auto px-2 py-1 text-xs"
-              onClick={() => void markAllAsRead()}
+              className="h-auto px-2 py-1"
+              aria-pressed={muted}
+              aria-label={
+                muted ? "Nyalakan suara notifikasi" : "Matikan suara notifikasi"
+              }
+              onClick={toggleMuted}
             >
-              Tandai semua dibaca
+              {muted ? (
+                <IconVolumeOff className="size-4" />
+              ) : (
+                <IconVolume className="size-4" />
+              )}
             </Button>
-          ) : null}
+          </div>
         </PopoverHeader>
 
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">

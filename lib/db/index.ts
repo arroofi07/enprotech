@@ -7,27 +7,35 @@ const globalForDb = globalThis as typeof globalThis & {
   drizzleDb?: ReturnType<typeof createDb>;
 };
 
-function createDb() {
+/**
+ * The raw postgres.js client backing `db`. Cached globally so that callers
+ * needing driver features drizzle does not expose — `LISTEN`/`NOTIFY`, see
+ * lib/infrastructure/notifications/notification-events.ts — share the one pool
+ * instead of opening a second.
+ */
+export function getPostgresClient(): ReturnType<typeof postgres> {
+  if (globalForDb.postgresClient) {
+    return globalForDb.postgresClient;
+  }
+
   const connectionString = process.env.DATABASE_URL;
 
   if (!connectionString) {
     throw new Error("DATABASE_URL is not set");
   }
 
-  const client =
-    globalForDb.postgresClient ??
-    postgres(connectionString, {
-      max: 10,
-      idle_timeout: 20,
-      connect_timeout: 30,
-      max_lifetime: 60 * 30,
-    });
+  globalForDb.postgresClient = postgres(connectionString, {
+    max: 10,
+    idle_timeout: 20,
+    connect_timeout: 30,
+    max_lifetime: 60 * 30,
+  });
 
-  if (process.env.NODE_ENV !== "production") {
-    globalForDb.postgresClient = client;
-  }
+  return globalForDb.postgresClient;
+}
 
-  return drizzle(client, { schema });
+function createDb() {
+  return drizzle(getPostgresClient(), { schema });
 }
 
 // Lazily connects on first use instead of at module evaluation, so routes

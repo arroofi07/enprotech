@@ -86,7 +86,7 @@ export function ModuleFileUpload({
 
   const hint =
     purpose === "thumbnail"
-      ? "JPG, JPEG, PNG, WEBP · max 1 MB"
+      ? `JPG, JPEG, PNG, WEBP · max ${formatMaxFileSize(purpose)}`
       : `PDF, DOC/DOCX, XLS/XLSX · max ${formatMaxFileSize(purpose)}`;
 
   const displayName = uploadedFileName ?? localFileName;

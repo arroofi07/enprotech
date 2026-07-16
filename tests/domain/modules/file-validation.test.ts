@@ -34,7 +34,7 @@ describe("validateUploadFile", () => {
     expect(result).toEqual({ valid: false, error: "INVALID_FILE_TYPE" });
   });
 
-  it("accepts valid PDF documents under 1MB", () => {
+  it("accepts valid PDF documents at the max size", () => {
     const result = validateUploadFile("document", {
       type: "application/pdf",
       size: DOCUMENT_MAX_BYTES,
@@ -54,7 +54,7 @@ describe("validateUploadFile", () => {
     expect(result).toEqual({ valid: true });
   });
 
-  it("rejects documents over 1MB", () => {
+  it("rejects documents over the max size", () => {
     const result = validateUploadFile("document", {
       type: "application/pdf",
       size: DOCUMENT_MAX_BYTES + 1,

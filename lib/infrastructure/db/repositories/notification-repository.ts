@@ -3,6 +3,7 @@ import { and, count, desc, eq, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { notifications } from "@/lib/db/schema/notifications";
 import { users } from "@/lib/db/schema/users";
+import { publishNotificationCreated } from "@/lib/infrastructure/notifications/notification-events";
 import type {
   NotificationData,
   NotificationRecord,
@@ -53,6 +54,45 @@ export async function createNotification(input: {
     })
     .returning(notificationColumns);
 
+  await publishNotificationCreated([row.userId]);
+
+  return mapNotification(row);
+}
+
+/**
+ * Inserts a notification unless one with the same dedupKey already exists for
+ * the user, and reports which happened. Returns null when the row was already
+ * there.
+ *
+ * The uniqueness is enforced by notifications_user_id_dedup_key_idx rather than
+ * by reading first, so concurrent callers cannot both decide the row is absent
+ * and each insert one.
+ */
+export async function createNotificationIfAbsent(input: {
+  userId: string;
+  type: NotificationType;
+  title: string;
+  message: string;
+  data?: NotificationData;
+}): Promise<NotificationRecord | null> {
+  const [row] = await db
+    .insert(notifications)
+    .values({
+      userId: input.userId,
+      type: input.type,
+      title: input.title,
+      message: input.message,
+      data: input.data ?? null,
+    })
+    .onConflictDoNothing()
+    .returning(notificationColumns);
+
+  if (!row) {
+    return null;
+  }
+
+  await publishNotificationCreated([row.userId]);
+
   return mapNotification(row);
 }
 
@@ -80,7 +120,16 @@ export async function createNotifications(
         data: item.data ?? null,
       })),
     )
+    // Several callers bulk-insert notifications carrying a dedupKey. Without
+    // this a single duplicate would abort the whole batch — and take the
+    // business action that triggered it down with it. Rows without a dedupKey
+    // are unaffected: the unique index behind this is partial.
+    .onConflictDoNothing()
     .returning(notificationColumns);
+
+  // Only rows that actually landed are announced; skipped duplicates are not
+  // news to anyone.
+  await publishNotificationCreated(rows.map((row) => row.userId));
 
   return rows.map(mapNotification);
 }
