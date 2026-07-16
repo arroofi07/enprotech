@@ -2,6 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { DataTable } from "@/components/ui/data-table";
 import { UserActions } from "@/components/users/user-actions";
 import { UserStatusBadge } from "@/components/users/user-status-badge";
+import { ROLE_LABELS } from "@/lib/domain/auth/role-labels";
 import { formatUserDisplayName } from "@/lib/domain/users/format-display-name";
 import type { PublicUserRecord } from "@/lib/infrastructure/db/repositories/user-repository";
 
@@ -35,9 +36,7 @@ export function UsersTable({ users, currentUserId }: UsersTableProps) {
           id: "role",
           header: "Role",
           cell: (user) => (
-            <Badge variant="secondary" className="capitalize">
-              {user.role}
-            </Badge>
+            <Badge variant="secondary">{ROLE_LABELS[user.role]}</Badge>
           ),
         },
         {

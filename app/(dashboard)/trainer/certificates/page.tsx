@@ -75,7 +75,7 @@ export default async function TrainerCertificatesPage({
         <div className="container max-w-7xl min-w-0 space-y-6 p-4 sm:p-6 md:p-8">
           <AdminPageHeader
             title="Sertifikat Diterbitkan"
-            description="Pantau sertifikat student yang otomatis diterbitkan setelah lulus post-test."
+            description="Pantau sertifikat peserta yang otomatis diterbitkan setelah lulus post-test."
           />
 
           <Card>
@@ -106,12 +106,12 @@ export default async function TrainerCertificatesPage({
                   getRowKey={(certificate) => certificate.id}
                   emptyState={{
                     message:
-                      "Belum ada sertifikat diterbitkan. Sertifikat muncul otomatis setelah student lulus post-test.",
+                      "Belum ada sertifikat diterbitkan. Sertifikat muncul otomatis setelah peserta lulus post-test.",
                   }}
                   columns={[
                     {
                       id: "student",
-                      header: "Student",
+                      header: "Peserta",
                       cell: (certificate) => (
                         <div className="space-y-1">
                           <p className="font-medium">{certificate.studentName}</p>

@@ -22,11 +22,11 @@ const TRAINING_ERROR_MESSAGES: Record<TrainingErrorCode, string> = {
     "Anda tidak memiliki akses untuk tindakan ini.",
   [TrainingErrorCode.TRAINING_NOT_FOUND]: "Training tidak ditemukan.",
   [TrainingErrorCode.ENROLLMENT_NOT_FOUND]: "Enrollment tidak ditemukan.",
-  [TrainingErrorCode.STUDENT_NOT_FOUND]: "Student tidak ditemukan.",
+  [TrainingErrorCode.STUDENT_NOT_FOUND]: "Peserta tidak ditemukan.",
   [TrainingErrorCode.INVALID_STATUS_TRANSITION]:
     "Perubahan status training tidak diizinkan.",
   [TrainingErrorCode.ALREADY_ENROLLED]:
-    "Student sudah terdaftar di training ini.",
+    "Peserta sudah terdaftar di training ini.",
   [TrainingErrorCode.MODULES_NOT_READY]:
     "Semua modul harus memiliki materi sebelum pre-test diaktifkan.",
   [TrainingErrorCode.TRAINING_NOT_READY]:

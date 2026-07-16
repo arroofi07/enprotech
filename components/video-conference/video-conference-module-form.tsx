@@ -119,7 +119,7 @@ export function VideoConferenceModuleForm({
         <p className="rounded-md border border-dashed bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
           Video conference diakhiri pada{" "}
           {formatVideoConferenceSchedule(module.videoConferenceEndedAt)}.
-          Siswa tidak bisa bergabung lagi, tetapi quiz tetap tersedia.
+          Peserta tidak bisa bergabung lagi, tetapi quiz tetap tersedia.
         </p>
       ) : null}
 
@@ -198,8 +198,8 @@ export function VideoConferenceModuleForm({
                 <AlertDialogHeader>
                   <AlertDialogTitle>Akhiri video conference?</AlertDialogTitle>
                   <AlertDialogDescription>
-                    Siswa tidak akan bisa bergabung ke meeting setelah
-                    diakhiri. Quiz modul tetap tersedia bagi siswa yang sudah
+                    Peserta tidak akan bisa bergabung ke meeting setelah
+                    diakhiri. Quiz modul tetap tersedia bagi peserta yang sudah
                     hadir.
                   </AlertDialogDescription>
                 </AlertDialogHeader>

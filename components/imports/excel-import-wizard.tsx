@@ -39,7 +39,7 @@ type ExcelImportWizardProps = {
 
 const KIND_LABELS: Record<ImportKind, string> = {
   questions: "Soal Quiz/Latihan",
-  enrollments: "Enrollment Student",
+  enrollments: "Enrollment Peserta",
   scores: "Nilai Training",
 };
 

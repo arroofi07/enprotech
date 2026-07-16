@@ -38,7 +38,7 @@ export function ReportsTable({ rows }: ReportsTableProps) {
       columns={[
         {
           id: "studentName",
-          header: "Student",
+          header: "Peserta",
           cell: (row) => (
             <div>
               <p className="font-medium">{row.studentName}</p>

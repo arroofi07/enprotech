@@ -29,6 +29,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useActionToast } from "@/hooks/use-action-toast";
+import { ROLE_LABELS } from "@/lib/domain/auth/role-labels";
 import { formatUserDisplayName } from "@/lib/domain/users/format-display-name";
 import type { PublicUserRecord } from "@/lib/infrastructure/db/repositories/user-repository";
 
@@ -87,7 +88,7 @@ export function UserActions({ user, currentUserId }: UserActionsProps) {
               </div>
               <div>
                 <dt className="text-muted-foreground">Role</dt>
-                <dd className="capitalize">{user.role}</dd>
+                <dd>{ROLE_LABELS[user.role]}</dd>
               </div>
               <div>
                 <dt className="text-muted-foreground">Status</dt>
@@ -139,7 +140,7 @@ export function UserActions({ user, currentUserId }: UserActionsProps) {
                 >
                   <option value="admin">Admin</option>
                   <option value="trainer">Trainer</option>
-                  <option value="student">Student</option>
+                  <option value="student">Peserta</option>
                 </select>
                 <DialogFooter>
                   <Button

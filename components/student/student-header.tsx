@@ -23,7 +23,7 @@ export function StudentHeader({ title, breadcrumbs = [] }: StudentHeaderProps) {
       <Breadcrumb>
         <BreadcrumbList className="text-sm">
           <BreadcrumbItem>
-            <BreadcrumbLink href="/student/dashboard">Student</BreadcrumbLink>
+            <BreadcrumbLink href="/student/dashboard">Peserta</BreadcrumbLink>
           </BreadcrumbItem>
           {breadcrumbs.map((crumb) => (
             <span key={crumb.label} className="contents">

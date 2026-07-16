@@ -15,7 +15,7 @@ const REPORT_ERROR_MESSAGES: Record<ReportErrorCode, string> = {
   [ReportErrorCode.FORBIDDEN]:
     "Anda tidak memiliki akses untuk tindakan ini.",
   [ReportErrorCode.VALIDATION_ERROR]: "Data yang dimasukkan tidak valid.",
-  [ReportErrorCode.STUDENT_NOT_FOUND]: "Student tidak ditemukan.",
+  [ReportErrorCode.STUDENT_NOT_FOUND]: "Peserta tidak ditemukan.",
   [ReportErrorCode.TRAINING_NOT_FOUND]: "Training tidak ditemukan.",
   [ReportErrorCode.ENROLLMENT_NOT_FOUND]: "Enrollment tidak ditemukan.",
 };

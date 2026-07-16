@@ -44,14 +44,14 @@ export function ReportsFilters({
     >
       <div className="space-y-2 xl:col-span-2">
         <Label htmlFor="search" className="text-sm font-medium">
-          Cari Student
+          Cari Peserta
         </Label>
         <div className="relative">
           <IconSearch className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             id="search"
             name="search"
-            placeholder="Cari nama atau email student..."
+            placeholder="Cari nama atau email peserta..."
             defaultValue={search ?? ""}
             className="h-10 pl-9"
           />
@@ -60,7 +60,7 @@ export function ReportsFilters({
 
       <div className="space-y-2">
         <Label htmlFor="studentId" className="text-sm font-medium">
-          Student
+          Peserta
         </Label>
         <select
           id="studentId"
@@ -68,7 +68,7 @@ export function ReportsFilters({
           defaultValue={studentId ?? ""}
           className={selectClassName}
         >
-          <option value="">Semua Student</option>
+          <option value="">Semua Peserta</option>
           {students.map((student) => (
             <option key={student.id} value={student.id}>
               {student.label}

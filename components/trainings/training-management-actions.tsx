@@ -84,7 +84,7 @@ export function TrainingManagementActions({
               <AlertDialogHeader>
                 <AlertDialogTitle>Arsipkan training?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  Training tidak akan terlihat oleh student. Data enrollment tetap
+                  Training tidak akan terlihat oleh peserta. Data enrollment tetap
                   tersimpan.
                 </AlertDialogDescription>
               </AlertDialogHeader>

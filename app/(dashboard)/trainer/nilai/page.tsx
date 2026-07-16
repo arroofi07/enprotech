@@ -84,7 +84,7 @@ export default async function TrainerNilaiPage({
         <div className="container max-w-7xl min-w-0 space-y-6 p-4 sm:p-6 md:p-8">
           <AdminPageHeader
             title="Rekap Hasil Training"
-            description="Filter rekap nilai student per training dan modul, lalu export ke Excel atau PDF."
+            description="Filter rekap nilai peserta per training dan modul, lalu export ke Excel atau PDF."
             actions={<ReportExportButtons searchParams={filterParams} />}
           />
 

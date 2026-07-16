@@ -95,7 +95,7 @@ export function AuthBrandPanel() {
           <AspectRatio ratio={4 / 3}>
             <Image
               src="/auth-illustration.png"
-              alt="Ilustrasi Mahasiswa Belajar"
+              alt="Ilustrasi Peserta Belajar"
               fill
               className="object-cover"
               priority

@@ -54,7 +54,7 @@ export function CertificateFilters({
 
       <div className="space-y-2">
         <Label htmlFor="studentId" className="text-sm font-medium">
-          Student
+          Peserta
         </Label>
         <select
           id="studentId"
@@ -62,7 +62,7 @@ export function CertificateFilters({
           defaultValue={studentId ?? ""}
           className={selectClassName}
         >
-          <option value="">Semua Student</option>
+          <option value="">Semua Peserta</option>
           {students.map((student) => (
             <option key={student.id} value={student.id}>
               {student.label}

@@ -92,7 +92,7 @@ export function AssessmentManagementPanel({
             Passing grade: <span className="font-medium">{passingGrade}%</span>
           </p>
           <p className="text-sm text-muted-foreground">
-            Tampilan student:{" "}
+            Tampilan peserta:{" "}
             <span className="font-medium text-foreground">
               {effectiveDisplayCount}
             </span>{" "}

@@ -32,7 +32,7 @@ describe("buildTrainingReportExcelBuffer", () => {
     const rows = XLSX.utils.sheet_to_json<Record<string, string>>(sheet);
 
     expect(rows).toHaveLength(1);
-    expect(rows[0]?.["Nama Student"]).toBe("Ani");
+    expect(rows[0]?.["Nama Peserta"]).toBe("Ani");
     expect(rows[0]?.["Nilai Quiz"]).toBe("80");
   });
 });

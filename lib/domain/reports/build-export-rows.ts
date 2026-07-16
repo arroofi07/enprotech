@@ -23,7 +23,7 @@ export function buildExportRows(rows: TrainingReportRow[]): ReportExportRow[] {
 }
 
 export const REPORT_EXPORT_HEADERS: Record<keyof ReportExportRow, string> = {
-  studentName: "Nama Student",
+  studentName: "Nama Peserta",
   studentEmail: "Email",
   trainingTitle: "Training",
   moduleTitle: "Modul",

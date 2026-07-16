@@ -51,7 +51,7 @@ export function UsersFilters({ search, role, status }: UsersFiltersProps) {
           <option value="">Semua Role</option>
           <option value="admin">Admin</option>
           <option value="trainer">Trainer</option>
-          <option value="student">Student</option>
+          <option value="student">Peserta</option>
         </select>
       </div>
 

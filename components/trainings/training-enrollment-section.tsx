@@ -41,16 +41,10 @@ import {
 } from "@/components/ui/table";
 import { useActionToast } from "@/hooks/use-action-toast";
 import type { TrainingDetail } from "@/lib/application/trainings/get-training";
-import type { UserRole } from "@/lib/domain/auth/types";
+import { ROLE_LABELS } from "@/lib/domain/auth/role-labels";
 import type { PublicUserRecord } from "@/lib/infrastructure/db/repositories/user-repository";
 
 const initialState: TrainingActionState = {};
-
-const ROLE_LABELS: Record<UserRole, string> = {
-  admin: "Admin",
-  trainer: "Trainer",
-  student: "Peserta",
-};
 
 type TrainingEnrollmentSectionProps = {
   training: TrainingDetail;

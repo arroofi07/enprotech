@@ -78,9 +78,9 @@ export function StudentReportDetailDialog({
       </DialogTrigger>
       <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-3xl">
         <DialogHeader>
-          <DialogTitle>Detail Rekap Student</DialogTitle>
+          <DialogTitle>Detail Rekap Peserta</DialogTitle>
           <DialogDescription>
-            Semua attempt dan nilai per assessment untuk student ini.
+            Semua attempt dan nilai per assessment untuk peserta ini.
           </DialogDescription>
         </DialogHeader>
 

@@ -1,4 +1,5 @@
 import { getDashboardPath } from "@/lib/domain/auth/permissions";
+import { ROLE_LABELS } from "@/lib/domain/auth/role-labels";
 import type { UserRole } from "@/lib/domain/auth/types";
 import { formatTrainingDeadline } from "@/lib/domain/trainings/format-deadline";
 
@@ -329,12 +330,6 @@ export function buildVideoConferenceScheduledNotification(input: {
 
 // --- Tier 3 --------------------------------------------------------------
 
-const ROLE_LABEL: Record<string, string> = {
-  admin: "Admin",
-  trainer: "Trainer",
-  student: "Peserta",
-};
-
 function isUserRole(role: string): role is UserRole {
   return role === "admin" || role === "trainer" || role === "student";
 }
@@ -348,7 +343,9 @@ export function buildRoleChangedNotification(input: { role: string }) {
   return {
     type: NotificationType.ROLE_CHANGED,
     title: "Peran akun diubah",
-    message: `Peran akun kamu diubah menjadi ${ROLE_LABEL[input.role] ?? input.role}.`,
+    message: `Peran akun kamu diubah menjadi ${
+      isUserRole(input.role) ? ROLE_LABELS[input.role] : input.role
+    }.`,
     data,
   };
 }

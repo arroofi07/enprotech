@@ -68,7 +68,7 @@ export default async function StudentCertificateDetailPage({
 
               <dl className="grid gap-3 text-sm sm:grid-cols-2">
                 <div>
-                  <dt className="text-muted-foreground">Nama Student</dt>
+                  <dt className="text-muted-foreground">Nama Peserta</dt>
                   <dd className="font-medium">{certificate.studentName}</dd>
                 </div>
                 <div>

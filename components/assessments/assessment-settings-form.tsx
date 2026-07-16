@@ -54,7 +54,7 @@ export function AssessmentSettingsForm({
       <div>
         <h3 className="text-sm font-semibold">Pengaturan Tampilan Soal</h3>
         <p className="mt-0.5 text-xs text-muted-foreground">
-          Atur berapa soal yang ditampilkan ke student dan apakah urutan soal
+          Atur berapa soal yang ditampilkan ke peserta dan apakah urutan soal
           diacak setiap attempt baru.
         </p>
       </div>
@@ -95,7 +95,7 @@ export function AssessmentSettingsForm({
             placeholder="Tanpa batas waktu"
           />
           <p className="text-xs text-muted-foreground">
-            Kosongkan jika student tidak dibatasi waktu pengerjaan.
+            Kosongkan jika peserta tidak dibatasi waktu pengerjaan.
           </p>
         </Field>
 

@@ -156,7 +156,7 @@ async function enrichEnrollmentRows(
       const errors = [...row.errors];
       const student = await findUserByEmail(row.data.studentEmail);
       if (!student || student.role !== "student" || student.status !== "active") {
-        errors.push("Student tidak ditemukan atau tidak aktif.");
+        errors.push("Peserta tidak ditemukan atau tidak aktif.");
       }
 
       const training = await findTrainingById(row.data.trainingId);
@@ -171,7 +171,7 @@ async function enrichEnrollmentRows(
           student.id,
         ]);
         if (existing.length > 0) {
-          errors.push("Student sudah terdaftar di training ini.");
+          errors.push("Peserta sudah terdaftar di training ini.");
         }
       }
 
@@ -257,7 +257,7 @@ async function enrichScoreRows(rows: ReturnType<typeof validateScoreRows>) {
       const errors = [...row.errors];
       const student = await findUserByEmail(row.data.studentEmail);
       if (!student || student.role !== "student" || student.status !== "active") {
-        errors.push("Student tidak ditemukan atau tidak aktif.");
+        errors.push("Peserta tidak ditemukan atau tidak aktif.");
       }
 
       const training = await findTrainingById(row.data.trainingId);
@@ -270,7 +270,7 @@ async function enrichScoreRows(rows: ReturnType<typeof validateScoreRows>) {
           student.id,
         ]);
         if (existing.length === 0) {
-          errors.push("Student belum terdaftar di training ini.");
+          errors.push("Peserta belum terdaftar di training ini.");
         }
       }
 

@@ -52,7 +52,7 @@ describe("buildExportRows", () => {
   });
 
   it("defines stable export headers", () => {
-    expect(REPORT_EXPORT_HEADERS.studentName).toBe("Nama Student");
+    expect(REPORT_EXPORT_HEADERS.studentName).toBe("Nama Peserta");
     expect(REPORT_EXPORT_HEADERS.moduleTitle).toBe("Modul");
   });
 });

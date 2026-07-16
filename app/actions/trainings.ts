@@ -145,7 +145,7 @@ export async function enrollStudentsAction(
   revalidateTrainingPaths(trainingId);
   return {
     success: true,
-    message: `${result.data.length} student berhasil di-enroll.`,
+    message: `${result.data.length} peserta berhasil di-enroll.`,
     trainingId,
   };
 }
@@ -165,7 +165,7 @@ export async function removeEnrollmentAction(
   }
 
   revalidateTrainingPaths(trainingId);
-  return { success: true, message: "Student berhasil dihapus dari training." };
+  return { success: true, message: "Peserta berhasil dihapus dari training." };
 }
 
 export async function activatePretestAction(
