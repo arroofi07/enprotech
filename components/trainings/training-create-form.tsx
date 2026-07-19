@@ -2,11 +2,22 @@
 
 import { useState } from "react";
 import { useFormStatus } from "react-dom";
-import { IconCalendar, IconPhoto, IconPlus, IconSchool } from "@tabler/icons-react";
+import {
+  IconCalendar,
+  IconChevronDown,
+  IconPhoto,
+  IconPlus,
+  IconSchool,
+} from "@tabler/icons-react";
 
 import { createTrainingFormAction } from "@/app/actions/trainings";
 import { ModuleFileUpload } from "@/components/modules/module-file-upload";
 import { Button } from "@/components/ui/button";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import {
   Field,
   FieldDescription,
@@ -152,39 +163,45 @@ export function TrainingCreateForm() {
           </p>
         </div>
 
-        <div className="grid gap-5 sm:grid-cols-2">
-          <Field>
-            <FieldLabel htmlFor="passingGrade">Passing Grade (%)</FieldLabel>
-            <Input
-              id="passingGrade"
-              name="passingGrade"
-              type="number"
-              min={1}
-              max={100}
-              defaultValue={70}
-              required
-              className="h-10 text-sm md:text-sm"
-            />
-            <FieldDescription>
-              Nilai minimum (1–100%) agar peserta dinyatakan lulus. Tidak boleh
-              0: passing grade 0% membuat peserta otomatis dianggap lulus dengan
-              nilai 0 dan justru terkunci sehingga tidak bisa mengerjakan soal.
-            </FieldDescription>
-          </Field>
+        <Field>
+          <FieldLabel htmlFor="deadline">Deadline</FieldLabel>
+          <Input
+            id="deadline"
+            name="deadline"
+            type="date"
+            className="h-10 text-sm md:text-sm"
+          />
+          <FieldDescription>
+            Opsional. Kosongkan jika training tidak berbatas waktu.
+          </FieldDescription>
+        </Field>
 
-          <Field>
-            <FieldLabel htmlFor="deadline">Deadline</FieldLabel>
-            <Input
-              id="deadline"
-              name="deadline"
-              type="date"
-              className="h-10 text-sm md:text-sm"
-            />
-            <FieldDescription>
-              Opsional. Kosongkan jika training tidak berbatas waktu.
-            </FieldDescription>
-          </Field>
-        </div>
+        <Collapsible className="rounded-lg border">
+          <CollapsibleTrigger className="group flex w-full items-center justify-between gap-2 px-3 py-2.5 text-sm font-medium text-foreground outline-none">
+            <span>Passing Grade (%)</span>
+            <IconChevronDown className="size-4 text-muted-foreground transition-transform group-data-[panel-open]:rotate-180" />
+          </CollapsibleTrigger>
+          <CollapsibleContent keepMounted className="px-3 pb-3">
+            <Field>
+              <Input
+                id="passingGrade"
+                name="passingGrade"
+                type="number"
+                min={1}
+                max={100}
+                defaultValue={70}
+                required
+                className="h-10 text-sm md:text-sm"
+              />
+              <FieldDescription>
+                Nilai minimum (1–100%) agar peserta dinyatakan lulus. Tidak
+                boleh 0: passing grade 0% membuat peserta otomatis dianggap
+                lulus dengan nilai 0 dan justru terkunci sehingga tidak bisa
+                mengerjakan soal.
+              </FieldDescription>
+            </Field>
+          </CollapsibleContent>
+        </Collapsible>
       </FieldGroup>
 
       <CreateTrainingSubmit />

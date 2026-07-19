@@ -231,7 +231,7 @@ export function StudentModuleView({
                         progressItem.quiz.passingGrade,
                         progressItem.quiz.hasPassed,
                       )
-                    : `Nilai minimum ${module.minQuizScore}%`}
+                    : "Belum ada nilai"}
                 </p>
                 {quizUnlocked ? (
                   <ButtonLink
@@ -277,7 +277,7 @@ export function StudentModuleView({
                         progressItem.latihan.passingGrade,
                         progressItem.latihan.hasPassed,
                       )
-                    : `Nilai minimum ${module.minLatihanScore}%`}
+                    : "Belum ada nilai"}
                 </p>
                 {latihanUnlocked ? (
                   <ButtonLink

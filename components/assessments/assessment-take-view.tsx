@@ -11,7 +11,6 @@ import {
   IconDeviceFloppy,
   IconInfoCircle,
   IconListNumbers,
-  IconTargetArrow,
 } from "@tabler/icons-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -526,8 +525,7 @@ export function AssessmentTakeView({
         <div>
           <h2 className="text-xl font-semibold">{typeLabel}</h2>
           <p className="text-sm text-muted-foreground">
-            Passing grade {passingGrade}% · Nilai tertinggi{" "}
-            {result ? result.bestScore : bestScore}%
+            Nilai tertinggi {result ? result.bestScore : bestScore}%
           </p>
         </div>
         {(result ? result.passed : hasPassed) ? (
@@ -571,8 +569,8 @@ export function AssessmentTakeView({
 
             <div
               className={cn(
-                "grid gap-3 sm:grid-cols-3",
-                assessment.timeLimit ? "lg:grid-cols-4" : null,
+                "grid gap-3 sm:grid-cols-2",
+                assessment.timeLimit ? "lg:grid-cols-3" : null,
               )}
             >
               <div className="rounded-lg border p-4">
@@ -583,13 +581,6 @@ export function AssessmentTakeView({
                 <p className="mt-1 text-3xl font-semibold">
                   {initialQuestions.length}
                 </p>
-              </div>
-              <div className="rounded-lg border p-4">
-                <div className="flex items-center gap-1.5 text-muted-foreground">
-                  <IconTargetArrow className="size-4" />
-                  <span className="text-xs">Passing Grade</span>
-                </div>
-                <p className="mt-1 text-3xl font-semibold">{passingGrade}%</p>
               </div>
               {assessment.timeLimit ? (
                 <div className="rounded-lg border p-4">

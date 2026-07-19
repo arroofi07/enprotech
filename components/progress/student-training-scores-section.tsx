@@ -67,7 +67,6 @@ export function StudentTrainingScoresSection({
               <TableHead>Assessment</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-right">Nilai Tertinggi</TableHead>
-              <TableHead className="text-right">Passing Grade</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -78,9 +77,6 @@ export function StudentTrainingScoresSection({
               </TableCell>
               <TableCell className="text-right tabular-nums">
                 {formatScoreCell(progress.summary.preTest)}
-              </TableCell>
-              <TableCell className="text-right tabular-nums">
-                {progress.summary.preTest.passingGrade}%
               </TableCell>
             </TableRow>
 
@@ -95,9 +91,6 @@ export function StudentTrainingScoresSection({
                 <TableCell className="text-right tabular-nums">
                   {formatScoreCell(module.quiz)}
                 </TableCell>
-                <TableCell className="text-right tabular-nums">
-                  {module.quiz.passingGrade}%
-                </TableCell>
               </TableRow>,
               <TableRow key={`${module.id}-latihan`}>
                 <TableCell className="font-medium">
@@ -109,9 +102,6 @@ export function StudentTrainingScoresSection({
                 <TableCell className="text-right tabular-nums">
                   {formatScoreCell(module.latihan)}
                 </TableCell>
-                <TableCell className="text-right tabular-nums">
-                  {module.latihan.passingGrade}%
-                </TableCell>
               </TableRow>,
             ])}
 
@@ -122,9 +112,6 @@ export function StudentTrainingScoresSection({
               </TableCell>
               <TableCell className="text-right tabular-nums">
                 {formatScoreCell(progress.summary.postTest)}
-              </TableCell>
-              <TableCell className="text-right tabular-nums">
-                {progress.summary.postTest.passingGrade}%
               </TableCell>
             </TableRow>
           </TableBody>

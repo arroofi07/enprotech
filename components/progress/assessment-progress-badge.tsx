@@ -55,9 +55,6 @@ export function formatAssessmentScore(
     return "Belum ada nilai";
   }
 
-  if (hasPassed) {
-    return `Nilai tertinggi: ${bestScore}%`;
-  }
-
-  return `Nilai tertinggi: ${bestScore}% (min. ${passingGrade}%)`;
+  // Passing grade is intentionally not shown to peserta.
+  return `Nilai tertinggi: ${bestScore}%`;
 }

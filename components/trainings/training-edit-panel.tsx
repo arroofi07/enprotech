@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { IconPhoto } from "@tabler/icons-react";
+import { IconChevronDown, IconPhoto } from "@tabler/icons-react";
 
 import {
   activatePretestAction,
@@ -13,6 +13,11 @@ import { TrainingEnrollmentSection } from "@/components/trainings/training-enrol
 import { TrainingManagementActions } from "@/components/trainings/training-management-actions";
 import { TrainingStatusBadge } from "@/components/trainings/training-status-badge";
 import { Button } from "@/components/ui/button";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import {
   Field,
   FieldDescription,
@@ -190,37 +195,42 @@ export function TrainingEditPanel({
                 </FieldDescription>
               </Field>
 
-              <div className="grid gap-4 sm:grid-cols-2">
-                <Field>
-                  <FieldLabel htmlFor="passingGrade">Passing Grade (%)</FieldLabel>
-                  <Input
-                    id="passingGrade"
-                    name="passingGrade"
-                    type="number"
-                    min={1}
-                    max={100}
-                    value={passingGrade}
-                    onChange={(event) => setPassingGrade(event.target.value)}
-                    required
-                  />
-                  <FieldDescription>
-                    Nilai minimum (1–100%) agar peserta dinyatakan lulus. Tidak
-                    boleh 0: passing grade 0% membuat peserta otomatis dianggap
-                    lulus dengan nilai 0 dan justru terkunci sehingga tidak bisa
-                    mengerjakan soal.
-                  </FieldDescription>
-                </Field>
+              <Field>
+                <FieldLabel htmlFor="deadline">Deadline</FieldLabel>
+                <Input
+                  id="deadline"
+                  name="deadline"
+                  type="date"
+                  defaultValue={formatDeadlineForInput(training.deadline)}
+                />
+              </Field>
 
-                <Field>
-                  <FieldLabel htmlFor="deadline">Deadline</FieldLabel>
-                  <Input
-                    id="deadline"
-                    name="deadline"
-                    type="date"
-                    defaultValue={formatDeadlineForInput(training.deadline)}
-                  />
-                </Field>
-              </div>
+              <Collapsible className="rounded-lg border">
+                <CollapsibleTrigger className="group flex w-full items-center justify-between gap-2 px-3 py-2.5 text-sm font-medium text-foreground outline-none">
+                  <span>Passing Grade (%)</span>
+                  <IconChevronDown className="size-4 text-muted-foreground transition-transform group-data-[panel-open]:rotate-180" />
+                </CollapsibleTrigger>
+                <CollapsibleContent keepMounted className="px-3 pb-3">
+                  <Field>
+                    <Input
+                      id="passingGrade"
+                      name="passingGrade"
+                      type="number"
+                      min={1}
+                      max={100}
+                      value={passingGrade}
+                      onChange={(event) => setPassingGrade(event.target.value)}
+                      required
+                    />
+                    <FieldDescription>
+                      Nilai minimum (1–100%) agar peserta dinyatakan lulus.
+                      Tidak boleh 0: passing grade 0% membuat peserta otomatis
+                      dianggap lulus dengan nilai 0 dan justru terkunci sehingga
+                      tidak bisa mengerjakan soal.
+                    </FieldDescription>
+                  </Field>
+                </CollapsibleContent>
+              </Collapsible>
             </FieldGroup>
 
             <Button type="submit" disabled={updatePending}>

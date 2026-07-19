@@ -95,16 +95,10 @@ export function AssessmentResultCard({
           </div>
           <p className="text-sm text-muted-foreground">
             {passed
-              ? `Selamat! Kamu berhasil mencapai passing grade ${passingGrade}%.`
-              : `Nilai kamu belum mencapai passing grade ${passingGrade}%. Tetap semangat!`}
+              ? "Selamat! Kamu dinyatakan lulus."
+              : "Nilai kamu belum memenuhi syarat kelulusan. Tetap semangat!"}
           </p>
           <div className="flex flex-wrap justify-center gap-x-8 gap-y-3 border-t pt-4 sm:justify-start">
-            <div>
-              <p className="text-xs text-muted-foreground">Passing Grade</p>
-              <p className="text-xl font-semibold tabular-nums">
-                {passingGrade}%
-              </p>
-            </div>
             <div>
               <p className="text-xs text-muted-foreground">Nilai Tertinggi</p>
               <p className="text-xl font-semibold tabular-nums">{bestScore}%</p>
