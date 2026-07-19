@@ -10,6 +10,10 @@ function emptyToUndefined(value: unknown): unknown {
 
 export const submitProjectSchema = z.object({
   trainingId: z.uuid("ID training tidak valid."),
+  projectId: z.preprocess(
+    emptyToUndefined,
+    z.uuid("ID project tidak valid.").optional(),
+  ),
   title: z.preprocess(
     emptyToUndefined,
     z.string().trim().max(200, "Judul maksimal 200 karakter.").optional(),
@@ -42,5 +46,10 @@ export const uploadProjectFileSchema = z.object({
   kind: z.enum(["image", "pdf"]),
 });
 
+export const deleteProjectSchema = z.object({
+  projectId: z.uuid("ID project tidak valid."),
+});
+
 export type SubmitProjectInput = z.infer<typeof submitProjectSchema>;
 export type ListProjectsInput = z.infer<typeof listProjectsSchema>;
+export type DeleteProjectInput = z.infer<typeof deleteProjectSchema>;

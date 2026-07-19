@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { getCurrentUser } from "@/lib/application/auth/get-session";
+import { deleteStudentProject } from "@/lib/application/projects/delete-project";
 import { submitProject } from "@/lib/application/projects/submit-project";
 import { ProjectErrorCode } from "@/lib/domain/projects/errors";
 
@@ -32,6 +33,12 @@ function parseOptionalNumber(
   return Number.isFinite(parsed) ? parsed : undefined;
 }
 
+function revalidateProjectPaths(trainingId: string): void {
+  revalidatePath("/student/projects");
+  revalidatePath(`/student/projects/${trainingId}`);
+  revalidatePath("/trainer/projects");
+}
+
 export async function submitProjectFormAction(
   _prevState: ProjectActionState,
   formData: FormData,
@@ -41,6 +48,7 @@ export async function submitProjectFormAction(
 
   const result = await submitProject(actor, {
     trainingId,
+    projectId: parseOptionalString(formData.get("projectId")),
     title: parseOptionalString(formData.get("title")),
     description: parseOptionalString(formData.get("description")),
     imageUrl: String(formData.get("imageUrl") ?? ""),
@@ -53,13 +61,33 @@ export async function submitProjectFormAction(
     return { error: result.error, message: result.message, success: false };
   }
 
-  revalidatePath("/student/projects");
-  revalidatePath(`/student/projects/${trainingId}`);
-  revalidatePath("/trainer/projects");
+  revalidateProjectPaths(trainingId);
 
   return {
     success: true,
     message: "Project berhasil disimpan.",
     trainingId,
+  };
+}
+
+export async function deleteProjectFormAction(
+  _prevState: ProjectActionState,
+  formData: FormData,
+): Promise<ProjectActionState> {
+  const actor = await getCurrentUser();
+  const projectId = String(formData.get("projectId") ?? "");
+
+  const result = await deleteStudentProject(actor, { projectId });
+
+  if (!result.success) {
+    return { error: result.error, message: result.message, success: false };
+  }
+
+  revalidateProjectPaths(result.data.trainingId);
+
+  return {
+    success: true,
+    message: "Project berhasil dihapus.",
+    trainingId: result.data.trainingId,
   };
 }

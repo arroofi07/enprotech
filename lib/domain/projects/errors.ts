@@ -5,6 +5,7 @@ export const ProjectErrorCode = {
   NOT_ENROLLED: "NOT_ENROLLED",
   PROJECT_LOCKED: "PROJECT_LOCKED",
   PROJECT_NOT_FOUND: "PROJECT_NOT_FOUND",
+  PROJECT_LIMIT_REACHED: "PROJECT_LIMIT_REACHED",
   VALIDATION_ERROR: "VALIDATION_ERROR",
   INVALID_FILE_TYPE: "INVALID_FILE_TYPE",
   FILE_TOO_LARGE: "FILE_TOO_LARGE",
@@ -22,6 +23,8 @@ const PROJECT_ERROR_MESSAGES: Record<ProjectErrorCode, string> = {
   [ProjectErrorCode.PROJECT_LOCKED]:
     "Selesaikan seluruh modul dan lulus post-test sebelum mengunggah project.",
   [ProjectErrorCode.PROJECT_NOT_FOUND]: "Project tidak ditemukan.",
+  [ProjectErrorCode.PROJECT_LIMIT_REACHED]:
+    "Anda sudah mengunggah maksimal 4 project untuk training ini.",
   [ProjectErrorCode.VALIDATION_ERROR]: "Data yang dimasukkan tidak valid.",
   [ProjectErrorCode.INVALID_FILE_TYPE]: "Format file tidak didukung.",
   [ProjectErrorCode.FILE_TOO_LARGE]:

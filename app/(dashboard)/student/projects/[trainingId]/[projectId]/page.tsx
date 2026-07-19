@@ -1,44 +1,40 @@
 import { redirect } from "next/navigation";
 
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
-import { StudentProjectManager } from "@/components/projects/student-project-manager";
+import { ProjectSubmitForm } from "@/components/projects/project-submit-form";
 import { StudentHeader } from "@/components/student/student-header";
 import { ButtonLink } from "@/components/ui/button-link";
 import { Card, CardContent } from "@/components/ui/card";
 import { getCurrentUser } from "@/lib/application/auth/get-session";
-import { listStudentProjectsByTraining } from "@/lib/application/projects/get-student-project";
+import { getStudentProjectById } from "@/lib/application/projects/get-student-project";
 import { getStudentTrainingFlowState } from "@/lib/application/training-flow/get-student-training-flow-state";
-import { MAX_PROJECTS_PER_TRAINING } from "@/lib/domain/projects/limits";
 import { canAccessProject } from "@/lib/domain/training-flow/gates";
 import { findEnrollmentSummary } from "@/lib/infrastructure/db/repositories/report-repository";
 
-type StudentProjectManagerPageProps = {
-  params: Promise<{ trainingId: string }>;
+type EditProjectPageProps = {
+  params: Promise<{ trainingId: string; projectId: string }>;
 };
 
-export default async function StudentProjectManagerPage({
+export default async function EditProjectPage({
   params,
-}: StudentProjectManagerPageProps) {
+}: EditProjectPageProps) {
   const user = await getCurrentUser();
 
   if (!user) {
     redirect("/login");
   }
 
-  const { trainingId } = await params;
+  const { trainingId, projectId } = await params;
 
   const enrollment = await findEnrollmentSummary(user.id, trainingId);
   if (!enrollment) {
     redirect("/student/projects");
   }
 
-  const [projectsResult, flow] = await Promise.all([
-    listStudentProjectsByTraining(user, trainingId),
+  const [projectResult, flow] = await Promise.all([
+    getStudentProjectById(user, projectId),
     getStudentTrainingFlowState(user.id, trainingId),
   ]);
-  if (!projectsResult.success) {
-    redirect("/unauthorized");
-  }
 
   if (
     !flow ||
@@ -50,22 +46,31 @@ export default async function StudentProjectManagerPage({
     redirect("/student/projects");
   }
 
+  // Project must exist, belong to this student, and match the training in the URL.
+  if (!projectResult.success || projectResult.data.trainingId !== trainingId) {
+    redirect(`/student/projects/${trainingId}`);
+  }
+
   return (
     <>
       <StudentHeader
         title="Project"
         breadcrumbs={[
           { label: "Project", href: "/student/projects" },
-          { label: enrollment.trainingTitle },
+          { label: enrollment.trainingTitle, href: `/student/projects/${trainingId}` },
+          { label: "Edit" },
         ]}
       />
       <main className="flex-1 overflow-auto">
         <div className="container max-w-3xl min-w-0 space-y-6 p-4 sm:p-6 md:p-8">
           <AdminPageHeader
-            title="Project Saya"
+            title="Edit Project"
             description={enrollment.trainingTitle}
             actions={
-              <ButtonLink variant="outline" href="/student/projects">
+              <ButtonLink
+                variant="outline"
+                href={`/student/projects/${trainingId}`}
+              >
                 Kembali
               </ButtonLink>
             }
@@ -73,10 +78,10 @@ export default async function StudentProjectManagerPage({
 
           <Card>
             <CardContent className="p-4 sm:p-6">
-              <StudentProjectManager
+              <ProjectSubmitForm
                 trainingId={trainingId}
-                projects={projectsResult.data}
-                maxProjects={MAX_PROJECTS_PER_TRAINING}
+                trainingTitle={enrollment.trainingTitle}
+                project={projectResult.data}
               />
             </CardContent>
           </Card>

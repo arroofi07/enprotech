@@ -12,6 +12,7 @@ import { getCurrentUser } from "@/lib/application/auth/get-session";
 import { listStudentProjects } from "@/lib/application/projects/get-student-project";
 import { getStudentTrainingFlowState } from "@/lib/application/training-flow/get-student-training-flow-state";
 import { listEnrolledTrainings } from "@/lib/application/trainings/list-enrolled-trainings";
+import { MAX_PROJECTS_PER_TRAINING } from "@/lib/domain/projects/limits";
 import { canAccessProject } from "@/lib/domain/training-flow/gates";
 
 const PAGE_SIZE = 10;
@@ -42,9 +43,10 @@ export default async function StudentProjectsPage({
   }
 
   const { items: trainings, total, totalPages } = trainingsResult.data;
-  const projectByTraining = new Map(
-    projectsResult.data.map((project) => [project.trainingId, project]),
-  );
+  const projectCountByTraining = projectsResult.data.reduce((acc, project) => {
+    acc.set(project.trainingId, (acc.get(project.trainingId) ?? 0) + 1);
+    return acc;
+  }, new Map<string, number>());
   const projectAccessByTraining = new Map(
     await Promise.all(
       trainings.map(async (training) => {
@@ -68,7 +70,7 @@ export default async function StudentProjectsPage({
         <div className="container max-w-7xl min-w-0 space-y-6 p-4 sm:p-6 md:p-8">
           <AdminPageHeader
             title="Project Saya"
-            description="Unggah project (gambar, link video, dan file PDF) untuk setiap training yang Anda ikuti."
+            description="Unggah hingga 4 project (gambar, link video, dan file PDF) untuk setiap training yang Anda ikuti."
             actions={
               <ButtonLink variant="outline" href="/student/dashboard">
                 Kembali ke Dashboard
@@ -96,7 +98,8 @@ export default async function StudentProjectsPage({
                 ) : (
                   <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                     {trainings.map((training) => {
-                      const project = projectByTraining.get(training.id);
+                      const projectCount =
+                        projectCountByTraining.get(training.id) ?? 0;
                       const canUpload =
                         projectAccessByTraining.get(training.id) ?? false;
                       return (
@@ -114,8 +117,10 @@ export default async function StudentProjectsPage({
                                   <IconLock data-icon="inline-start" />
                                   Terkunci
                                 </Badge>
-                              ) : project ? (
-                                <Badge>Sudah dikumpulkan</Badge>
+                              ) : projectCount > 0 ? (
+                                <Badge>
+                                  {projectCount}/{MAX_PROJECTS_PER_TRAINING} project
+                                </Badge>
                               ) : (
                                 <Badge variant="secondary">Belum ada</Badge>
                               )}
@@ -126,11 +131,13 @@ export default async function StudentProjectsPage({
                           </div>
                           {canUpload ? (
                             <ButtonLink
-                              variant={project ? "outline" : "default"}
+                              variant={projectCount > 0 ? "outline" : "default"}
                               size="sm"
                               href={`/student/projects/${training.id}`}
                             >
-                              {project ? "Edit Project" : "Upload Project"}
+                              {projectCount > 0
+                                ? "Kelola Project"
+                                : "Upload Project"}
                             </ButtonLink>
                           ) : (
                             <div className="space-y-2">

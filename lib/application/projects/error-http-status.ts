@@ -11,6 +11,8 @@ export function projectErrorHttpStatus(error: ProjectErrorCode): number {
     case "TRAINING_NOT_FOUND":
     case "PROJECT_NOT_FOUND":
       return 404;
+    case "PROJECT_LIMIT_REACHED":
+      return 409;
     case "VALIDATION_ERROR":
     case "INVALID_FILE_TYPE":
     case "FILE_TOO_LARGE":

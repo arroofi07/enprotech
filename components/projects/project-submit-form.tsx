@@ -65,17 +65,20 @@ export function ProjectSubmitForm({
   useEffect(() => {
     if (state.success) {
       toast.success(state.message ?? "Project berhasil disimpan.");
-      router.push("/student/projects");
+      router.push(`/student/projects/${trainingId}`);
     } else if (state.error) {
       toast.error(state.message ?? "Gagal menyimpan project.");
     }
-  }, [state, router]);
+  }, [state, router, trainingId]);
 
   const canSubmit = Boolean(imageUrl) && Boolean(pdfUrl) && !isPending;
 
   return (
     <form action={formAction} className="space-y-8">
       <input type="hidden" name="trainingId" value={trainingId} />
+      {project ? (
+        <input type="hidden" name="projectId" value={project.id} />
+      ) : null}
       <input type="hidden" name="imageUrl" value={imageUrl} />
       <input type="hidden" name="pdfUrl" value={pdfUrl} />
       <input type="hidden" name="pdfFileSize" value={pdfSize ?? ""} />
