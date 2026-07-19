@@ -30,7 +30,7 @@ export default function VerifyPage() {
           <CardHeader>
             <CardTitle>Cek Sertifikat</CardTitle>
             <CardDescription>
-              Format nomor: CERT-&#123;KODE-TRAINING&#125;-&#123;TAHUN&#125;-&#123;URUTAN&#125;
+              Format nomor: CERT-&#123;KODE-TRAINING&#125;-&#123;TAHUN&#125;-&#123;URUTAN&#125;-&#123;KODE-UNIK&#125;
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">

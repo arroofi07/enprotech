@@ -13,13 +13,22 @@ describe("buildTrainingCode", () => {
 });
 
 describe("buildCertificateNumber", () => {
-  it("builds certificate number with expected format", () => {
-    expect(
-      buildCertificateNumber({
-        trainingTitle: "Leadership 101",
-        year: 2026,
-        sequence: 7,
-      }),
-    ).toBe("CERT-LEADERSHIP-1-2026-0007");
+  it("builds certificate number with expected prefix and unique suffix", () => {
+    const number = buildCertificateNumber({
+      trainingTitle: "Leadership 101",
+      year: 2026,
+      sequence: 7,
+    });
+
+    expect(number).toMatch(/^CERT-LEADERSHIP-1-2026-0007-[0-9A-F]{8}$/);
+  });
+
+  it("produces a distinct number on every call", () => {
+    const input = { trainingTitle: "Leadership 101", year: 2026, sequence: 7 };
+    const numbers = new Set(
+      Array.from({ length: 50 }, () => buildCertificateNumber(input)),
+    );
+
+    expect(numbers.size).toBe(50);
   });
 });

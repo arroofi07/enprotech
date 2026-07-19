@@ -37,7 +37,7 @@ export function VerifyCertificateForm({
         <Input
           id="certificateNumber"
           name="certificateNumber"
-          placeholder="CERT-TRAINING-2026-0001"
+          placeholder="CERT-TRAINING-2026-0001-3F9A21BC"
           value={certificateNumber}
           onChange={(event) => setCertificateNumber(event.target.value)}
           className={cn("h-10", inputClassName)}

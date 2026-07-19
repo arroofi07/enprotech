@@ -119,7 +119,7 @@ const FAQS = [
   {
     question: "Bagaimana cara memverifikasi sertifikat?",
     answer:
-      "Masukkan nomor sertifikat resmi (format CERT-KODE-TRAINING-TAHUN-URUTAN) di halaman verifikasi. Sistem akan menampilkan status keaslian beserta detail peserta dan training.",
+      "Masukkan nomor sertifikat resmi (format CERT-KODE-TRAINING-TAHUN-URUTAN-KODE-UNIK) di halaman verifikasi. Sistem akan menampilkan status keaslian beserta detail peserta dan training.",
   },
   {
     question: "Berapa lama durasi pelatihan?",
@@ -238,12 +238,12 @@ export function LandingCertificateVerification() {
                 Format nomor resmi
               </p>
               <p className="mt-2 font-mono text-sm font-medium text-primary-foreground">
-                CERT-&#123;KODE-TRAINING&#125;-&#123;TAHUN&#125;-&#123;URUTAN&#125;
+                CERT-&#123;KODE-TRAINING&#125;-&#123;TAHUN&#125;-&#123;URUTAN&#125;-&#123;KODE-UNIK&#125;
               </p>
               <p className="mt-2 text-sm text-primary-foreground/75">
                 Contoh:{" "}
                 <span className="font-mono text-primary-foreground">
-                  CERT-DEP-2026-0001
+                  CERT-DEP-2026-0001-3F9A21BC
                 </span>
               </p>
             </div>

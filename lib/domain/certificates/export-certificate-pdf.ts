@@ -345,23 +345,9 @@ export function buildCertificatePdfBuffer(
 
   ink(doc, INK);
   doc.setFont("helvetica", "bold");
-  const titleSize = fitFontSize(doc, data.trainingTitle, 430, 16, 11);
+  fitFontSize(doc, data.trainingTitle, 430, 16, 11);
   const titleLines = doc.splitTextToSize(data.trainingTitle, 430) as string[];
   doc.text(titleLines, CONTENT_CX, 340, { align: "center" });
-
-  const afterTitle = 340 + (titleLines.length - 1) * (titleSize + 3);
-
-  ink(doc, MUTED);
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(9.5);
-  doc.setCharSpace(0.4);
-  doc.text(
-    `Pre-Test ${data.preTestScore}  ·  Post-Test ${data.postTestScore}  ·  Nilai Akhir ${data.finalGrade}`,
-    CONTENT_CX,
-    afterTitle + 26,
-    { align: "center" },
-  );
-  doc.setCharSpace(0);
 
   drawQrCode(doc, verifyUrl(data.certificateNumber), 74, 432, 58);
   ink(doc, MUTED);

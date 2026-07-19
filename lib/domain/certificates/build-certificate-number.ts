@@ -1,3 +1,5 @@
+import { randomUUID } from "node:crypto";
+
 export function buildTrainingCode(trainingTitle: string): string {
   const normalized = trainingTitle
     .toUpperCase()
@@ -8,6 +10,11 @@ export function buildTrainingCode(trainingTitle: string): string {
   return normalized || "TRAINING";
 }
 
+/** Short, collision-resistant token appended to guarantee global uniqueness. */
+function buildUniqueSuffix(): string {
+  return randomUUID().replace(/-/g, "").slice(0, 8).toUpperCase();
+}
+
 export function buildCertificateNumber(input: {
   trainingTitle: string;
   year: number;
@@ -15,6 +22,7 @@ export function buildCertificateNumber(input: {
 }): string {
   const trainingCode = buildTrainingCode(input.trainingTitle);
   const sequence = String(input.sequence).padStart(4, "0");
+  const unique = buildUniqueSuffix();
 
-  return `CERT-${trainingCode}-${input.year}-${sequence}`;
+  return `CERT-${trainingCode}-${input.year}-${sequence}-${unique}`;
 }
