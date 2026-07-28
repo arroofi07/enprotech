@@ -7,3 +7,4 @@ export * from "./certificates";
 export * from "./notifications";
 export * from "./student-projects";
 export * from "./training-feedback";
+export * from "./community";

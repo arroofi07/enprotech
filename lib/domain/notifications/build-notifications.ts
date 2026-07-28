@@ -328,6 +328,33 @@ export function buildVideoConferenceScheduledNotification(input: {
   };
 }
 
+export function buildCommunityMeetingScheduledNotification(input: {
+  trainingId: string;
+  trainingName: string;
+  meetingId: string;
+  meetingTitle: string;
+  creatorName: string;
+  scheduledAt: string;
+  scheduledLabel: string;
+}) {
+  const data: NotificationData = {
+    href: `/student/community/${input.trainingId}?tab=meetings`,
+    trainingId: input.trainingId,
+    trainingName: input.trainingName,
+    meetingId: input.meetingId,
+    meetingTitle: input.meetingTitle,
+    scheduledAt: input.scheduledAt,
+    dedupKey: `community_meeting:${input.meetingId}`,
+  };
+
+  return {
+    type: NotificationType.COMMUNITY_MEETING_SCHEDULED,
+    title: "Jadwal meeting komunitas",
+    message: `${input.creatorName} menjadwalkan "${input.meetingTitle}" di ${input.trainingName} pada ${input.scheduledLabel}.`,
+    data,
+  };
+}
+
 // --- Tier 3 --------------------------------------------------------------
 
 function isUserRole(role: string): role is UserRole {

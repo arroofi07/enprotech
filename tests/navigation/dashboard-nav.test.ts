@@ -13,6 +13,23 @@ const LEARNING_FLOW_TITLES = [
   "Quiz",
   "Latihan",
   "Post Test",
+  "Batas Waktu",
+  "Bobot Soal",
+  "Project",
+  "Feedback",
+  "Nilai",
+  "Sertifikat",
+] as const;
+
+const STUDENT_LEARNING_FLOW_TITLES = [
+  "Pre Test",
+  "Modul",
+  "Video Conference",
+  "Quiz",
+  "Latihan",
+  "Post Test",
+  "Project",
+  "Feedback",
   "Nilai",
   "Sertifikat",
 ] as const;
@@ -78,7 +95,8 @@ describe("getDashboardNav", () => {
     expect(titles).toEqual([
       "Dashboard",
       "Training Saya",
-      ...LEARNING_FLOW_TITLES,
+      "Komunitas",
+      ...STUDENT_LEARNING_FLOW_TITLES,
     ]);
     expect(nav.homeHref).toBe("/student/dashboard");
   });

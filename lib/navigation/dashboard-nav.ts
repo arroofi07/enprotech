@@ -313,6 +313,13 @@ const STUDENT_NAV: DashboardNavGroup[] = [
         implemented: true,
         isActive: isStudentTrainingOverviewPath,
       },
+      {
+        title: "Komunitas",
+        href: "/student/community",
+        icon: IconUsers,
+        implemented: true,
+        activePrefixes: ["/student/community"],
+      },
     ],
   },
   {

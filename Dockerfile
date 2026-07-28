@@ -30,19 +30,25 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 CMD ["bun", "run", "db:migrate"]
 
-# ---- runner: image produksi minimal ----
+# ---- runner: Next standalone (3000) + community WebSocket sidecar (3001) ----
 FROM base AS runner
 ENV NODE_ENV=production \
     NEXT_TELEMETRY_DISABLED=1 \
     PORT=3000 \
-    HOSTNAME=0.0.0.0
+    HOSTNAME=0.0.0.0 \
+    COMMUNITY_WS_PORT=3001
 
 COPY --from=builder --chown=bun:bun /app/public ./public
 COPY --from=builder --chown=bun:bun /app/.next/standalone ./
 COPY --from=builder --chown=bun:bun /app/.next/static ./.next/static
+# WS hub + application code (imports @/lib from the sidecar process).
+COPY --from=builder --chown=bun:bun /app/server ./server
+COPY --from=builder --chown=bun:bun /app/lib ./lib
+COPY --from=builder --chown=bun:bun /app/tsconfig.json ./tsconfig.json
+COPY --from=builder --chown=bun:bun /app/package.json ./package.json
+# Full deps so the WS sidecar can resolve drizzle/jose/ws/etc.
+COPY --from=deps --chown=bun:bun /app/node_modules ./node_modules
 
 USER bun
-EXPOSE 3000
-# Standalone server.js dijalankan oleh Bun. Jika ada isu kompat runtime,
-# ganti base runner ke `node:22-slim` + CMD ["node", "server.js"].
-CMD ["bun", "server.js"]
+EXPOSE 3000 3001
+CMD ["bun", "run", "server/start-docker.ts"]

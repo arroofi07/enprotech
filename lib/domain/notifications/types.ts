@@ -12,6 +12,7 @@ export const NotificationType = {
   POST_TEST_RESULT_STAFF: "post_test_result_staff",
   TRAINING_PUBLISHED: "training_published",
   VIDEO_CONFERENCE_SCHEDULED: "video_conference_scheduled",
+  COMMUNITY_MEETING_SCHEDULED: "community_meeting_scheduled",
   ROLE_CHANGED: "role_changed",
   ACCOUNT_DEACTIVATED: "account_deactivated",
 } as const;
@@ -39,6 +40,8 @@ export type NotificationData = {
   userName?: string;
   scheduledAt?: string;
   certificateId?: string;
+  meetingId?: string;
+  meetingTitle?: string;
 };
 
 export type NotificationRecord = {
