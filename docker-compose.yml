@@ -12,7 +12,8 @@ services:
       DATABASE_URL: ${DATABASE_URL}
       SESSION_SECRET: ${SESSION_SECRET}
       SESSION_MAX_AGE: ${SESSION_MAX_AGE:-604800}
-      # Opsional: override URL WebSocket komunitas (default: same-origin /api/community/ws)
+      # Opsional: override URL WebSocket komunitas.
+      # Default produksi: same-origin wss://<domain>/api/community/ws (gateway di :3000).
       NEXT_PUBLIC_COMMUNITY_WS_URL: ${NEXT_PUBLIC_COMMUNITY_WS_URL:-}
       S3_ENDPOINT: ${S3_ENDPOINT:?wajib diisi, mis. https://cdn.enprotech.id}
       S3_ACCESS_KEY_ID: ${S3_ACCESS_KEY_ID:?wajib diisi, samakan dengan RUSTFS_ACCESS_KEY}
@@ -22,8 +23,6 @@ services:
       S3_PUBLIC_URL: ${S3_PUBLIC_URL:-${S3_ENDPOINT}}
     ports:
       - "3000:3000"
-      # Community chat WebSocket sidecar (browser on :3000 connects here)
-      - "3001:3001"
     networks:
       - default
       - dokploy-network

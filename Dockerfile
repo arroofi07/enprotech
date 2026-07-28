@@ -25,30 +25,30 @@ RUN bun run build
 
 # ---- tooling: image untuk migrate & seed one-off (punya source + drizzle-kit) ----
 FROM base AS tooling
-ENV NODE_ENV=production
+ENV NODE_ENV=production \
+    NEXT_TELEMETRY_DISABLED=1
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 CMD ["bun", "run", "db:migrate"]
 
-# ---- runner: Next standalone (3000) + community WebSocket sidecar (3001) ----
+# ---- runner: gateway :3000 (HTTP proxy + WS) → Next internal :3002 ----
 FROM base AS runner
 ENV NODE_ENV=production \
     NEXT_TELEMETRY_DISABLED=1 \
     PORT=3000 \
     HOSTNAME=0.0.0.0 \
-    COMMUNITY_WS_PORT=3001
+    NEXT_INTERNAL_PORT=3002
 
 COPY --from=builder --chown=bun:bun /app/public ./public
 COPY --from=builder --chown=bun:bun /app/.next/standalone ./
 COPY --from=builder --chown=bun:bun /app/.next/static ./.next/static
-# WS hub + application code (imports @/lib from the sidecar process).
 COPY --from=builder --chown=bun:bun /app/server ./server
 COPY --from=builder --chown=bun:bun /app/lib ./lib
 COPY --from=builder --chown=bun:bun /app/tsconfig.json ./tsconfig.json
 COPY --from=builder --chown=bun:bun /app/package.json ./package.json
-# Full deps so the WS sidecar can resolve drizzle/jose/ws/etc.
 COPY --from=deps --chown=bun:bun /app/node_modules ./node_modules
 
 USER bun
-EXPOSE 3000 3001
+EXPOSE 3000
+# Gateway menempelkan WebSocket di /api/community/ws pada port publik yang sama.
 CMD ["bun", "run", "server/start-docker.ts"]
