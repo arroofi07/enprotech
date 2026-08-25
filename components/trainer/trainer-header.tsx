@@ -32,8 +32,8 @@ export function TrainerHeader({ title, breadcrumbs = [], user }: TrainerHeaderPr
   const home = getHomeCrumb(user);
 
   return (
-    <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center gap-3 border-b bg-background/95 px-6 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <SidebarTrigger className="-ml-2" />
+    <header className="sticky top-0 z-10 flex h-14 shrink-0 items-center gap-3 border-b border-border/70 bg-background/80 px-4 backdrop-blur-md supports-[backdrop-filter]:bg-background/65 sm:h-16 sm:px-6">
+      <SidebarTrigger className="-ml-1" />
       <Separator orientation="vertical" className="h-5" />
       <Breadcrumb>
         <BreadcrumbList className="text-sm">

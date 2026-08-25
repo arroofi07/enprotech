@@ -2,26 +2,24 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import {
   IconArrowRight,
+  IconChevronRight,
   IconUserCheck,
   IconUserOff,
-  IconUsers,
   IconUserPlus,
-  IconChevronRight,
+  IconUsers,
 } from "@tabler/icons-react";
 
 import { AdminHeader } from "@/components/admin/admin-header";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
+import { DashboardEmptyState } from "@/components/dashboard/dashboard-empty-state";
+import { DashboardMain } from "@/components/dashboard/dashboard-main";
+import { DashboardPanel } from "@/components/dashboard/dashboard-panel";
+import { DashboardQuickLink } from "@/components/dashboard/dashboard-quick-link";
+import { DashboardStatCard } from "@/components/dashboard/dashboard-stat-card";
 import { TrainingPublicationSummary } from "@/components/trainings/training-publication-summary";
 import { TrainingStatusBadge } from "@/components/trainings/training-status-badge";
 import { Badge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button-link";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { getCurrentUser } from "@/lib/application/auth/get-session";
 import { listTrainings } from "@/lib/application/trainings/list-trainings";
 import { listUsers } from "@/lib/application/users/list-users";
@@ -62,264 +60,169 @@ export default async function AdminDashboardPage() {
       value: total,
       description: "Semua akun terdaftar",
       icon: IconUsers,
-      color: "bg-blue-500/10 text-blue-600 dark:text-blue-400",
-      iconBg: "bg-blue-500/10",
     },
     {
       title: "Menunggu Approve",
       value: pendingTotal,
       description: "Perlu ditinjau Admin",
       icon: IconUserPlus,
-      color: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
-      iconBg: "bg-amber-500/10",
     },
     {
       title: "Aktif",
       value: activeTotal,
       description: "Dapat login ke sistem",
       icon: IconUserCheck,
-      color: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
-      iconBg: "bg-emerald-500/10",
     },
     {
       title: "Nonaktif",
       value: inactiveTotal,
       description: "Diblokir dari login",
       icon: IconUserOff,
-      color: "bg-rose-500/10 text-rose-600 dark:text-rose-400",
-      iconBg: "bg-rose-500/10",
+    },
+  ] as const;
+
+  const quickActions = [
+    {
+      title: "Semua Pengguna",
+      description: "Lihat daftar lengkap",
+      href: "/admin/users",
+      icon: IconUsers,
+    },
+    {
+      title: "Approve Pending",
+      description: `${pendingTotal} menunggu`,
+      href: "/admin/users?status=pending",
+      icon: IconUserPlus,
+    },
+    {
+      title: "Pengguna Aktif",
+      description: `${activeTotal} aktif`,
+      href: "/admin/users?status=active",
+      icon: IconUserCheck,
+    },
+    {
+      title: "Akun Nonaktif",
+      description: `${inactiveTotal} diblokir`,
+      href: "/admin/users?status=inactive",
+      icon: IconUserOff,
     },
   ] as const;
 
   return (
     <>
       <AdminHeader title="Dashboard" />
-      <main className="flex-1 overflow-auto">
-        <div className="container max-w-7xl min-w-0 space-y-8 p-4 sm:p-6 md:p-8">
-          <AdminPageHeader
-            title={`Selamat datang, ${user.name.split(" ")[0]}!`}
-            description="Ringkasan sistem dan akses cepat ke manajemen pengguna."
-            actions={
-              <ButtonLink size="lg" href="/admin/users">
-                Kelola Pengguna
-                <IconArrowRight data-icon="inline-end" />
-              </ButtonLink>
-            }
-          />
+      <DashboardMain>
+        <AdminPageHeader
+          eyebrow="Dashboard Admin"
+          title={`Selamat datang, ${user.name.split(" ")[0]}!`}
+          description="Ringkasan sistem dan akses cepat ke manajemen pengguna."
+          actions={
+            <ButtonLink size="lg" href="/admin/users" className="rounded-full">
+              Kelola Pengguna
+              <IconArrowRight data-icon="inline-end" />
+            </ButtonLink>
+          }
+        />
 
-          {/* Stats Grid */}
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {stats.map((stat) => (
-              <Card key={stat.title} className="relative overflow-hidden">
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardDescription className="text-sm font-medium">
-                    {stat.title}
-                  </CardDescription>
-                  <div className={`rounded-lg p-2 ${stat.iconBg}`}>
-                    <stat.icon className={`size-5 ${stat.color.split(" ").slice(1).join(" ")}`} />
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="font-heading text-3xl font-bold tracking-tight sm:text-4xl">
-                    {stat.value}
-                  </p>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    {stat.description}
-                  </p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          {/* Main Content Grid */}
-          <div className="grid gap-6 lg:grid-cols-5">
-            {/* Pending Approvals - Takes more space */}
-            <Card className="lg:col-span-3">
-              <CardHeader className="flex flex-row items-center justify-between">
-                <div>
-                  <CardTitle className="text-lg">Menunggu Persetujuan</CardTitle>
-                  <CardDescription>
-                    Pengguna baru yang belum dapat login
-                  </CardDescription>
-                </div>
-                <ButtonLink variant="outline" href="/admin/users?status=pending">
-                  Lihat Semua
-                  <IconChevronRight data-icon="inline-end" className="size-4" />
-                </ButtonLink>
-              </CardHeader>
-              <CardContent>
-                {pendingItems.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed py-12">
-                    <div className="rounded-full bg-muted p-4">
-                      <IconUserCheck className="size-8 text-muted-foreground" />
-                    </div>
-                    <p className="mt-4 text-center text-sm font-medium text-muted-foreground">
-                      Tidak ada permintaan approve saat ini
-                    </p>
-                    <p className="mt-1 text-center text-xs text-muted-foreground">
-                      Semua pengguna sudah diproses
-                    </p>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {pendingItems.map((item) => (
-                      <div
-                        key={item.id}
-                        className="flex items-center justify-between gap-4 rounded-lg border bg-card p-4 transition-colors hover:bg-muted/50"
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="flex size-10 items-center justify-center rounded-full bg-amber-500/10 font-medium text-amber-600">
-                            {item.name.charAt(0).toUpperCase()}
-                          </div>
-                          <div className="min-w-0">
-                            <p className="truncate font-medium">
-                              {formatUserDisplayName(item)}
-                            </p>
-                            <p className="truncate text-sm text-muted-foreground">
-                              {item.email}
-                            </p>
-                          </div>
-                        </div>
-                        <Badge variant="secondary" className="capitalize shrink-0">
-                          {item.role}
-                        </Badge>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Quick Actions */}
-            <Card className="lg:col-span-2">
-              <CardHeader>
-                <CardTitle className="text-lg">Aksi Cepat</CardTitle>
-                <CardDescription>
-                  Shortcut ke fitur yang sering digunakan
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <Link
-                  href="/admin/users"
-                  className="flex items-center justify-between rounded-lg border bg-card p-4 transition-all hover:border-primary/50 hover:bg-muted/50 hover:shadow-sm"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="flex size-10 items-center justify-center rounded-lg bg-blue-500/10">
-                      <IconUsers className="size-5 text-blue-600" />
-                    </div>
-                    <div>
-                      <p className="font-medium">Semua Pengguna</p>
-                      <p className="text-sm text-muted-foreground">
-                        Lihat daftar lengkap
-                      </p>
-                    </div>
-                  </div>
-                  <IconChevronRight className="size-5 text-muted-foreground" />
-                </Link>
-
-                <Link
-                  href="/admin/users?status=pending"
-                  className="flex items-center justify-between rounded-lg border bg-card p-4 transition-all hover:border-primary/50 hover:bg-muted/50 hover:shadow-sm"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="flex size-10 items-center justify-center rounded-lg bg-amber-500/10">
-                      <IconUserPlus className="size-5 text-amber-600" />
-                    </div>
-                    <div>
-                      <p className="font-medium">Approve Pending</p>
-                      <p className="text-sm text-muted-foreground">
-                        {pendingTotal} menunggu
-                      </p>
-                    </div>
-                  </div>
-                  <IconChevronRight className="size-5 text-muted-foreground" />
-                </Link>
-
-                <Link
-                  href="/admin/users?status=active"
-                  className="flex items-center justify-between rounded-lg border bg-card p-4 transition-all hover:border-primary/50 hover:bg-muted/50 hover:shadow-sm"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="flex size-10 items-center justify-center rounded-lg bg-emerald-500/10">
-                      <IconUserCheck className="size-5 text-emerald-600" />
-                    </div>
-                    <div>
-                      <p className="font-medium">Pengguna Aktif</p>
-                      <p className="text-sm text-muted-foreground">
-                        {activeTotal} aktif
-                      </p>
-                    </div>
-                  </div>
-                  <IconChevronRight className="size-5 text-muted-foreground" />
-                </Link>
-
-                <Link
-                  href="/admin/users?status=inactive"
-                  className="flex items-center justify-between rounded-lg border bg-card p-4 transition-all hover:border-primary/50 hover:bg-muted/50 hover:shadow-sm"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="flex size-10 items-center justify-center rounded-lg bg-rose-500/10">
-                      <IconUserOff className="size-5 text-rose-600" />
-                    </div>
-                    <div>
-                      <p className="font-medium">Akun Nonaktif</p>
-                      <p className="text-sm text-muted-foreground">
-                        {inactiveTotal} diblokir
-                      </p>
-                    </div>
-                  </div>
-                  <IconChevronRight className="size-5 text-muted-foreground" />
-                </Link>
-              </CardContent>
-            </Card>
-          </div>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <div>
-                <CardTitle className="text-lg">
-                  Kelengkapan Training Terbaru
-                </CardTitle>
-                <CardDescription>
-                  Ringkasan modul dan soal sebelum training dipublikasikan
-                </CardDescription>
-              </div>
-              <ButtonLink variant="outline" href="/trainer/modules">
-                Lihat Semua
-                <IconChevronRight data-icon="inline-end" className="size-4" />
-              </ButtonLink>
-            </CardHeader>
-            <CardContent>
-              {recentTrainingItems.length === 0 ? (
-                <p className="py-8 text-center text-sm text-muted-foreground">
-                  Belum ada training.
-                </p>
-              ) : (
-                <div className="space-y-3">
-                  {recentTrainingItems.map((training) => (
-                    <Link
-                      key={training.id}
-                      href={`/trainer/trainings/${training.id}/edit`}
-                      className="block space-y-3 rounded-lg border bg-card p-4 transition-colors hover:bg-muted/50"
-                    >
-                      <div className="flex items-center justify-between gap-4">
-                        <p className="truncate font-medium">{training.title}</p>
-                        <TrainingStatusBadge status={training.status} />
-                      </div>
-                      {publicationSummaries[training.id] ? (
-                        <TrainingPublicationSummary
-                          summary={publicationSummaries[training.id]}
-                          compact
-                        />
-                      ) : null}
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {stats.map((stat) => (
+            <DashboardStatCard key={stat.title} {...stat} />
+          ))}
         </div>
-      </main>
+
+        <div className="grid gap-6 lg:grid-cols-5">
+          <DashboardPanel
+            className="lg:col-span-3"
+            title="Menunggu Persetujuan"
+            description="Pengguna baru yang belum dapat login"
+            actionHref="/admin/users?status=pending"
+          >
+            {pendingItems.length === 0 ? (
+              <DashboardEmptyState
+                icon={IconUserCheck}
+                title="Tidak ada permintaan approve saat ini"
+                description="Semua pengguna sudah diproses"
+              />
+            ) : (
+              <div className="space-y-2">
+                {pendingItems.map((item) => (
+                  <div
+                    key={item.id}
+                    className="flex items-center justify-between gap-4 rounded-xl p-3 transition-colors hover:bg-primary/5"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="flex size-10 items-center justify-center rounded-full bg-primary/10 font-semibold text-primary">
+                        {item.name.charAt(0).toUpperCase()}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="truncate font-medium">
+                          {formatUserDisplayName(item)}
+                        </p>
+                        <p className="truncate text-sm text-muted-foreground">
+                          {item.email}
+                        </p>
+                      </div>
+                    </div>
+                    <Badge variant="secondary" className="shrink-0 capitalize">
+                      {item.role}
+                    </Badge>
+                  </div>
+                ))}
+              </div>
+            )}
+          </DashboardPanel>
+
+          <DashboardPanel
+            className="lg:col-span-2"
+            title="Aksi Cepat"
+            description="Shortcut ke fitur yang sering digunakan"
+          >
+            <div className="-mx-1 space-y-0.5">
+              {quickActions.map((action) => (
+                <DashboardQuickLink key={action.title} {...action} />
+              ))}
+            </div>
+          </DashboardPanel>
+        </div>
+
+        <DashboardPanel
+          title="Kelengkapan Training Terbaru"
+          description="Ringkasan modul dan soal sebelum training dipublikasikan"
+          actionHref="/trainer/modules"
+        >
+          {recentTrainingItems.length === 0 ? (
+            <p className="py-8 text-center text-sm text-muted-foreground">
+              Belum ada training.
+            </p>
+          ) : (
+            <div className="space-y-2">
+              {recentTrainingItems.map((training) => (
+                <Link
+                  key={training.id}
+                  href={`/trainer/trainings/${training.id}/edit`}
+                  className="group block space-y-3 rounded-xl p-3 transition-colors hover:bg-primary/5"
+                >
+                  <div className="flex items-center justify-between gap-4">
+                    <p className="truncate font-medium group-hover:text-primary">
+                      {training.title}
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <TrainingStatusBadge status={training.status} />
+                      <IconChevronRight className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-primary" />
+                    </div>
+                  </div>
+                  {publicationSummaries[training.id] ? (
+                    <TrainingPublicationSummary
+                      summary={publicationSummaries[training.id]}
+                      compact
+                    />
+                  ) : null}
+                </Link>
+              ))}
+            </div>
+          )}
+        </DashboardPanel>
+      </DashboardMain>
     </>
   );
 }

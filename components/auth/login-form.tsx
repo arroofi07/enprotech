@@ -78,16 +78,16 @@ export function LoginForm() {
 
   return (
     <div className="w-full">
-      <CardHeader className="mb-2 px-0">
-        <CardTitle className="text-2xl font-bold tracking-tight">
+      <CardHeader className="mb-6 gap-1.5 px-0">
+        <CardTitle className="font-heading text-2xl font-semibold tracking-tight">
           Masuk ke akun Anda
         </CardTitle>
-        <CardDescription>
+        <CardDescription className="text-sm leading-relaxed">
           Gunakan email dan password yang telah terdaftar.
         </CardDescription>
       </CardHeader>
 
-      <form onSubmit={onSubmit} className="space-y-4">
+      <form onSubmit={onSubmit} className="space-y-5">
         <FieldGroup>
           <Field data-invalid={!!errors.email}>
             <FieldLabel htmlFor="email">Email</FieldLabel>
@@ -96,6 +96,7 @@ export function LoginForm() {
               type="email"
               autoComplete="email"
               placeholder="nama@perusahaan.com"
+              className="h-11"
               {...register("email")}
             />
             <FieldError errors={[errors.email]} />
@@ -103,7 +104,7 @@ export function LoginForm() {
 
           <Field data-invalid={!!errors.password}>
             <FieldLabel htmlFor="password">Password</FieldLabel>
-            <InputGroup>
+            <InputGroup className="h-11">
               <InputGroupInput
                 id="password"
                 type={showPassword ? "text" : "password"}
@@ -126,19 +127,23 @@ export function LoginForm() {
             <FieldError errors={[errors.password]} />
           </Field>
 
-          <Button type="submit" className="w-full" disabled={isPending}>
+          <Button
+            type="submit"
+            className="mt-1 h-11 w-full rounded-full text-sm font-semibold"
+            disabled={isPending}
+          >
             {isPending ? <Spinner data-icon="inline-start" /> : null}
             Masuk
           </Button>
         </FieldGroup>
       </form>
 
-      <p className="mt-4 text-center text-xs text-muted-foreground">
+      <p className="mt-6 text-center text-sm text-muted-foreground">
         Belum punya akun?{" "}
         <ButtonLink
           href="/register"
           variant="link"
-          className="h-auto p-0 text-xs"
+          className="h-auto p-0 text-sm font-medium"
         >
           Daftar sekarang
         </ButtonLink>

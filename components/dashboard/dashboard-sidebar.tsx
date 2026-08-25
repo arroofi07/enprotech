@@ -50,21 +50,24 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
 
   return (
     <Sidebar collapsible="icon" variant="sidebar">
-      <SidebarHeader className="p-4">
+      <SidebarHeader className="gap-0 p-3">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
               size="lg"
               tooltip="Enprotech"
-              className="h-auto py-3"
+              className="h-auto gap-3 rounded-xl px-3 py-3 hover:bg-sidebar-accent"
               render={<Link href={homeHref} />}
             >
               <BrandLogo
                 priority
-                className="h-10 w-auto max-w-36 shrink-0 group-data-[collapsible=icon]:h-8 group-data-[collapsible=icon]:max-w-8"
+                className="h-9 w-auto max-w-32 shrink-0 group-data-[collapsible=icon]:h-8 group-data-[collapsible=icon]:max-w-8"
               />
               <div className="grid flex-1 text-left leading-tight group-data-[collapsible=icon]:hidden">
-                <span className="text-xs text-sidebar-muted-foreground">
+                <span className="font-heading text-sm font-semibold tracking-tight text-sidebar-foreground">
+                  Enprotech
+                </span>
+                <span className="text-[0.65rem] font-medium tracking-wide text-sidebar-muted-foreground uppercase">
                   {shellLabel}
                 </span>
               </div>
@@ -75,8 +78,8 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
 
       <SidebarContent className="px-2">
         {groups.map((group) => (
-          <SidebarGroup key={group.label}>
-            <SidebarGroupLabel className="px-3 text-xs font-medium uppercase tracking-wider text-sidebar-muted-foreground">
+          <SidebarGroup key={group.label} className="py-2">
+            <SidebarGroupLabel className="px-3 text-[0.65rem] font-semibold tracking-[0.14em] text-sidebar-muted-foreground uppercase">
               {group.label}
             </SidebarGroupLabel>
             <SidebarGroupContent>
@@ -89,7 +92,7 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
                       <SidebarMenuButton
                         isActive={isActive}
                         tooltip={item.title}
-                        className="h-10 text-sm [&_svg]:size-5"
+                        className="h-10 rounded-lg text-sm transition-colors data-[active=true]:bg-sidebar-primary/20 data-[active=true]:font-medium data-[active=true]:text-sidebar-primary [&_svg]:size-5"
                         render={<Link href={item.href} />}
                       >
                         <item.icon />
@@ -116,9 +119,9 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
 
       <SidebarFooter className="p-3">
         <SidebarSeparator className="mb-3" />
-        <div className="flex items-center gap-3 rounded-lg bg-sidebar-accent/50 p-3 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:bg-transparent group-data-[collapsible=icon]:p-0">
+        <div className="flex items-center gap-3 rounded-xl border border-sidebar-border/50 bg-sidebar-accent/40 p-3 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:border-0 group-data-[collapsible=icon]:bg-transparent group-data-[collapsible=icon]:p-0">
           <Avatar>
-            <AvatarFallback className="bg-primary text-primary-foreground text-sm font-medium">
+            <AvatarFallback className="bg-sidebar-primary text-sm font-semibold text-sidebar-primary-foreground">
               {getInitials(user.name)}
             </AvatarFallback>
           </Avatar>
@@ -136,7 +139,7 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
             <form action={logoutAction} className="w-full">
               <SidebarMenuButton
                 tooltip="Keluar"
-                className="h-10 text-sm text-sidebar-destructive hover:bg-sidebar-destructive/15 hover:text-sidebar-destructive [&_svg]:size-5"
+                className="h-10 rounded-lg text-sm text-sidebar-destructive hover:bg-sidebar-destructive/15 hover:text-sidebar-destructive [&_svg]:size-5"
                 render={<button type="submit" />}
               >
                 <IconLogout />

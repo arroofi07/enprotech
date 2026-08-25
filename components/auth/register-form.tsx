@@ -80,16 +80,16 @@ export function RegisterForm() {
 
   return (
     <div className="w-full">
-      <CardHeader className="mb-2 px-0">
-        <CardTitle className="text-2xl font-bold tracking-tight">
+      <CardHeader className="mb-6 gap-1.5 px-0">
+        <CardTitle className="font-heading text-2xl font-semibold tracking-tight">
           Buat akun baru
         </CardTitle>
-        <CardDescription>
+        <CardDescription className="text-sm leading-relaxed">
           Akun akan aktif setelah disetujui Admin.
         </CardDescription>
       </CardHeader>
 
-      <form onSubmit={onSubmit} className="space-y-4">
+      <form onSubmit={onSubmit} className="space-y-5">
         <FieldGroup>
           <Field data-invalid={!!errors.name}>
             <FieldLabel htmlFor="name">Nama Lengkap</FieldLabel>
@@ -97,6 +97,7 @@ export function RegisterForm() {
               id="name"
               autoComplete="name"
               placeholder="Nama lengkap"
+              className="h-11"
               {...register("name")}
             />
             <FieldError errors={[errors.name]} />
@@ -109,6 +110,7 @@ export function RegisterForm() {
               type="email"
               autoComplete="email"
               placeholder="nama@perusahaan.com"
+              className="h-11"
               {...register("email")}
             />
             <FieldError errors={[errors.email]} />
@@ -116,7 +118,7 @@ export function RegisterForm() {
 
           <Field data-invalid={!!errors.password}>
             <FieldLabel htmlFor="password">Password</FieldLabel>
-            <InputGroup>
+            <InputGroup className="h-11">
               <InputGroupInput
                 id="password"
                 type={showPassword ? "text" : "password"}
@@ -143,7 +145,7 @@ export function RegisterForm() {
             <FieldLabel htmlFor="confirmPassword">
               Konfirmasi Password
             </FieldLabel>
-            <InputGroup>
+            <InputGroup className="h-11">
               <InputGroupInput
                 id="confirmPassword"
                 type={showConfirmPassword ? "text" : "password"}
@@ -168,19 +170,23 @@ export function RegisterForm() {
             <FieldError errors={[errors.confirmPassword]} />
           </Field>
 
-          <Button type="submit" className="w-full" disabled={isPending}>
+          <Button
+            type="submit"
+            className="mt-1 h-11 w-full rounded-full text-sm font-semibold"
+            disabled={isPending}
+          >
             {isPending ? <Spinner data-icon="inline-start" /> : null}
             Daftar
           </Button>
         </FieldGroup>
       </form>
 
-      <p className="mt-4 text-center text-xs text-muted-foreground">
+      <p className="mt-6 text-center text-sm text-muted-foreground">
         Sudah punya akun?{" "}
         <ButtonLink
           href="/login"
           variant="link"
-          className="h-auto p-0 text-xs"
+          className="h-auto p-0 text-sm font-medium"
         >
           Masuk di sini
         </ButtonLink>
