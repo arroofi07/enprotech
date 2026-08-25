@@ -193,12 +193,6 @@ export function TrainingCreateForm() {
                 required
                 className="h-10 text-sm md:text-sm"
               />
-              <FieldDescription>
-                Nilai minimum (1–100%) agar peserta dinyatakan lulus. Tidak
-                boleh 0: passing grade 0% membuat peserta otomatis dianggap
-                lulus dengan nilai 0 dan justru terkunci sehingga tidak bisa
-                mengerjakan soal.
-              </FieldDescription>
             </Field>
           </CollapsibleContent>
         </Collapsible>

@@ -611,8 +611,7 @@ export function AssessmentTakeView({
               <span>
                 Jawaban tersimpan otomatis. Semua soal wajib dijawab sebelum
                 submit manual. Jika waktu habis, jawaban yang sudah dipilih
-                akan dikirim otomatis dan soal kosong dihitung salah. Kamu
-                dapat mencoba lagi selama belum lulus.
+                akan dikirim otomatis dan soal kosong dihitung salah.
               </span>
             </div>
 
