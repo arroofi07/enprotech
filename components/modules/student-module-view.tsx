@@ -179,9 +179,6 @@ export function StudentModuleView({
               <span className="font-medium tabular-nums">{completionPercent}%</span>
             </div>
             <Progress value={completionPercent} className="h-2" />
-            <p className="text-xs text-muted-foreground">
-              Selesaikan materi, quiz, dan latihan untuk menyelesaikan modul ini.
-            </p>
           </div>
         </div>
       </section>
